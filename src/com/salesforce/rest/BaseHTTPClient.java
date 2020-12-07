@@ -54,11 +54,12 @@ public class BaseHTTPClient {
 
   public String delete(HttpDelete deleteRequest) throws IOException, AuthenticationException {
     CloseableHttpClient httpClient = HttpClients.createDefault();
+    printRequest(deleteRequest);
     HttpResponse response = httpClient.execute(deleteRequest);
     checkResponse(response, "DELETE");
-    String responseText = getResponseText(response);
+    //String responseText = getResponseText(response);
     httpClient.close();
-    return responseText ;
+    return "";
   }
 
   public String patch(HttpPatch patchRequest) throws IOException, AuthenticationException {
@@ -99,6 +100,14 @@ public class BaseHTTPClient {
       System.out.println(EntityUtils.toString(postRequest.getEntity()));
     } catch (IOException e) {
       e.printStackTrace();
+    }
+  }
+
+  public void printRequest(HttpDelete deleteRequest) {
+    System.out.println("Sending DELETE request to " + deleteRequest.getURI());
+    System.out.println("Available headers:");
+    for (Header header : deleteRequest.getAllHeaders()) {
+      System.out.println(header.getName() + ": " + header.getValue());
     }
   }
 }

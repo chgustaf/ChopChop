@@ -34,7 +34,8 @@ public class SalesforceClient {
   public final String baseEndpoint = "/services/data/v"+apiVersion+".0/";
   public final String queryEndpoint = baseEndpoint+"query/?q=";
   public final String queryAllEndpoint = baseEndpoint+"query/?q=";
-  public final String postEndpoint = baseEndpoint+"sobjects/";
+  public final String sobjectEndpoint = baseEndpoint + "sobjects/";
+  public final String multipleRecordsEndpoint = baseEndpoint + "composite/tree/";
   public AccessParameters accessParameters;
   public final BaseHTTPClient httpClient;
   public final Secrets secrets;
@@ -82,11 +83,20 @@ public class SalesforceClient {
     getRequest.addHeader("accept", "application/json");
     getRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
     return executeHttpRequest(getRequest);
-
   }
 
-  public String post(String objectName, String body) throws IOException, AuthenticationException {
-    HttpPost postRequest = new HttpPost(accessParameters.instanceUrl + postEndpoint + objectName);
+  public String postMultipleRecords(String objectName, String body)
+      throws IOException, AuthenticationException {
+    HttpPost postRequest = new HttpPost(accessParameters.instanceUrl + multipleRecordsEndpoint
+                                        + objectName);
+    postRequest.addHeader("Content-Type", "application/json");
+    postRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
+    postRequest.setEntity(new StringEntity(body));
+    return executeHttpRequest(postRequest);
+  }
+
+  public String postSingleRecord(String objectName, String body) throws IOException, AuthenticationException {
+    HttpPost postRequest = new HttpPost(accessParameters.instanceUrl + sobjectEndpoint + objectName);
     postRequest.addHeader("Content-Type", "application/json");
     postRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
     postRequest.setEntity(new StringEntity(body));
@@ -100,12 +110,16 @@ public class SalesforceClient {
     return executeHttpRequest(patchRequest);
   }
 
-  public String delete(String url) throws IOException, AuthenticationException {
-    HttpDelete deleteRequest = new HttpDelete(url);
-    deleteRequest.addHeader("accept", "application/json");
+  public String deleteSingleRecord(String objectName, String recordId) throws IOException,
+                                                               AuthenticationException {
+    HttpDelete deleteRequest =
+        new HttpDelete(accessParameters.instanceUrl + sobjectEndpoint + objectName +"/" + recordId);
+    deleteRequest.addHeader("X", "DELETE");
     deleteRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
     return executeHttpRequest(deleteRequest);
   }
+
+
 
   public String executeHttpRequest(HttpRequest request)
       throws IOException, AuthenticationException {
@@ -147,6 +161,5 @@ public class SalesforceClient {
     return get(url);
   }
 
-  //TODO: fix GIT
   //TODO: Retry JWT process and document
 }
