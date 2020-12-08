@@ -116,6 +116,10 @@ public class SalesforceCaseClient {
     //client.deleteSingleRecord()
   }
 
+  public void deleteAccounts(List<String> ids) throws IOException, AuthenticationException {
+    System.out.println(client.deleteMultipleRecords(ids, true));
+  }
+
   public void deleteAccount(Account account) throws IOException, AuthenticationException {
     String str = client.deleteSingleRecord("account", account.getId());
     System.out.println("Deleted "+str);

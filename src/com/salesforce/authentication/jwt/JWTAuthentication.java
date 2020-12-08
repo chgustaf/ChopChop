@@ -41,7 +41,7 @@ public class JWTAuthentication extends Authentication {
     httpPost.setHeader("Host", "login.example.com");
     httpPost.setHeader("Content-type", "application/x-www-form-urlencoded");
     httpPost.setEntity(getJWTEntity(jwt));
-    String returnJson = post(httpPost);
+    String returnJson = post(httpPost).getResponseBody();
     ObjectMapper objectMapper = new ObjectMapper();
     AccessParameters accessParameters = objectMapper.readValue(returnJson, AccessParameters.class);
     return accessParameters;

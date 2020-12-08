@@ -1,6 +1,7 @@
 package com.salesforce.rest;
 
 import static com.salesforce.exceptions.AuthenticationException.Code.UNAUTHORIZED;
+import static com.salesforce.rest.TransactionResponse.Action.DELETE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.salesforce.exceptions.AuthenticationException;
@@ -33,45 +34,66 @@ public class BaseHTTPClient {
     acceptableResponseCodes.put("DELETE", new HashSet<>(Arrays.asList(200, 202, 204)));
   }
 
-  public String post(HttpPost postRequest) throws IOException, AuthenticationException {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
+  public TransactionResponse post(HttpPost postRequest) throws IOException, AuthenticationException {
+    CloseableHttpClient httpClient = getClosableHttpClient();
     printRequest(postRequest);
     HttpResponse response = httpClient.execute(postRequest);
-    checkResponse(response, "POST");
+    retryIfNeeded(response, "POST");
     String responseText = getResponseText(response);
     httpClient.close();
-    return responseText;
+    return new TransactionResponseBuilder().createTransactionResponse();
   }
 
-  public String get(HttpGet getRequest) throws IOException, AuthenticationException {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
+  public TransactionResponse get(HttpGet getRequest) throws IOException, AuthenticationException {
+    CloseableHttpClient httpClient = getClosableHttpClient();
     HttpResponse response = httpClient.execute(getRequest);
-    checkResponse(response, "GET");
+    retryIfNeeded(response, "GET");
     String text = getResponseText(response);
     httpClient.close();
-    return text;
+    return new TransactionResponseBuilder().createTransactionResponse();
   }
 
-  public String delete(HttpDelete deleteRequest) throws IOException, AuthenticationException {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
+  public TransactionResponse delete(HttpDelete deleteRequest) {
+    CloseableHttpClient httpClient = getClosableHttpClient();
     printRequest(deleteRequest);
-    HttpResponse response = httpClient.execute(deleteRequest);
-    checkResponse(response, "DELETE");
-    //String responseText = getResponseText(response);
-    httpClient.close();
-    return "";
+
+    TransactionResponseBuilder transactionResponse = new TransactionResponseBuilder();
+    transactionResponse.setMethod(DELETE);
+    transactionResponse.setEndpoint(deleteRequest.getURI().toString());
+
+    HttpResponse response = null;
+    try {
+      response = httpClient.execute(deleteRequest);
+      retryIfNeeded(response, "DELETE");
+      transactionResponse.setStatusCode(getStatusCode(response));
+      transactionResponse.setResponseBody(getResponseText(response));
+      transactionResponse.setSuccess(true);
+    } catch (IOException e) {
+      transactionResponse.setStatusCode(-1);
+      transactionResponse.setFailureReason("IOException");
+    } catch (AuthenticationException e) {
+      transactionResponse.setStatusCode(response.getStatusLine().getStatusCode());
+      transactionResponse.setFailureReason(response.getStatusLine().getReasonPhrase());
+    }
+
+    try {
+      httpClient.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return transactionResponse.createTransactionResponse();
   }
 
-  public String patch(HttpPatch patchRequest) throws IOException, AuthenticationException {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
+  public TransactionResponse patch(HttpPatch patchRequest) throws IOException, AuthenticationException {
+    CloseableHttpClient httpClient = getClosableHttpClient();
     HttpResponse response = httpClient.execute(patchRequest);
-    checkResponse(response, "PATCH");
+    retryIfNeeded(response, "PATCH");
     String responseText = getResponseText(response);
     httpClient.close();
-    return responseText ;
+    return new TransactionResponseBuilder().createTransactionResponse();
   }
 
-  private void checkResponse(HttpResponse response, String httpMethod) throws AuthenticationException {
+  private void retryIfNeeded(HttpResponse response, String httpMethod) throws AuthenticationException {
     if (response.getStatusLine().getStatusCode() == 401) {
       throw new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST");
     }
@@ -81,13 +103,21 @@ public class BaseHTTPClient {
     }
   }
 
+  private int getStatusCode(HttpResponse response) {
+    return response.getStatusLine().getStatusCode();
+  }
+
   private String getResponseText(HttpResponse response) throws IOException {
-    if (response != null) {
+    if (response != null && !response.equals("")) {
       return IOUtils.toString(
           response.getEntity().getContent(),
           UTF_8.name());
     }
     return "";
+  }
+
+  private CloseableHttpClient getClosableHttpClient() {
+    return HttpClients.createDefault();
   }
 
   public void printRequest(HttpPost postRequest) {

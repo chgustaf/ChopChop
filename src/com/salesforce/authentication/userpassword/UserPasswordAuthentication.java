@@ -8,6 +8,7 @@ import com.salesforce.authentication.Authentication;
 import com.salesforce.authentication.secrets.Secrets;
 import com.salesforce.exceptions.AuthenticationException;
 import com.salesforce.rest.BaseHTTPClient;
+import com.salesforce.rest.TransactionResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,8 @@ public class UserPasswordAuthentication extends Authentication {
     HttpPost httpPost = new HttpPost(loginURL);
     httpPost.setHeader("Content-type", "application/x-www-form-urlencoded");
     httpPost.setEntity(getUserPasswordEntity());
-    String returnJson = post(httpPost);
+    TransactionResponse transactionResponse =  post(httpPost);
+    String returnJson = transactionResponse.getResponseBody();
     ObjectMapper objectMapper = new ObjectMapper();
     AccessParameters accessParameters = objectMapper.readValue(returnJson, AccessParameters.class);
     return accessParameters;

@@ -8,6 +8,7 @@ import com.salesforce.exceptions.AuthenticationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CaseUpdate {
 
@@ -46,6 +47,11 @@ public class CaseUpdate {
     Account account1 = new Account();
     account1.setName("Shit " + System.nanoTime());
     CallResult callResult = client.createAccount(account1);
+
+    List<String> ids =
+        callResult.successes.stream().map(res -> res.getId()).collect(Collectors.toList());
     System.out.println("callResult.successes "+callResult.successes);
+
+    client.deleteAccounts(ids);
   }
 }
