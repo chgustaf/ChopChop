@@ -7,20 +7,17 @@ import com.examples.caseupdater.client.domain.CallResult;
 import com.examples.caseupdater.client.domain.Case;
 import com.examples.caseupdater.client.domain.Record;
 import com.examples.caseupdater.client.domain.Records;
-import com.examples.caseupdater.client.dto.Attributes;
 import com.examples.caseupdater.client.dto.RecordCreated;
 import com.examples.caseupdater.client.dto.RecordsCreated;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salesforce.exceptions.AuthenticationException;
 import com.salesforce.rest.SalesforceClient;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SalesforceCaseClient {
 
-  SalesforceClient client;
+  public SalesforceClient client;
 
   public SalesforceCaseClient() {
     try {
@@ -69,7 +66,7 @@ public class SalesforceCaseClient {
 
   public List<Account> createAccounts(List<Account> accounts)
       throws IOException, AuthenticationException {
-
+/*
     Account[] accountsArr = accounts.toArray(new Account[0]);
 
     Records<Account> records = new Records<>(accountsArr);
@@ -87,7 +84,7 @@ public class SalesforceCaseClient {
     for (Account account : accounts) {
       account.setId(refIdToId.get(account.getAttributes().getReferenceId()));
       System.out.println("Account "+account.toString());
-    }
+    }*/
 
     return accounts;
   }

@@ -45,6 +45,7 @@ public class BaseHTTPClient {
 
   public String get(HttpGet getRequest) throws IOException, AuthenticationException {
     CloseableHttpClient httpClient = HttpClients.createDefault();
+    printRequest(getRequest);
     HttpResponse response = httpClient.execute(getRequest);
     checkResponse(response, "GET");
     String text = getResponseText(response);
@@ -107,6 +108,14 @@ public class BaseHTTPClient {
     System.out.println("Sending DELETE request to " + deleteRequest.getURI());
     System.out.println("Available headers:");
     for (Header header : deleteRequest.getAllHeaders()) {
+      System.out.println(header.getName() + ": " + header.getValue());
+    }
+  }
+
+  public void printRequest(HttpGet getRequest) {
+    System.out.println("Sending GET request to " + getRequest.getURI());
+    System.out.println("Available headers:");
+    for (Header header : getRequest.getAllHeaders()) {
       System.out.println(header.getName() + ": " + header.getValue());
     }
   }

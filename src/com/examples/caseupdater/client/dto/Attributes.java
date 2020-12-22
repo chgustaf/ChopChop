@@ -7,8 +7,21 @@ public class Attributes {
   public String type;
   public String referenceId;
 
+  @Override
+  public String toString() {
+    return "Attributes{" +
+           "type='" + type + '\'' +
+           ", referenceId='" + referenceId + '\'' +
+           '}';
+  }
+
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public String id;
+
+  public Attributes(final String type, final String referenceId) {
+    this.type = type;
+    this.referenceId = referenceId;
+  }
 
   public String getType() {
     return type;
@@ -24,13 +37,5 @@ public class Attributes {
 
   public void setReferenceId(final String referenceId) {
     this.referenceId = referenceId;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(final String id) {
-    this.id = id;
   }
 }

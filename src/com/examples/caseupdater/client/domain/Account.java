@@ -2,6 +2,7 @@ package com.examples.caseupdater.client.domain;
 
 import com.examples.caseupdater.client.dto.Attributes;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.UUID;
 
 public class Account implements Record{
 
@@ -10,6 +11,21 @@ public class Account implements Record{
   private String name;
 
   private Attributes attributes;
+
+  public Account() {
+    this.attributes = new Attributes("Account", UUID.randomUUID().toString());
+  }
+
+  public Account(String name) {
+    this.name = name;
+    this.attributes = new Attributes("Account", UUID.randomUUID().toString());
+  }
+
+  public Account(final String id, final String name, final Attributes attributes) {
+    this.id = id;
+    this.name = name;
+    this.attributes = attributes;
+  }
 
   @Override
   public String getId() {
