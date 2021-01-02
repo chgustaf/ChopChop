@@ -15,14 +15,11 @@ import org.json.JSONObject;
 
 public class ImprovedSalesforceClient {
 
-  SalesforceClient client;
+  private SalesforceClient client;
 
-  public Integer apiVersion = 50;
-
-  public String instanceUrl;
-  public String baseEndpoint;
-  public String compositeSobjectEndpoint;
-  public String readEndpoint;
+  private String compositeSobjectEndpoint;
+  private String compositeEndpoint;
+  private String compositeBatchEndpoint;
 
   public ImprovedSalesforceClient(SalesforceClient client) throws IOException,
                                                                       AuthenticationException {
@@ -31,10 +28,13 @@ public class ImprovedSalesforceClient {
   }
 
   private void initEndpoints() {
-    instanceUrl = client.accessParameters.instanceUrl;
-    baseEndpoint = instanceUrl+"/services/data/v"+apiVersion+".0/";
-    compositeSobjectEndpoint = baseEndpoint+"composite/sobjects";
-    readEndpoint = instanceUrl + baseEndpoint;
+    final String instanceUrl = client.accessParameters.instanceUrl;
+    final Integer apiVersion = 50;
+    final String baseEndpoint = instanceUrl + "/services/data/v" + apiVersion + ".0/";
+    compositeSobjectEndpoint = baseEndpoint + "composite/sobjects";
+    compositeBatchEndpoint = baseEndpoint + "composite/batch";
+    compositeEndpoint = baseEndpoint + "composite";
+    final String readEndpoint = instanceUrl + baseEndpoint;
   }
 
   public String read(List<String> ids, List<String> fields, String objectName)
@@ -55,6 +55,24 @@ public class ImprovedSalesforceClient {
     postRequest.addHeader("Content-Type", "application/json");
     postRequest.addHeader("Authorization", "Bearer " + client.accessParameters.accessToken);
     postRequest.setEntity(new StringEntity(createPostPayload(records, allOrNone), UTF_8));
+    return client.executeHttpRequest(postRequest);
+  }
+
+  public String compositeCall(String requestString)
+      throws IOException, AuthenticationException {
+    HttpPost postRequest = new HttpPost(compositeEndpoint);
+    postRequest.addHeader("Content-Type", "application/json");
+    postRequest.addHeader("Authorization", "Bearer " + client.accessParameters.accessToken);
+    postRequest.setEntity(new StringEntity(requestString, UTF_8));
+    return client.executeHttpRequest(postRequest);
+  }
+
+  public String compositeBatchCall(String requestString)
+      throws IOException, AuthenticationException {
+    HttpPost postRequest = new HttpPost(compositeBatchEndpoint);
+    postRequest.addHeader("Content-Type", "application/json");
+    postRequest.addHeader("Authorization", "Bearer " + client.accessParameters.accessToken);
+    postRequest.setEntity(new StringEntity(requestString, UTF_8));
     return client.executeHttpRequest(postRequest);
   }
 
@@ -98,18 +116,22 @@ public class ImprovedSalesforceClient {
     return "";
   }
 
+
   private String createPostPayload(List<String> records, boolean allOrNone) {
     JSONObject json = new JSONObject();
     JSONArray jsonArray = new JSONArray();
     records.forEach(str -> jsonArray.put(new JSONObject(str)));
+    json.put("allOrNone", allOrNone);
     json.put("records", jsonArray);
     return json.toString().replace("\\","");
   }
+
 
   private String createPatchPayload(List<String> records, boolean allOrNone) {
     JSONArray jsonArray = new JSONArray();
     JSONObject jsonObject = new JSONObject();
     return "";
   }
+
 
 }

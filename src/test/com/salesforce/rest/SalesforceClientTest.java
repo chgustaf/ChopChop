@@ -1,17 +1,15 @@
-package test.com.salesforce.rest;
+package com.salesforce.rest;
 
 import static com.salesforce.rest.SalesforceClient.AuthenticationFlow.JWT;
 import static com.salesforce.rest.SalesforceClient.AuthenticationFlow.USER_PASSWORD;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.salesforce.authentication.secrets.Secrets;
 import com.salesforce.authentication.secrets.SecretsUtil;
 import com.salesforce.exceptions.AuthenticationException;
-import com.salesforce.rest.BaseHTTPClient;
-import com.salesforce.rest.SalesforceClient;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,12 +1,29 @@
 package com.examples.caseupdater.client.domain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public interface Record {
+
+  Boolean getSuccess();
+
+  String getSObjectName();
+
+  String getReferenceId();
 
   String getId();
 
+  String getJSON() throws JsonProcessingException;
+
+  Integer getStatusCode();
+
+  void setSuccess(Boolean success);
+
+  void setReferenceId(String referenceId);
+
   void setId(String id);
 
-  default boolean inserted() {
-    return (this.getId() != null && this.getId().trim() == "");
-  }
+  void setJSON(String json);
+
+  void setStatusCode(Integer statusCode);
+
 }

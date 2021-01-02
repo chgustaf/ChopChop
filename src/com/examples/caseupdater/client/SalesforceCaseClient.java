@@ -122,7 +122,7 @@ public class SalesforceCaseClient {
     CallResult result = new CallResult();
 
     if (recordCreated.success) {
-      record.setId(recordCreated.id);
+      //record.setId(recordCreated.id);
       result.successes.add(record);
     } else {
       result.failures.add(record);
