@@ -1,26 +1,29 @@
 package com.examples.caseupdater.client.domain;
 
 import com.examples.caseupdater.client.dto.Attributes;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Account implements Record {
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String id;
-  private String name;
-  private String aFieldThatDoesNotExist;
+
+  @JsonIgnore
+  @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
+  public String id;
+  public String name;
+  public String description;
 
   private Integer statusCode;
   private Attributes attributes;
   private ObjectMapper mapper;
-
   private String referenceId;
   private String sobjectName;
-
   private Boolean success;
 
   public Account() {
@@ -44,8 +47,7 @@ public class Account implements Record {
     this.statusCode = statusCode;
   }
 
-
-
+  @JsonIgnore
   public String getId() {
     return id;
   }
@@ -124,12 +126,32 @@ public class Account implements Record {
   }
 
   @Override
+  @JsonIgnore
+  public List<String> getAllFields() {
+    return Arrays.stream(this.getClass().getFields()).map(field -> field.getName()).collect(Collectors.toList());
+  }
+
+
+  @Override
   public String toString() {
     return "Account{" +
            "id='" + id + '\'' +
            ", name='" + name + '\'' +
+           ", description='" + description + '\'' +
+           ", statusCode=" + statusCode +
            ", attributes=" + attributes +
+           ", mapper=" + mapper +
+           ", referenceId='" + referenceId + '\'' +
+           ", sobjectName='" + sobjectName + '\'' +
+           ", success=" + success +
            '}';
   }
 
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(final String description) {
+    this.description = description;
+  }
 }

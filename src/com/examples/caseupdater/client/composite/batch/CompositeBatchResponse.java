@@ -4,6 +4,8 @@ import com.examples.caseupdater.client.composite.Result;
 
 public class CompositeBatchResponse {
 
+
+
   boolean hasErrors;
   Result[] results;
 
@@ -21,5 +23,13 @@ public class CompositeBatchResponse {
 
   public void setResults(final Result[] results) {
     this.results = results;
+  }
+
+  private boolean isHasErrors() {
+    return hasErrors;
+  }
+
+  private void setHasErrors(final boolean hasErrors) {
+    this.hasErrors = hasErrors;
   }
 }

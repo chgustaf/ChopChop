@@ -6,6 +6,10 @@ public class Attributes {
 
   public String type;
   public String referenceId;
+  public String url;
+
+  private Attributes() {
+  }
 
   @Override
   public String toString() {
@@ -37,5 +41,13 @@ public class Attributes {
 
   public void setReferenceId(final String referenceId) {
     this.referenceId = referenceId;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(final String url) {
+    this.url = url;
   }
 }

@@ -1,16 +1,16 @@
 package com.examples.caseupdater.client.composite.batch;
 
-import com.examples.caseupdater.client.composite.InnerResult;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class CombinedRequestResponse {
 
   public BatchRequest request;
-  public InnerResult result;
+  public JsonNode result;
   public Integer statusCode;
 
 
   public CombinedRequestResponse(
-      final BatchRequest request, final InnerResult result, final Integer statusCode) {
+      final BatchRequest request, final JsonNode result, final Integer statusCode) {
     this.request = request;
     this.result = result;
     this.statusCode = statusCode;
@@ -24,11 +24,11 @@ public class CombinedRequestResponse {
     this.request = request;
   }
 
-  public InnerResult getResult() {
+  public JsonNode getResult() {
     return result;
   }
 
-  public void setResult(final InnerResult result) {
+  public void setResult(final JsonNode result) {
     this.result = result;
   }
 

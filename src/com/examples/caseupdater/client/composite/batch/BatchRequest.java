@@ -24,6 +24,9 @@ public class BatchRequest {
   String sobjectName;
   String referenceId;
 
+  @JsonIgnore
+  String id;
+
   public enum Type {
     LIMITS,
     SOBJECT,
@@ -38,7 +41,8 @@ public class BatchRequest {
   BatchRequest(final Type type, final String sobjectName, final String binaryPartName,
                final String getBinaryPartNameAlias,
                final String method,
-               final String richInput, final String url, final String referenceId) {
+               final String richInput, final String url, final String referenceId,
+               final String id) {
     this.binaryPartName = binaryPartName;
     this.getBinaryPartNameAlias = getBinaryPartNameAlias;
     this.method = method;
@@ -47,6 +51,7 @@ public class BatchRequest {
     this.type = type;
     this.sobjectName = sobjectName;
     this.referenceId = referenceId;
+    this.id = id;
   }
 
   @JsonIgnore
@@ -122,5 +127,10 @@ public class BatchRequest {
 
   public void setReferenceId(final String referenceId) {
     this.referenceId = referenceId;
+  }
+
+  @JsonIgnore
+  public String getId() {
+    return id;
   }
 }

@@ -1,8 +1,11 @@
 package com.examples.caseupdater.client.composite;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class Result {
+
   int statusCode;
-  InnerResult[] result;
+  JsonNode result;
 
   public int getStatusCode() {
     return statusCode;
@@ -12,11 +15,11 @@ public class Result {
     this.statusCode = statusCode;
   }
 
-  public InnerResult[] getResult() {
+  public JsonNode getResult() {
     return result;
   }
 
-  public void setResult(final InnerResult[] result) {
+  public void setResult(final JsonNode result) {
     this.result = result;
   }
 }

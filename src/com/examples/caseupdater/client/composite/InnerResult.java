@@ -1,11 +1,16 @@
 package com.examples.caseupdater.client.composite;
 
+import com.examples.caseupdater.client.dto.Attributes;
+
 public class InnerResult {
+
   String id;
   boolean success;
   String[] errors;
   String errorCode;
   String message;
+  Attributes attributes;
+  String name;
 
   public String getErrorCode() {
     return errorCode;
@@ -45,5 +50,21 @@ public class InnerResult {
 
   public void setErrors(final String[] errors) {
     this.errors = errors;
+  }
+
+  public Attributes getAttributes() {
+    return attributes;
+  }
+
+  public void setAttributes(final Attributes attributes) {
+    this.attributes = attributes;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
   }
 }

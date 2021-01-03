@@ -1,6 +1,5 @@
 package com.examples.caseupdater.client;
 
-import com.examples.caseupdater.client.composite.InnerResult;
 import com.examples.caseupdater.client.composite.batch.BatchRequest;
 import com.examples.caseupdater.client.composite.batch.BatchRequestBuilder;
 import com.examples.caseupdater.client.composite.batch.CombinedRequestResponse;
@@ -10,6 +9,8 @@ import com.examples.caseupdater.client.composite.batch.CompositeBatchResponse;
 import com.examples.caseupdater.client.domain.Record;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salesforce.exceptions.AuthenticationException;
 import com.salesforce.rest.ImprovedSalesforceClient;
@@ -29,7 +30,7 @@ public class CompositeBatchTransaction {
   ObjectMapper mapper;
   boolean haltOnError;
   ImprovedSalesforceClient improvedSalesforceClient;
-
+  Boolean alreadyExecuted = false;
 
   private String baseURL = "v50.0/sobjects/";
 
@@ -55,6 +56,8 @@ public class CompositeBatchTransaction {
             .setMethod("PATCH")
             .setUrl(baseURL+record.getSObjectName()+"/"+record.getId())
             .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
+            .setReferenceId(record.getReferenceId())
+            .setId(record.getId())
             .createBatchRequest();
     requests.add(batchRequest);
   }
@@ -81,15 +84,20 @@ public class CompositeBatchTransaction {
             .setUrl(baseURL+record.getSObjectName()+"/"+record.getId())
             .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
             .setReferenceId(record.getReferenceId())
+            .setId(record.getId())
             .createBatchRequest();
     requests.add(batchRequest);
   }
 
   public void get(Record record) {
+    records.add(record);
     BatchRequest batchRequest =
         new BatchRequestBuilder()
             .setMethod("GET")
-            .setUrl(baseURL+record.getSObjectName()+"/"+record.getId())
+            .setUrl(baseURL+record.getSObjectName()+"/"+record.getId()+"?fields="+String.join(
+                ",", record.getAllFields()))
+            .setReferenceId(record.getReferenceId())
+            .setId(record.getId())
             .createBatchRequest();
     requests.add(batchRequest);
     //TODO: put the requested fields to the url
@@ -97,9 +105,11 @@ public class CompositeBatchTransaction {
 
   public boolean execute()
       throws IOException, AuthenticationException {
+    if (alreadyExecuted) {
+      return false;
+    }
     String payload = renderPayload();
     String responseString = improvedSalesforceClient.compositeBatchCall(payload);
-
     compositeBatchResponse = parseCompositeBatchResponse(responseString);
 
     // I the number results differ from the number of batches then something is really wrong
@@ -109,25 +119,22 @@ public class CompositeBatchTransaction {
 
     resultList = new ArrayList<>();
     for (int i = 0; i < compositeBatchResponse.getResults().length;i++) {
-
-      if (requests.get(i).getMethod() == "DELETE") {
-
+      if (requests.get(i).getMethod() == "DELETE" || requests.get(i).getMethod() == "PATCH") {
         resultList.add(
             new CombinedRequestResponse(
                 requests.get(i),
                 null,
                 compositeBatchResponse.getResults()[i].getStatusCode()));
       } else {
-        for (int j = 0; j < compositeBatchResponse.getResults()[i].getResult().length; j++) {
           resultList.add(
               new CombinedRequestResponse(
                   requests.get(i),
-                  compositeBatchResponse.getResults()[i].getResult()[0],
+                  compositeBatchResponse.getResults()[i].getResult(),
                   compositeBatchResponse.getResults()[i].getStatusCode()));
-        }
       }
     }
 
+    alreadyExecuted = true;
     if (compositeBatchResponse.getHasErrors()) {
       return false;
     }
@@ -137,9 +144,11 @@ public class CompositeBatchTransaction {
 
   public CompositeBatchResponse parseCompositeBatchResponse(String stringResponse)
       throws JsonProcessingException {
+
     System.out.println(stringResponse);
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
     return mapper.readValue(stringResponse, CompositeBatchResponse.class);
 
   }
@@ -174,6 +183,7 @@ public class CompositeBatchTransaction {
 
     if (result.isPresent()) {
       ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
 
       String json;
       T record;
@@ -184,21 +194,36 @@ public class CompositeBatchTransaction {
           // of type T
           success = (result.get().getStatusCode() == 201);
           json = result.get().getRequest().getRichInput();
-          InnerResult innerResult = result.get().getResult();
+          JsonNode innerResult = result.get().getResult();
           record = mapper.readValue(json, clazz);
-          record.setId(innerResult.getId());
+          if (success) {
+            record.setId(innerResult.get("id").textValue());
+          }
           record.setSuccess(success);
           record.setReferenceId(UUID.randomUUID().toString());
           return record;
         case "GET" :
-          return null;
+          success = (result.get().getStatusCode() == 200);
+          JsonNode jsonN =  result.get().getResult();
+          record = mapper.treeToValue(jsonN, clazz);
+          record.setReferenceId(UUID.randomUUID().toString());
+          record.setId(result.get().getRequest().getId());
+          record.setSuccess(success);
+          return record;
         case "PATCH" :
-          return null;
+          success = (result.get().getStatusCode() == 204);
+          json = result.get().getRequest().getRichInput();
+          record = mapper.readValue(json, clazz);
+          record.setReferenceId(UUID.randomUUID().toString());
+          record.setId(result.get().getRequest().getId());
+          record.setSuccess(success);
+          return record;
         case "DELETE" :
           success = (result.get().getStatusCode() == 204);
           json = result.get().getRequest().getRichInput();
           record = mapper.readValue(json, clazz);
           record.setReferenceId(UUID.randomUUID().toString());
+          record.setId(result.get().getRequest().getId());
           record.setSuccess(success);
           return record;
         default :

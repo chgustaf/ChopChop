@@ -1,6 +1,7 @@
 package com.examples.caseupdater.client.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.List;
 
 public interface Record {
 
@@ -25,5 +26,7 @@ public interface Record {
   void setJSON(String json);
 
   void setStatusCode(Integer statusCode);
+
+  List<String> getAllFields();
 
 }

@@ -87,30 +87,19 @@ public class CaseUpdate {
 
     Account account = new Account();
     account.setName("Test Account "+System.currentTimeMillis());
-    CompositeBatchTransaction transaction = new CompositeBatchTransaction(improvedSalesforceClient);
-    transaction.create(account);
-    if (!transaction.execute()) {
-      System.out.println("Shit went down");
-    }
+    account = create(account, improvedSalesforceClient);
+    System.out.println("Account created " + account);
 
-    account = transaction.getRecord(account.getReferenceId(), account.getClass());
+    account = get(account, improvedSalesforceClient);
+    System.out.println("Account retrieved " + account);
+
     account.setName("New Test Account " + System.currentTimeMillis());
-    transaction.update(account);
-    if (transaction.execute()) {
-      System.out.println("Shit went down 2");
-    }
+    account = update(account, improvedSalesforceClient);
+    System.out.println("Account updated " + account);
 
+    account = delete(account, improvedSalesforceClient);
+    System.out.println("This account was deleted " + account);
 
-    account = transaction.getRecord(account.getReferenceId(), account.getClass());
-    System.out.println("This is the updated account " + account);
-
-
-    transaction = new CompositeBatchTransaction(improvedSalesforceClient);
-    transaction.delete(account);
-    if (transaction.execute()) {
-      account = transaction.getRecord(account.getReferenceId(), account.getClass());
-      System.out.println("This account was deleted "+account);
-    }
 
 /*
     Account account = new Account();
@@ -125,5 +114,53 @@ public class CaseUpdate {
 
     //System.out.println(improvedSalesforceClient.read(ids, fields, "account"));
 
+  }
+
+  private static Account create(Account account, ImprovedSalesforceClient improvedSalesforceClient)
+      throws IOException, AuthenticationException {
+    CompositeBatchTransaction transaction = new CompositeBatchTransaction(improvedSalesforceClient);
+      transaction.create(account);
+      if (!transaction.execute()) {
+        System.out.println("Unable to create Account");
+        return null;
+      }
+
+    return transaction.getRecord(account.getReferenceId(), account.getClass());
+  }
+
+  private static Account get(Account account, ImprovedSalesforceClient improvedSalesforceClient)
+      throws IOException, AuthenticationException {
+    CompositeBatchTransaction transaction = new CompositeBatchTransaction(improvedSalesforceClient);
+    transaction.get(account);
+    if (!transaction.execute()) {
+      System.out.println("Unable to get Account");
+      return null;
+    }
+
+    return transaction.getRecord(account.getReferenceId(), account.getClass());
+  }
+
+  private static Account update(Account account, ImprovedSalesforceClient improvedSalesforceClient)
+      throws IOException, AuthenticationException {
+    CompositeBatchTransaction transaction = new CompositeBatchTransaction(improvedSalesforceClient);
+    transaction.update(account);
+    if (!transaction.execute()) {
+      System.out.println("Unable to update Account");
+      return null;
+    }
+
+    return transaction.getRecord(account.getReferenceId(), account.getClass());
+  }
+
+  private static Account delete(Account account, ImprovedSalesforceClient improvedSalesforceClient)
+      throws IOException, AuthenticationException {
+    CompositeBatchTransaction transaction = new CompositeBatchTransaction(improvedSalesforceClient);
+    transaction.delete(account);
+    if (!transaction.execute()) {
+      System.out.println("Unable to delete Account");
+      return null;
+    }
+
+    return transaction.getRecord(account.getReferenceId(), account.getClass());
   }
 }

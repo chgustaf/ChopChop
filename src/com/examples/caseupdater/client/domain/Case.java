@@ -1,6 +1,7 @@
 package com.examples.caseupdater.client.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.List;
 
 public class Case implements Record {
 
@@ -51,6 +52,11 @@ public class Case implements Record {
   @Override
   public void setStatusCode(final Integer statusCode) {
 
+  }
+
+  @Override
+  public List<String> getAllFields() {
+    return null;
   }
 
   public void setId(final String id) {

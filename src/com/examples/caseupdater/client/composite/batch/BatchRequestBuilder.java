@@ -10,6 +10,7 @@ public class BatchRequestBuilder {
   private String richInput;
   private String url;
   private String referenceId;
+  private String id;
 
   public BatchRequestBuilder setType(final BatchRequest.Type type) {
     this.type = type;
@@ -51,8 +52,14 @@ public class BatchRequestBuilder {
     return this;
   }
 
+  public BatchRequestBuilder setId(final String id) {
+    this.id = id;
+    return this;
+  }
+
+
   public BatchRequest createBatchRequest() {
     return new BatchRequest(type, sobjectName, binaryPartName, getBinaryPartNameAlias, method,
-        richInput, url, referenceId);
+        richInput, url, referenceId, id);
   }
 }
