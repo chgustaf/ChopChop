@@ -6,6 +6,7 @@ import com.examples.caseupdater.client.composite.batch.CombinedRequestResponse;
 import com.examples.caseupdater.client.composite.batch.CompositeBatchRequest;
 import com.examples.caseupdater.client.composite.batch.CompositeBatchRequestBuilder;
 import com.examples.caseupdater.client.composite.batch.CompositeBatchResponse;
+import com.examples.caseupdater.client.domain.Query;
 import com.examples.caseupdater.client.domain.Record;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -24,6 +25,7 @@ public class CompositeBatchTransaction {
 
   private List<BatchRequest> requests;
   private List<Record> records;
+  private List<Query> queries;
   private CompositeBatchResponse compositeBatchResponse;
   private List<CombinedRequestResponse> resultList;
 
@@ -31,7 +33,8 @@ public class CompositeBatchTransaction {
   private SalesforceCompositeBatchClient salesforceCompositeBatchClient;
   private Boolean alreadyExecuted = false;
 
-  private String baseURL = "v50.0/sobjects/";
+  private String sobjectURL = "v50.0/sobjects/";
+  private String queryURL = "v50.0/query/";
 
   public CompositeBatchTransaction(
       final SalesforceCompositeBatchClient salesforceCompositeBatchClient) {
@@ -45,15 +48,27 @@ public class CompositeBatchTransaction {
     requests = new ArrayList<>();
     records = new ArrayList<>();
     resultList = new ArrayList<>();
+    queries = new ArrayList<>();
   }
 
+  public void query(Query query) {
+    queries.add(query);
+    BatchRequest batchRequest =
+        new BatchRequestBuilder()
+            .setMethod("GET")
+            .setUrl(queryURL + "?q=" + query.getQuery())
+            .setType(BatchRequest.Type.QUERY)
+            .setReferenceId(query.getReferenceId())
+            .createBatchRequest();
+    requests.add(batchRequest);
+  }
 
   public void update(Record record) throws JsonProcessingException {
     records.add(record);
     BatchRequest batchRequest =
         new BatchRequestBuilder()
             .setMethod("PATCH")
-            .setUrl(baseURL+record.getSObjectName()+"/"+record.getId())
+            .setUrl(sobjectURL + record.getSObjectName() + "/" + record.getId())
             .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
             .setReferenceId(record.getReferenceId())
             .setId(record.getId())
@@ -66,9 +81,8 @@ public class CompositeBatchTransaction {
     BatchRequest batchRequest =
         new BatchRequestBuilder()
             .setMethod("POST")
-            .setUrl(baseURL+record.getSObjectName())
+            .setUrl(sobjectURL + record.getSObjectName())
             .setType(BatchRequest.Type.SOBJECT)
-            .setSobjectName(record.getSObjectName())
             .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
             .setReferenceId(record.getReferenceId())
             .createBatchRequest();
@@ -80,7 +94,7 @@ public class CompositeBatchTransaction {
     BatchRequest batchRequest =
         new BatchRequestBuilder()
             .setMethod("DELETE")
-            .setUrl(baseURL+record.getSObjectName()+"/"+record.getId())
+            .setUrl(sobjectURL + record.getSObjectName() + "/" + record.getId())
             .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
             .setReferenceId(record.getReferenceId())
             .setId(record.getId())
@@ -93,7 +107,8 @@ public class CompositeBatchTransaction {
     BatchRequest batchRequest =
         new BatchRequestBuilder()
             .setMethod("GET")
-            .setUrl(baseURL+record.getSObjectName()+"/"+record.getId()+"?fields="+String.join(
+            .setUrl(
+                sobjectURL + record.getSObjectName() + "/" + record.getId() + "?fields=" + String.join(
                 ",", record.getAllFields()))
             .setReferenceId(record.getReferenceId())
             .setId(record.getId())
@@ -109,6 +124,11 @@ public class CompositeBatchTransaction {
     String payload = renderPayload();
     String responseString = salesforceCompositeBatchClient.compositeBatchCall(payload);
     compositeBatchResponse = parseCompositeBatchResponse(responseString);
+
+    //TODO Create a super class to both Record and Query (maybe only containg ReferenceID) and
+    // change the records List to contains the super class instead of Record. The super class
+    // list can then be used for determining how and answer should be deserialized (i.e. should
+    // it be a record or a query)
 
     // I the number results differ from the number of batches then something is really wrong
     if (compositeBatchResponse.getResults().length != records.size()) {
@@ -229,5 +249,19 @@ public class CompositeBatchTransaction {
       }
     }
     return null;
+  }
+
+  public String getQuery(final String referenceId) {
+    // Find the request with the specific referenceId
+    Optional<CombinedRequestResponse> result =
+        resultList
+            .stream()
+            .filter(res -> res.getRequest() != null)
+            .filter(res -> res.getRequest().getReferenceId().equals(referenceId))
+            .findFirst();
+    if (result.isPresent()) {
+      System.out.println(result.get().getResult().textValue());
+    }
+    return "";
   }
 }

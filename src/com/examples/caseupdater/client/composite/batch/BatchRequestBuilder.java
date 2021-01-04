@@ -3,7 +3,6 @@ package com.examples.caseupdater.client.composite.batch;
 public class BatchRequestBuilder {
 
   private BatchRequest.Type type;
-  private String sobjectName;
   private String binaryPartName;
   private String getBinaryPartNameAlias;
   private String method;
@@ -14,11 +13,6 @@ public class BatchRequestBuilder {
 
   public BatchRequestBuilder setType(final BatchRequest.Type type) {
     this.type = type;
-    return this;
-  }
-
-  public BatchRequestBuilder setSobjectName(final String sobjectName) {
-    this.sobjectName = sobjectName;
     return this;
   }
 
@@ -59,7 +53,7 @@ public class BatchRequestBuilder {
 
 
   public BatchRequest createBatchRequest() {
-    return new BatchRequest(type, sobjectName, binaryPartName, getBinaryPartNameAlias, method,
+    return new BatchRequest(type, binaryPartName, getBinaryPartNameAlias, method,
         richInput, url, referenceId, id);
   }
 }

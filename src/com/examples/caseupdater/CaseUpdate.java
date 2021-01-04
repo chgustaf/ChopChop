@@ -3,9 +3,12 @@ package com.examples.caseupdater;
 import com.examples.caseupdater.client.CompositeBatchTransaction;
 import com.examples.caseupdater.client.domain.Account;
 import com.examples.caseupdater.client.domain.Case;
+import com.examples.caseupdater.client.domain.Query;
 import com.salesforce.exceptions.AuthenticationException;
 import com.salesforce.rest.SalesforceCompositeBatchClient;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +49,12 @@ public class CaseUpdate {
     account1.setName("New Test Account " + System.currentTimeMillis());
     account1 = update(account1, salesforceCompositeBatchClient);
     System.out.println("Account updated " + account1);
+
+    Query query = new Query();
+    query.setQuery(URLEncoder.encode("SELECT id FROM Case", StandardCharsets.UTF_8));
+
+    query(query, salesforceCompositeBatchClient);
+
 
     //account1 = delete(account1, salesforceCompositeBatchClient);
     //System.out.println("This account1 was deleted " + account1);
@@ -144,6 +153,18 @@ public class CaseUpdate {
     }
 
     return transaction.getRecord(account.getReferenceId(), account.getClass());
+  }
+
+  private static String query(Query query,
+                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
+      throws IOException, AuthenticationException {
+    CompositeBatchTransaction transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient);
+    transaction.query(query);
+    if (!transaction.execute()) {
+      System.out.println("Unable to query");
+      return null;
+    }
+    return transaction.getQuery(query.getReferenceId());
   }
 
 }

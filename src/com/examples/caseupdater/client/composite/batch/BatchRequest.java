@@ -21,8 +21,6 @@ public class BatchRequest {
   String url; //required
   Type type;
 
-  @JsonIgnore
-  String sobjectName;
   String referenceId;
 
   @JsonIgnore
@@ -39,7 +37,7 @@ public class BatchRequest {
   }
   String requestType;
 
-  BatchRequest(final Type type, final String sobjectName, final String binaryPartName,
+  BatchRequest(final Type type, final String binaryPartName,
                final String getBinaryPartNameAlias,
                final String method,
                final String richInput, final String url, final String referenceId,
@@ -50,7 +48,6 @@ public class BatchRequest {
     this.richInput = richInput;
     this.url = url;
     this.type = type;
-    this.sobjectName = sobjectName;
     this.referenceId = referenceId;
     this.id = id;
   }
@@ -66,15 +63,6 @@ public class BatchRequest {
 
   private String getRequestType() {
     return requestType;
-  }
-
-  @JsonIgnore
-  public String getSobjectName() {
-    return sobjectName;
-  }
-
-  private void setSobjectName(final String sobjectName) {
-    this.sobjectName = sobjectName;
   }
 
   private void setRequestType(final String requestType) {
