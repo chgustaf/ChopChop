@@ -80,7 +80,7 @@ public class CompositeBatchTransactionTest {
     assertEquals(accountName, account.getName());
     assertTrue(account.getSuccess());
 
-    // TODO Continue writing test methods
+    // TODO Add test methods to all known scenarios
   }
 
   @Test

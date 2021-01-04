@@ -22,15 +22,14 @@ import java.util.UUID;
 
 public class CompositeBatchTransaction {
 
-  List<BatchRequest> requests;
-  List<Record> records;
-  CompositeBatchResponse compositeBatchResponse;
-  List<CombinedRequestResponse> resultList;
+  private List<BatchRequest> requests;
+  private List<Record> records;
+  private CompositeBatchResponse compositeBatchResponse;
+  private List<CombinedRequestResponse> resultList;
 
-  ObjectMapper mapper;
-  boolean haltOnError;
-  ImprovedSalesforceClient improvedSalesforceClient;
-  Boolean alreadyExecuted = false;
+  private boolean haltOnError;
+  private ImprovedSalesforceClient improvedSalesforceClient;
+  private Boolean alreadyExecuted = false;
 
   private String baseURL = "v50.0/sobjects/";
 
@@ -100,7 +99,6 @@ public class CompositeBatchTransaction {
             .setId(record.getId())
             .createBatchRequest();
     requests.add(batchRequest);
-    //TODO: put the requested fields to the url
   }
 
   public boolean execute()
@@ -160,7 +158,7 @@ public class CompositeBatchTransaction {
     CompositeBatchRequest request =
         new CompositeBatchRequestBuilder()
             .setBatchRequests(requestsArray)
-            .setHaltOnError(false)
+            .setHaltOnError(haltOnError)
             .createCompositeBatchRequest();
     ObjectMapper mapper = new ObjectMapper();
     return mapper.writeValueAsString(request);
