@@ -1,70 +1,47 @@
 package com.examples.caseupdater.client.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.List;
 
-public class Case implements Record {
+public class Case extends Record {
 
   public String id;
-  public String name;
+  public String subject;
   public String accountId;
 
-
-  @Override
-  public Boolean getSuccess() {
-    return null;
+  public Case() {
+    super("Case");
   }
 
-  @Override
-  public String getSObjectName() {
-    return null;
+  public String getSubject() {
+    return subject;
   }
 
-  @Override
-  public String getReferenceId() {
-    return null;
+  public void setSubject(final String subject) {
+    this.subject = subject;
   }
 
-  @Override
-  public String getId() {
-    return null;
+  public String getAccountId() {
+    return accountId;
   }
 
-  @Override
-  public String getJSON() throws JsonProcessingException {
-    return null;
-  }
-
-  @Override
-  public Integer getStatusCode() {
-    return null;
-  }
-
-  @Override
-  public void setSuccess(final Boolean success) {
-
-  }
-  @Override
-  public void setReferenceId(final String referenceId) {
-
-  }
-
-  @Override
-  public void setStatusCode(final Integer statusCode) {
-
+  public void setAccountId(final String accountId) {
+    this.accountId = accountId;
   }
 
   @Override
   public List<String> getAllFields() {
-    return null;
-  }
-
-  public void setId(final String id) {
-
+    return super.getAllFieldsHelper(this.getClass());
   }
 
   @Override
-  public void setJSON(final String json) {
-
+  @JsonIgnore
+  public String getJSON() throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    return mapper.writeValueAsString(this);
   }
 }

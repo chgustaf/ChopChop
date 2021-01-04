@@ -1,13 +1,13 @@
 package com.innovationmadness;
 
-import com.salesforce.rest.SalesforceClient;
+import com.salesforce.rest.SalesforceHttpClient;
 
 public class Main {
 
   public static void main(String[] args) {
 
     try {
-      SalesforceClient client = new SalesforceClient(SalesforceClient.AuthenticationFlow.USER_PASSWORD);
+      SalesforceHttpClient client = new SalesforceHttpClient(SalesforceHttpClient.AuthenticationFlow.USER_PASSWORD);
       System.out.println("Query "+client.query("SELECT ID FROM Case"));
       Thread.sleep(30000);
       System.out.println("Query "+client.query("SELECT ID FROM Case"));

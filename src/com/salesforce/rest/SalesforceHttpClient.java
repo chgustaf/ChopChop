@@ -3,7 +3,6 @@ package com.salesforce.rest;
 
 import static com.salesforce.exceptions.AuthenticationException.Code.UNAUTHORIZED;
 import static com.salesforce.exceptions.AuthenticationException.Code.UNKNOWN_AUTHENTICATION_FLOW;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.salesforce.authentication.AccessParameters;
 import com.salesforce.authentication.Authentication;
@@ -20,9 +19,8 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 
-public class SalesforceClient {
+public class SalesforceHttpClient {
 
   public enum AuthenticationFlow {
     USER_PASSWORD,
@@ -41,7 +39,7 @@ public class SalesforceClient {
   public final Secrets secrets;
 
 
-  public SalesforceClient(AuthenticationFlow authenticationFlow)
+  public SalesforceHttpClient(AuthenticationFlow authenticationFlow)
       throws AuthenticationException, IOException {
     this.httpClient = new BaseHTTPClient();
     this.secrets = SecretsUtil.readCredentials("secrets.json");
@@ -49,8 +47,8 @@ public class SalesforceClient {
   }
 
   // For testing
-  public SalesforceClient(AuthenticationFlow authenticationFlow, BaseHTTPClient httpClient,
-                          Secrets secrets)
+  public SalesforceHttpClient(AuthenticationFlow authenticationFlow, BaseHTTPClient httpClient,
+                              Secrets secrets)
       throws IOException, AuthenticationException {
     this.httpClient = httpClient;
     this.secrets = secrets;
@@ -84,42 +82,6 @@ public class SalesforceClient {
     getRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
     return executeHttpRequest(getRequest);
   }
-
-  public String postMultipleRecords(String objectName, String body)
-      throws IOException, AuthenticationException {
-    HttpPost postRequest = new HttpPost(accessParameters.instanceUrl + multipleRecordsEndpoint
-                                        + objectName);
-    postRequest.addHeader("Content-Type", "application/json");
-    postRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
-    postRequest.setEntity(new StringEntity(body));
-    return executeHttpRequest(postRequest);
-  }
-
-  public String postSingleRecord(String objectName, String body) throws IOException, AuthenticationException {
-    HttpPost postRequest = new HttpPost(accessParameters.instanceUrl + sobjectEndpoint + objectName);
-    postRequest.addHeader("Content-Type", "application/json");
-    postRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
-    postRequest.setEntity(new StringEntity(body));
-    return executeHttpRequest(postRequest);
-  }
-
-  public String patch(String url, String body) throws IOException, AuthenticationException {
-    HttpPatch patchRequest = new HttpPatch(url);
-    patchRequest.addHeader("accept", "application/json");
-    patchRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
-    return executeHttpRequest(patchRequest);
-  }
-
-  public String deleteSingleRecord(String objectName, String recordId) throws IOException,
-                                                               AuthenticationException {
-    HttpDelete deleteRequest =
-        new HttpDelete(accessParameters.instanceUrl + sobjectEndpoint + objectName +"/" + recordId);
-    deleteRequest.addHeader("X", "DELETE");
-    deleteRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
-    return executeHttpRequest(deleteRequest);
-  }
-
-
 
   public String executeHttpRequest(HttpRequest request)
       throws IOException, AuthenticationException {
@@ -155,11 +117,6 @@ public class SalesforceClient {
     return get(url);
   }
 
-  public String queryAll(String query) throws IOException, AuthenticationException {
-    String url = accessParameters.instanceUrl + queryAllEndpoint + URLEncoder.encode(query,
-        UTF_8);
-    return get(url);
-  }
 
   //TODO: Retry JWT process and document
 }

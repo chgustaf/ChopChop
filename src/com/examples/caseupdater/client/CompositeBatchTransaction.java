@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salesforce.exceptions.AuthenticationException;
-import com.salesforce.rest.ImprovedSalesforceClient;
+import com.salesforce.rest.SalesforceCompositeBatchClient;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,20 +28,20 @@ public class CompositeBatchTransaction {
   private List<CombinedRequestResponse> resultList;
 
   private boolean haltOnError;
-  private ImprovedSalesforceClient improvedSalesforceClient;
+  private SalesforceCompositeBatchClient salesforceCompositeBatchClient;
   private Boolean alreadyExecuted = false;
 
   private String baseURL = "v50.0/sobjects/";
 
   public CompositeBatchTransaction(
-      final ImprovedSalesforceClient improvedSalesforceClient) {
-    this(improvedSalesforceClient, false);
+      final SalesforceCompositeBatchClient salesforceCompositeBatchClient) {
+    this(salesforceCompositeBatchClient, false);
   }
 
-  private CompositeBatchTransaction(final ImprovedSalesforceClient improvedSalesforceClient,
+  private CompositeBatchTransaction(final SalesforceCompositeBatchClient salesforceCompositeBatchClient,
                                     final boolean haltOnError) {
     this.haltOnError = haltOnError;
-    this.improvedSalesforceClient = improvedSalesforceClient;
+    this.salesforceCompositeBatchClient = salesforceCompositeBatchClient;
     requests = new ArrayList<>();
     records = new ArrayList<>();
     resultList = new ArrayList<>();
@@ -107,7 +107,7 @@ public class CompositeBatchTransaction {
       return false;
     }
     String payload = renderPayload();
-    String responseString = improvedSalesforceClient.compositeBatchCall(payload);
+    String responseString = salesforceCompositeBatchClient.compositeBatchCall(payload);
     compositeBatchResponse = parseCompositeBatchResponse(responseString);
 
     // I the number results differ from the number of batches then something is really wrong

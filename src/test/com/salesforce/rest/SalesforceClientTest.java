@@ -1,7 +1,7 @@
 package com.salesforce.rest;
 
-import static com.salesforce.rest.SalesforceClient.AuthenticationFlow.JWT;
-import static com.salesforce.rest.SalesforceClient.AuthenticationFlow.USER_PASSWORD;
+import static com.salesforce.rest.SalesforceHttpClient.AuthenticationFlow.JWT;
+import static com.salesforce.rest.SalesforceHttpClient.AuthenticationFlow.USER_PASSWORD;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -27,7 +27,7 @@ public class SalesforceClientTest {
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
 
     Secrets secrets = SecretsUtil.readTestCredentials("secrets.json");
-    SalesforceClient client = new SalesforceClient(JWT, baseHTTPClient, secrets);
+    SalesforceHttpClient client = new SalesforceHttpClient(JWT, baseHTTPClient, secrets);
     assertNotNull(client.accessParameters.accessToken);
   }
 
@@ -40,7 +40,7 @@ public class SalesforceClientTest {
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
 
     Secrets secrets = SecretsUtil.readTestCredentials("secrets.json");
-    SalesforceClient client = new SalesforceClient(USER_PASSWORD, baseHTTPClient, secrets);
+    SalesforceHttpClient client = new SalesforceHttpClient(USER_PASSWORD, baseHTTPClient, secrets);
   }
 
   public static String readResourceJSON(String fileName) throws IOException {

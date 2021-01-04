@@ -14,6 +14,7 @@ public class BatchRequest {
 
   String method; //required
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonRawValue
   String richInput;
 

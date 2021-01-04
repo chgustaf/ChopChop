@@ -4,7 +4,7 @@ public class CompositeBatchRequest {
 
   /*
   Limits—vXX.X/limits
-  SObject resources—vXX.X/sobjects/
+  SObject resources—vXX.X/sobjects/ DONE!
   Query—vXX.X/query/?q=soql
   QueryAll—vXX.X/queryAll/?q=soql
   Search—vXX.X/search/?q=sosl

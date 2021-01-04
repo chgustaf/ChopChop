@@ -1,7 +1,5 @@
 package com.examples.caseupdater.client.composite.batch;
 
-import com.examples.caseupdater.client.composite.Result;
-
 public class CompositeBatchResponse {
 
 

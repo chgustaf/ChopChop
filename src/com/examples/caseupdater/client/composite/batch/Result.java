@@ -1,4 +1,4 @@
-package com.examples.caseupdater.client.composite;
+package com.examples.caseupdater.client.composite.batch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

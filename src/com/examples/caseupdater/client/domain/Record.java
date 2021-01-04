@@ -1,32 +1,109 @@
 package com.examples.caseupdater.client.domain;
 
+import com.examples.caseupdater.client.dto.Attributes;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-public interface Record {
+public abstract class Record {
 
-  Boolean getSuccess();
+  protected String id;
+  protected Integer statusCode;
+  protected Attributes attributes;
+  @JsonIgnore
+  protected ObjectMapper mapper;
+  protected String sobjectName;
+  protected Boolean success;
 
-  String getSObjectName();
+  protected Record(final String sobjectName) {
+    this.sobjectName = sobjectName;
+    this.attributes = new Attributes("Account", UUID.randomUUID().toString());
+    this.mapper = new ObjectMapper();
+  }
 
-  String getReferenceId();
+  @JsonIgnore
+  public String getId() {
+    return id;
+  }
 
-  String getId();
+  @JsonSetter("Id")
+  public void setId(final String id) {
+    this.id = id;
+  }
 
-  String getJSON() throws JsonProcessingException;
+  @JsonIgnore
+  public Integer getStatusCode() {
+    return statusCode;
+  }
 
-  Integer getStatusCode();
+  public void setStatusCode(final Integer statusCode) {
+    this.statusCode = statusCode;
+  }
 
-  void setSuccess(Boolean success);
 
-  void setReferenceId(String referenceId);
+  @JsonIgnore
+  public Boolean getSuccess() {
+    return success;
+  }
 
-  void setId(String id);
+  public void setSuccess(final Boolean success) {
+    this.success = success;
+  }
 
-  void setJSON(String json);
+  public void setReferenceId(final String referenceId) {
+    this.attributes.setReferenceId(referenceId);
+  }
 
-  void setStatusCode(Integer statusCode);
+  @JsonIgnore
+  public String getReferenceId() {
+    return attributes.getReferenceId();
+  }
 
-  List<String> getAllFields();
 
+  @JsonIgnore
+  public Attributes getAttributes() {
+    return attributes;
+  }
+
+  @JsonIgnore
+  public void setAttributes(final Attributes attributes) {
+    this.attributes = attributes;
+  }
+
+
+  public ObjectMapper getMapper() {
+    return mapper;
+  }
+
+  public void setMapper(final ObjectMapper mapper) {
+    this.mapper = mapper;
+  }
+
+  @JsonIgnore
+  public String getSObjectName() {
+    return this.getClass().getSimpleName();
+  }
+
+
+  public void setSobjectName(final String sobjectName) {
+    this.sobjectName = sobjectName;
+  }
+
+  @JsonIgnore
+  protected List<String> getAllFieldsHelper(Class clazz) {
+    return Arrays
+        .stream(clazz.getFields()).map(Field::getName).collect(Collectors.toList());
+  }
+
+  @JsonIgnore
+  public abstract List<String> getAllFields();
+
+  @JsonIgnore
+  public abstract String getJSON() throws JsonProcessingException;
 }
