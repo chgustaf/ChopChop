@@ -8,12 +8,11 @@ import java.util.List;
 
 public class Case extends Record {
 
-  public String id;
   public String subject;
   public String accountId;
 
   public Case() {
-    super("Case");
+    super(Case.class);
   }
 
   public String getSubject() {
@@ -43,5 +42,18 @@ public class Case extends Record {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     return mapper.writeValueAsString(this);
+  }
+
+  @Override
+  public Class getClazz() {
+    return null;
+  }
+
+  @Override
+  public String toString() {
+    return "Case{" +
+           "subject='" + subject + '\'' +
+           ", accountId='" + accountId + '\'' +
+           '}';
   }
 }

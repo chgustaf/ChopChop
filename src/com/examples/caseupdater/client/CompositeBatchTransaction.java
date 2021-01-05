@@ -75,6 +75,7 @@ public class CompositeBatchTransaction {
             .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
             .setReferenceId(record.getReferenceId())
             .setId(record.getId())
+            .setType(BatchRequest.Type.SOBJECT)
             .createBatchRequest();
     requests.add(batchRequest);
   }
@@ -101,6 +102,7 @@ public class CompositeBatchTransaction {
             .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
             .setReferenceId(record.getReferenceId())
             .setId(record.getId())
+            .setType(BatchRequest.Type.SOBJECT)
             .createBatchRequest();
     requests.add(batchRequest);
   }
@@ -111,9 +113,14 @@ public class CompositeBatchTransaction {
         new BatchRequestBuilder()
             .setMethod("GET")
             .setUrl(
-                sobjectURL + record.getSObjectName() + "/" + record.getId() + "?fields=" + String.join(
-                ",", record.getAllFields()))
+                sobjectURL
+                    + record.getSObjectName()
+                    + "/"
+                    + record.getId()
+                    + "?fields="
+                    + String.join(",", record.getAllFields()))
             .setReferenceId(record.getReferenceId())
+            .setType(BatchRequest.Type.SOBJECT)
             .setId(record.getId())
             .createBatchRequest();
     requests.add(batchRequest);
@@ -135,6 +142,8 @@ public class CompositeBatchTransaction {
 
     resultList = new ArrayList<>();
     for (int i = 0; i < compositeBatchResponse.getResults().length;i++) {
+
+      // TODO fix so that the java application will call while done != true
       if (requests.get(i).getType().equals(BatchRequest.Type.SOBJECT)) {
         if (requests.get(i).getMethod() == "DELETE" || requests.get(i).getMethod() == "PATCH") {
           resultList.add(

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public abstract class Record {
+public abstract class Record<T> {
 
   protected String id;
   protected Integer statusCode;
@@ -20,9 +20,11 @@ public abstract class Record {
   protected ObjectMapper mapper;
   protected String sobjectName;
   protected Boolean success;
+  protected Class<T> entityClass;
 
-  protected Record(final String sobjectName) {
-    this.sobjectName = sobjectName;
+  protected Record(Class<T> entityClass) {
+    this.entityClass = entityClass;
+    this.sobjectName = entityClass.getSimpleName();
     this.attributes = new Attributes("Account", UUID.randomUUID().toString());
     this.mapper = new ObjectMapper();
   }
@@ -30,6 +32,11 @@ public abstract class Record {
   @JsonIgnore
   public String getId() {
     return id;
+  }
+
+  @JsonIgnore
+  public Class<T> getEntityClass() {
+    return entityClass;
   }
 
   @JsonSetter("Id")
@@ -104,4 +111,7 @@ public abstract class Record {
 
   @JsonIgnore
   public abstract String getJSON() throws JsonProcessingException;
+
+  @JsonIgnore
+  public abstract Class getClazz();
 }

@@ -14,7 +14,7 @@ public class Account extends Record {
   public String description;
 
   public Account() {
-    super("Account");
+    super(Account.class);
   }
 
   public Account(String name) {
@@ -33,6 +33,11 @@ public class Account extends Record {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     return mapper.writeValueAsString(this);
+  }
+
+  @Override
+  public Class getClazz() {
+    return this.getClass();
   }
 
   public String getName() {
