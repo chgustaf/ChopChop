@@ -11,7 +11,6 @@ public class BatchRequest {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   String getBinaryPartNameAlias;
-
   String method; //required
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -35,7 +34,6 @@ public class BatchRequest {
     CONNECT,
     CHATTER
   }
-  String requestType;
 
   BatchRequest(final Type type, final String binaryPartName,
                final String getBinaryPartNameAlias,
@@ -59,14 +57,6 @@ public class BatchRequest {
 
   public void setType(final Type type) {
     this.type = type;
-  }
-
-  private String getRequestType() {
-    return requestType;
-  }
-
-  private void setRequestType(final String requestType) {
-    this.requestType = requestType;
   }
 
   public String getBinaryPartName() {

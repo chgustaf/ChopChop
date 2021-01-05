@@ -46,7 +46,6 @@ public abstract class Record {
     this.statusCode = statusCode;
   }
 
-
   @JsonIgnore
   public Boolean getSuccess() {
     return success;
@@ -71,7 +70,7 @@ public abstract class Record {
     return attributes;
   }
 
-  @JsonIgnore
+
   public void setAttributes(final Attributes attributes) {
     this.attributes = attributes;
   }
@@ -89,7 +88,6 @@ public abstract class Record {
   public String getSObjectName() {
     return this.getClass().getSimpleName();
   }
-
 
   public void setSobjectName(final String sobjectName) {
     this.sobjectName = sobjectName;

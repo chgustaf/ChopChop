@@ -2,6 +2,7 @@ package com.examples.caseupdater.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -10,10 +11,14 @@ import static org.mockito.Mockito.when;
 import com.examples.caseupdater.client.composite.batch.CompositeBatchResponse;
 import com.examples.caseupdater.client.domain.Account;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.salesforce.exceptions.AuthenticationException;
 import com.salesforce.rest.SalesforceCompositeBatchClient;
 import java.io.IOException;
+import java.util.List;
 import org.junit.Test;
 
 public class CompositeBatchTransactionTest {
@@ -117,6 +122,13 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
+  public void batchDelete_FailChildRecords() {
+    String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
+                          + "\":\"DELETE_FAILED\",\"message\":\"Your attempt to delete Edge Communications could not be completed because some opportunities in that account were closed won. The opportunities that could not be deleted are shown below.: Edge Emergency Generator, Edge Installation, Edge SLA\\n\"}],\"statusCode\":400}]}\n";
+
+  }
+
+  @Test
   public void batchGet_success() throws IOException, AuthenticationException {
     String id = "0013V000009ikVtQAI";
     String responseJson =
@@ -168,5 +180,19 @@ public class CompositeBatchTransactionTest {
   public void query_success() {
     String responseJSON = "{\"totalSize\":13,\"done\":true,"
                           + "\"records\":[{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}\n";
+
   }
+
+  @Test
+  public void queryExperiment() throws IOException {
+    String jsonString = "[{\"attributes\":{\"type\":\"Account\",\"url\":\"/services/data/v50"
+                        + ".0/sobjects/Account/0013V0000082ALKQA2\"},\"Id\":\"0013V0000082ALKQA2\"},{\"attributes\":{\"type\":\"Account\",\"url\":\"/services/data/v50.0/sobjects/Account/0013V0000082ALLQA2\"},\"Id\":\"0013V0000082ALLQA2\"}]";
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(jsonString);
+    ObjectReader reader = mapper.readerFor(new TypeReference<List<Account>>() {});
+    List<Account> returnList = reader.readValue(jsonNode);
+    assertNotNull(jsonNode);
+  }
+
+
 }

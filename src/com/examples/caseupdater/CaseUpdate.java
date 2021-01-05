@@ -18,7 +18,7 @@ public class CaseUpdate {
   public static void main(String[] args) throws IOException, AuthenticationException {
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
-
+/*
     Account account1 = new Account();
     account1.setName("Test Account Ompa "+System.currentTimeMillis());
     Account account2 = new Account();
@@ -49,12 +49,17 @@ public class CaseUpdate {
     account1.setName("New Test Account " + System.currentTimeMillis());
     account1 = update(account1, salesforceCompositeBatchClient);
     System.out.println("Account updated " + account1);
-
+*/
     Query query = new Query();
-    query.setQuery(URLEncoder.encode("SELECT id FROM Case", StandardCharsets.UTF_8));
+    query.setQuery(URLEncoder.encode("SELECT id FROM Account LIMIT 13",
+        StandardCharsets.UTF_8));
+    List<Account> accountList = query(query, salesforceCompositeBatchClient);
+    System.out.println("Account List " + accountList);
 
-    query(query, salesforceCompositeBatchClient);
+    System.out.println(accountList.get(0));
 
+    Account account = delete(accountList.get(0), salesforceCompositeBatchClient);
+    System.out.println("Account has been deleted "+account.getStatusCode());
 
     //account1 = delete(account1, salesforceCompositeBatchClient);
     //System.out.println("This account1 was deleted " + account1);
@@ -155,7 +160,7 @@ public class CaseUpdate {
     return transaction.getRecord(account.getReferenceId(), account.getClass());
   }
 
-  private static String query(Query query,
+  private static List<Account> query(Query query,
                               SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException {
     CompositeBatchTransaction transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient);
@@ -164,7 +169,7 @@ public class CaseUpdate {
       System.out.println("Unable to query");
       return null;
     }
-    return transaction.getQuery(query.getReferenceId());
+    return transaction.getQueryResult(query.getReferenceId(), Account.class);
   }
 
 }

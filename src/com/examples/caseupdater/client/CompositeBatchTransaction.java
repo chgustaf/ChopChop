@@ -7,16 +7,19 @@ import com.examples.caseupdater.client.composite.batch.CompositeBatchRequest;
 import com.examples.caseupdater.client.composite.batch.CompositeBatchRequestBuilder;
 import com.examples.caseupdater.client.composite.batch.CompositeBatchResponse;
 import com.examples.caseupdater.client.domain.Query;
+import com.examples.caseupdater.client.domain.QueryResult;
 import com.examples.caseupdater.client.domain.Record;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.salesforce.exceptions.AuthenticationException;
 import com.salesforce.rest.SalesforceCompositeBatchClient;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -125,30 +128,33 @@ public class CompositeBatchTransaction {
     String responseString = salesforceCompositeBatchClient.compositeBatchCall(payload);
     compositeBatchResponse = parseCompositeBatchResponse(responseString);
 
-    //TODO Create a super class to both Record and Query (maybe only containg ReferenceID) and
-    // change the records List to contains the super class instead of Record. The super class
-    // list can then be used for determining how and answer should be deserialized (i.e. should
-    // it be a record or a query)
-
     // I the number results differ from the number of batches then something is really wrong
-    if (compositeBatchResponse.getResults().length != records.size()) {
+    if (compositeBatchResponse.getResults().length != (records.size()+queries.size())) {
       throw new RuntimeException("Something is meeeeessed up");
     }
 
     resultList = new ArrayList<>();
     for (int i = 0; i < compositeBatchResponse.getResults().length;i++) {
-      if (requests.get(i).getMethod() == "DELETE" || requests.get(i).getMethod() == "PATCH") {
-        resultList.add(
-            new CombinedRequestResponse(
-                requests.get(i),
-                null,
-                compositeBatchResponse.getResults()[i].getStatusCode()));
-      } else {
+      if (requests.get(i).getType().equals(BatchRequest.Type.SOBJECT)) {
+        if (requests.get(i).getMethod() == "DELETE" || requests.get(i).getMethod() == "PATCH") {
+          resultList.add(
+              new CombinedRequestResponse(
+                  requests.get(i),
+                  null,
+                  compositeBatchResponse.getResults()[i].getStatusCode()));
+        } else {
           resultList.add(
               new CombinedRequestResponse(
                   requests.get(i),
                   compositeBatchResponse.getResults()[i].getResult(),
                   compositeBatchResponse.getResults()[i].getStatusCode()));
+        }
+
+      } else if (requests.get(i).getType().equals(BatchRequest.Type.QUERY)) {
+        resultList.add(
+            new CombinedRequestResponse(requests.get(i),
+                compositeBatchResponse.getResults()[i].getResult(),
+                compositeBatchResponse.getResults()[i].getStatusCode()));
       }
     }
 
@@ -251,17 +257,26 @@ public class CompositeBatchTransaction {
     return null;
   }
 
-  public String getQuery(final String referenceId) {
+  public <T extends Record> List<T> getQueryResult(String referenceId, Class<T> clazz)
+      throws IOException {
     // Find the request with the specific referenceId
     Optional<CombinedRequestResponse> result =
-        resultList
-            .stream()
+        resultList.stream()
             .filter(res -> res.getRequest() != null)
             .filter(res -> res.getRequest().getReferenceId().equals(referenceId))
             .findFirst();
+
+    List<T> returnList = new ArrayList<>();
     if (result.isPresent()) {
-      System.out.println(result.get().getResult().textValue());
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+      JsonNode jsonNode = result.get().getResult();
+      QueryResult queryResult = mapper.treeToValue(jsonNode, QueryResult.class);
+
+      ObjectReader reader = mapper.readerForArrayOf(clazz);
+      T[] arrayofT = reader.readValue(queryResult.records);
+      returnList.addAll(Arrays.asList(arrayofT));
     }
-    return "";
+    return returnList;
   }
 }
