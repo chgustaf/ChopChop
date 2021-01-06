@@ -1,6 +1,6 @@
 
 
-#ChopChop - A Salesforce Client that will quickly get you started
+# ChopChop - A Salesforce Client that will quickly get you started
 
 The ChopChop client is distributed through Github Packages. Setup your maven application so that 
 you can import 
