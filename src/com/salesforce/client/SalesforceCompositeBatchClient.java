@@ -1,8 +1,8 @@
-package com.salesforce.rest;
+package com.salesforce.client;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.salesforce.exceptions.AuthenticationException;
+import com.salesforce.authentication.exceptions.AuthenticationException;
 import java.io.IOException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -22,7 +22,7 @@ public class SalesforceCompositeBatchClient {
   }
 
   private void initEndpoints() {
-    final String instanceUrl = client.accessParameters.instanceUrl;
+    final String instanceUrl = client.getAccessParameters().instanceUrl;
     final Integer apiVersion = 50;
     final String baseEndpoint = instanceUrl + "/services/data/v" + apiVersion + ".0/";
     compositeSobjectEndpoint = baseEndpoint + "composite/sobjects";
@@ -35,7 +35,7 @@ public class SalesforceCompositeBatchClient {
       throws IOException, AuthenticationException {
     HttpPost postRequest = new HttpPost(compositeEndpoint);
     postRequest.addHeader("Content-Type", "application/json");
-    postRequest.addHeader("Authorization", "Bearer " + client.accessParameters.accessToken);
+    postRequest.addHeader("Authorization", "Bearer " + client.getAccessParameters().accessToken);
     postRequest.setEntity(new StringEntity(requestString, UTF_8));
     return client.executeHttpRequest(postRequest);
   }
@@ -44,7 +44,7 @@ public class SalesforceCompositeBatchClient {
       throws IOException, AuthenticationException {
     HttpPost postRequest = new HttpPost(compositeBatchEndpoint);
     postRequest.addHeader("Content-Type", "application/json");
-    postRequest.addHeader("Authorization", "Bearer " + client.accessParameters.accessToken);
+    postRequest.addHeader("Authorization", "Bearer " + client.getAccessParameters().accessToken);
     postRequest.setEntity(new StringEntity(requestString, UTF_8));
     return client.executeHttpRequest(postRequest);
   }

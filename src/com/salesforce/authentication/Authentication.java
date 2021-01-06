@@ -1,8 +1,8 @@
 package com.salesforce.authentication;
 
 import com.salesforce.authentication.secrets.Secrets;
-import com.salesforce.exceptions.AuthenticationException;
-import com.salesforce.rest.BaseHTTPClient;
+import com.salesforce.authentication.exceptions.AuthenticationException;
+import com.salesforce.client.BaseHTTPClient;
 import java.io.IOException;
 import org.apache.http.client.methods.HttpPost;
 

@@ -2,23 +2,19 @@ package com.examples.caseupdater.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.examples.caseupdater.client.composite.batch.CompositeBatchResponse;
+import com.salesforce.client.composite.dto.CompositeBatchResponse;
 import com.examples.caseupdater.client.domain.Account;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.salesforce.exceptions.AuthenticationException;
-import com.salesforce.rest.SalesforceCompositeBatchClient;
+import com.salesforce.authentication.exceptions.AuthenticationException;
+import com.salesforce.client.SalesforceCompositeBatchClient;
+import com.salesforce.client.composite.batch.CompositeBatchTransaction;
 import java.io.IOException;
-import java.util.List;
 import org.junit.Test;
 
 public class CompositeBatchTransactionTest {
@@ -35,9 +31,7 @@ public class CompositeBatchTransactionTest {
   public void batchPost_unknownException() throws IOException, AuthenticationException {
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"UNKNOWN_EXCEPTION\",\"message\":\"An unexpected error occurred. Please include this ErrorId if you contact support: 8425053-14906 (608530858)\"}],\"statusCode\":500}]}";
-    SalesforceCompositeBatchClient
-        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
-    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
 
     CompositeBatchTransaction compositeBatchTransaction = new CompositeBatchTransaction(
         salesforceCompositeBatchClient);
@@ -49,9 +43,7 @@ public class CompositeBatchTransactionTest {
   public void batchPost_invalidFieldException() throws IOException, AuthenticationException {
     String responseJson =
         "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"No such column &#39;aFieldThatDoesNotExist&#39; on sobject of type Account\"}],\"statusCode\":400}]}";
-    SalesforceCompositeBatchClient
-        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
-    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
 
     Account account = new Account("Example Account");
     String uuid1 = account.getReferenceId();
@@ -73,10 +65,8 @@ public class CompositeBatchTransactionTest {
     String accountName = "Example Account 1";
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":201,\"result\":\n"
                           + "{\"id\":\""+id+"\",\"success\":true,\"errors\":[]}}]}";
-    SalesforceCompositeBatchClient
-        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
-    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
 
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
     Account account = new Account(accountName);
     String uuid1 = account.getReferenceId();
 
@@ -100,9 +90,7 @@ public class CompositeBatchTransactionTest {
     String id = "123456789";
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,"
                           + "\"result\":null}]}";
-    SalesforceCompositeBatchClient
-        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
-    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
 
     Account account = new Account();
     account.setId(id);
@@ -122,9 +110,17 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchDelete_FailChildRecords() {
+  public void batchDelete_FailChildRecords() throws IOException, AuthenticationException {
+
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"DELETE_FAILED\",\"message\":\"Your attempt to delete Edge Communications could not be completed because some opportunities in that account were closed won. The opportunities that could not be deleted are shown below.: Edge Emergency Generator, Edge Installation, Edge SLA\\n\"}],\"statusCode\":400}]}\n";
+    Account account = new Account();
+    account.setId(any());
+
+    mockCompositeBatchResponse(responseJson);
+
+
+
 
   }
 
@@ -135,9 +131,8 @@ public class CompositeBatchTransactionTest {
         "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":\n"
             + "    {\"attributes\":{\"type\":\"Account\",\"url\":\"/services/data/v50.0/sobjects/Account/0013V000009ikVtQAI\"},\"Id\":\"0013V000009ikVtQAI\",\"Name\":\"Test Account 1609674290821\"}}]}\n"
             + "    ";
-    SalesforceCompositeBatchClient
-        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
-    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+    mockCompositeBatchResponse(responseJson);
 
     Account account = new Account();
     account.setId(id);
@@ -169,14 +164,6 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void testSerialize() throws JsonProcessingException {
-    Account account = new Account();
-    account.setName("A Name");
-
-    assertNotEquals(null, account.getJSON());
-  }
-
-  @Test
   public void query_success() {
     String responseJSON = "{\"totalSize\":13,\"done\":true,"
                           + "\"records\":[{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}\n";
@@ -184,15 +171,17 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void queryExperiment() throws IOException {
-    String jsonString = "[{\"attributes\":{\"type\":\"Account\",\"url\":\"/services/data/v50"
-                        + ".0/sobjects/Account/0013V0000082ALKQA2\"},\"Id\":\"0013V0000082ALKQA2\"},{\"attributes\":{\"type\":\"Account\",\"url\":\"/services/data/v50.0/sobjects/Account/0013V0000082ALLQA2\"},\"Id\":\"0013V0000082ALLQA2\"}]";
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode jsonNode = mapper.readTree(jsonString);
-    ObjectReader reader = mapper.readerFor(new TypeReference<List<Account>>() {});
-    List<Account> returnList = reader.readValue(jsonNode);
-    assertNotNull(jsonNode);
+  public void query_invalidField() {
+    String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
+                          + "\":\"INVALID_FIELD\",\"message\":\"\\nSELECT id, name, non_existing_field FROM Account\\n\\nERROR at Row:1:Column:18\\nNo such column &#39;non_existing_field&#39; on entity &#39;Account&#39;. If you are attempting to use a custom field, be sure to append the &#39;__c&#39; after the custom field name. Please reference your WSDL or the describe call for the appropriate names.\"}],\"statusCode\":400}]}\n";
+
   }
 
 
+  private SalesforceCompositeBatchClient mockCompositeBatchResponse(String json) throws IOException, AuthenticationException {
+    SalesforceCompositeBatchClient
+        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(json);
+    return salesforceCompositeBatchClient;
+  }
 }

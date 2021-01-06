@@ -1,7 +1,7 @@
-package com.salesforce.rest;
+package com.salesforce.client;
 
-import static com.salesforce.rest.SalesforceHttpClient.AuthenticationFlow.JWT;
-import static com.salesforce.rest.SalesforceHttpClient.AuthenticationFlow.USER_PASSWORD;
+import static com.salesforce.client.SalesforceHttpClient.AuthenticationFlow.JWT;
+import static com.salesforce.client.SalesforceHttpClient.AuthenticationFlow.USER_PASSWORD;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.salesforce.authentication.secrets.Secrets;
 import com.salesforce.authentication.secrets.SecretsUtil;
-import com.salesforce.exceptions.AuthenticationException;
+import com.salesforce.authentication.exceptions.AuthenticationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,7 +28,7 @@ public class SalesforceClientTest {
 
     Secrets secrets = SecretsUtil.readTestCredentials("secrets.json");
     SalesforceHttpClient client = new SalesforceHttpClient(JWT, baseHTTPClient, secrets);
-    assertNotNull(client.accessParameters.accessToken);
+    assertNotNull(client.getAccessParameters().accessToken);
   }
 
   @Test

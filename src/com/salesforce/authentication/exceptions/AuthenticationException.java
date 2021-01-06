@@ -1,4 +1,4 @@
-package com.salesforce.exceptions;
+package com.salesforce.authentication.exceptions;
 
 public class AuthenticationException extends Exception {
 

@@ -1,6 +1,6 @@
 package com.innovationmadness;
 
-import com.salesforce.rest.SalesforceHttpClient;
+import com.salesforce.client.SalesforceHttpClient;
 
 public class Main {
 

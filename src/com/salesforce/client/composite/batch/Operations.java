@@ -1,18 +1,15 @@
-package com.examples.caseupdater.client;
+package com.salesforce.client.composite.batch;
 
 import com.examples.caseupdater.client.domain.Account;
-import com.examples.caseupdater.client.domain.Query;
-import com.examples.caseupdater.client.domain.Record;
-import com.salesforce.exceptions.AuthenticationException;
-import com.salesforce.rest.SalesforceCompositeBatchClient;
+import com.salesforce.client.composite.domain.Query;
+import com.salesforce.client.composite.domain.Record;
+import com.salesforce.authentication.exceptions.AuthenticationException;
+import com.salesforce.client.SalesforceCompositeBatchClient;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Operations {
-
-
-
 
   public static <T extends Record> List<T> createRecords(List<T> records,
                                                          SalesforceCompositeBatchClient salesforceCompositeBatchClient)
@@ -94,13 +91,13 @@ public class Operations {
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
   }
 
+  // TODO Make the query method generic
   public static List<Account> query(Query query,
                                     SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException {
     CompositeBatchTransaction transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient);
     transaction.query(query);
     if (!transaction.execute()) {
-      System.out.println("Unable to query");
       return null;
     }
     return transaction.getQueryResult(query.getReferenceId(), Account.class);

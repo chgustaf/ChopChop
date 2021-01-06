@@ -1,8 +1,8 @@
-package com.salesforce.rest;
+package com.salesforce.client;
 
 
-import static com.salesforce.exceptions.AuthenticationException.Code.UNAUTHORIZED;
-import static com.salesforce.exceptions.AuthenticationException.Code.UNKNOWN_AUTHENTICATION_FLOW;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.UNAUTHORIZED;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.UNKNOWN_AUTHENTICATION_FLOW;
 
 import com.salesforce.authentication.AccessParameters;
 import com.salesforce.authentication.Authentication;
@@ -10,7 +10,7 @@ import com.salesforce.authentication.jwt.JWTAuthentication;
 import com.salesforce.authentication.secrets.Secrets;
 import com.salesforce.authentication.secrets.SecretsUtil;
 import com.salesforce.authentication.userpassword.UserPasswordAuthentication;
-import com.salesforce.exceptions.AuthenticationException;
+import com.salesforce.authentication.exceptions.AuthenticationException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -28,15 +28,15 @@ public class SalesforceHttpClient {
   }
   private Authentication authentication;
 
-  public Integer apiVersion = 50;
-  public final String baseEndpoint = "/services/data/v"+apiVersion+".0/";
-  public final String queryEndpoint = baseEndpoint+"query/?q=";
-  public final String queryAllEndpoint = baseEndpoint+"query/?q=";
-  public final String sobjectEndpoint = baseEndpoint + "sobjects/";
-  public final String multipleRecordsEndpoint = baseEndpoint + "composite/tree/";
-  public AccessParameters accessParameters;
-  public final BaseHTTPClient httpClient;
-  public final Secrets secrets;
+  private Integer apiVersion = 50;
+  private final String baseEndpoint = "/services/data/v"+apiVersion+".0/";
+  private final String queryEndpoint = baseEndpoint+"query/?q=";
+  private final String queryAllEndpoint = baseEndpoint+"query/?q=";
+  private final String sobjectEndpoint = baseEndpoint + "sobjects/";
+  private final String multipleRecordsEndpoint = baseEndpoint + "composite/tree/";
+  private volatile AccessParameters accessParameters;
+  private final BaseHTTPClient httpClient;
+  private final Secrets secrets;
 
 
   public SalesforceHttpClient(AuthenticationFlow authenticationFlow)
@@ -80,33 +80,39 @@ public class SalesforceHttpClient {
     HttpGet getRequest = new HttpGet(url);
     getRequest.addHeader("accept", "application/json");
     getRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
+
     return executeHttpRequest(getRequest);
   }
 
   public String executeHttpRequest(HttpRequest request)
       throws IOException, AuthenticationException {
     String returnString = "";
-    int maxRetries = 1;
-    for (int i = 0; i <= maxRetries; i++) {
-      try {
-        if (request instanceof HttpDelete) {
-          returnString = httpClient.delete((HttpDelete) request);
-        } else if (request instanceof HttpGet) {
-          returnString = httpClient.get((HttpGet) request);
-        } else if (request instanceof HttpPatch) {
-          returnString = httpClient.patch((HttpPatch) request);
-        } else if (request instanceof HttpPost) {
-          returnString = httpClient.post((HttpPost) request);
-        }
-        break;
-      } catch (AuthenticationException authenticationException) {
-        if (authenticationException.getCode().equals(UNAUTHORIZED)) {
-          System.out.println("Re-Authenticating");
-          accessParameters = authentication.authenticate();
-          request.removeHeaders("Authorization");
-          request.addHeader("Authorization", accessParameters.accessToken);
+    synchronized (accessParameters) {
+      System.out.println("Synchronized start "+Thread.currentThread().getName());
+      int maxRetries = 1;
+      for (int i = 0; i <= maxRetries; i++) {
+        try {
+          if (request instanceof HttpDelete) {
+            returnString = httpClient.delete((HttpDelete) request);
+          } else if (request instanceof HttpGet) {
+            returnString = httpClient.get((HttpGet) request);
+          } else if (request instanceof HttpPatch) {
+            returnString = httpClient.patch((HttpPatch) request);
+          } else if (request instanceof HttpPost) {
+            returnString = httpClient.post((HttpPost) request);
+          }
+          break;
+        } catch (AuthenticationException authenticationException) {
+          if (authenticationException.getCode().equals(UNAUTHORIZED)) {
+            System.out.println("Re-Authenticating");
+            accessParameters = authentication.authenticate();
+            request.removeHeaders("Authorization");
+            request.addHeader("Authorization", accessParameters.accessToken);
+          }
         }
       }
+
+      System.out.println("Synchronized stop "+Thread.currentThread().getName());
     }
     return returnString;
   }
@@ -117,6 +123,9 @@ public class SalesforceHttpClient {
     return get(url);
   }
 
+  public synchronized AccessParameters getAccessParameters() {
+    return accessParameters;
+  }
 
   //TODO: Retry JWT process and document
 }

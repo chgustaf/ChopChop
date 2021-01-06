@@ -1,4 +1,4 @@
-package com.examples.caseupdater.client.domain;
+package com.salesforce.client.composite.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

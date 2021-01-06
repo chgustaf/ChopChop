@@ -1,9 +1,9 @@
-package com.salesforce.rest;
+package com.salesforce.client;
 
-import static com.salesforce.exceptions.AuthenticationException.Code.UNAUTHORIZED;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.UNAUTHORIZED;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.salesforce.exceptions.AuthenticationException;
+import com.salesforce.authentication.exceptions.AuthenticationException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;

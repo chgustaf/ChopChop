@@ -1,6 +1,6 @@
-package com.examples.caseupdater.client.domain;
+package com.salesforce.client.composite.domain;
 
-import com.examples.caseupdater.client.dto.Attributes;
+import com.salesforce.client.composite.dto.Attributes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonProcessingException;

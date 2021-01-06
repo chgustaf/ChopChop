@@ -1,4 +1,4 @@
-package com.examples.caseupdater.client.composite.batch;
+package com.salesforce.client.composite.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

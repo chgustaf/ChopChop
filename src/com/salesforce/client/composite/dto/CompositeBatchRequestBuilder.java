@@ -1,4 +1,4 @@
-package com.examples.caseupdater.client.composite.batch;
+package com.salesforce.client.composite.dto;
 
 public class CompositeBatchRequestBuilder {
 

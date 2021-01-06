@@ -1,16 +1,16 @@
 package com.salesforce.authentication.jwt;
 
-import static com.salesforce.exceptions.AuthenticationException.Code.CERTIFICATE_EXCEPTION;
-import static com.salesforce.exceptions.AuthenticationException.Code.INVALID_KEY_EXCEPTION;
-import static com.salesforce.exceptions.AuthenticationException.Code.KEY_STORE_EXCEPTION;
-import static com.salesforce.exceptions.AuthenticationException.Code.NO_SUCH_ALGORITHM_EXCEPTION;
-import static com.salesforce.exceptions.AuthenticationException.Code.SIGNATURE_EXCEPTION;
-import static com.salesforce.exceptions.AuthenticationException.Code.UNRECOVERABLE_KEY_EXCEPTION;
-import static com.salesforce.exceptions.AuthenticationException.Code.UNSUPPORTED_ENCODING_EXCEPTION;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.CERTIFICATE_EXCEPTION;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.INVALID_KEY_EXCEPTION;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.KEY_STORE_EXCEPTION;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.NO_SUCH_ALGORITHM_EXCEPTION;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.SIGNATURE_EXCEPTION;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.UNRECOVERABLE_KEY_EXCEPTION;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.UNSUPPORTED_ENCODING_EXCEPTION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.salesforce.authentication.secrets.Secrets;
-import com.salesforce.exceptions.AuthenticationException;
+import com.salesforce.authentication.exceptions.AuthenticationException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
