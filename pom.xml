@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.innovationmadness</groupId>
-    <artifactId>SimpleJavaSalesforce</artifactId>
+    <groupId>com.chgustaf</groupId>
+    <artifactId>chopchop</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>SimpleJavaSalesforce is a salesforce client for java</description>
+    <description>ChopChop is a salesforce client for java </description>
     <packaging>jar</packaging>
 
 

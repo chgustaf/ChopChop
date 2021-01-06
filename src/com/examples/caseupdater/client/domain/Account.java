@@ -5,12 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.salesforce.client.composite.domain.Record;
 import java.util.List;
 
 @JsonIgnoreProperties
-@JsonDeserialize(as=Account.class)
 public class Account extends Record {
 
   public String name;
