@@ -1,6 +1,7 @@
 package com.examples.caseupdater.client.domain;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 public class RecordTest {
 

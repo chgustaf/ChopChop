@@ -1,21 +1,23 @@
 package com.examples.caseupdater.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.salesforce.client.composite.dto.CompositeBatchResponse;
 import com.examples.caseupdater.client.domain.Account;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salesforce.authentication.exceptions.AuthenticationException;
 import com.salesforce.client.SalesforceCompositeBatchClient;
 import com.salesforce.client.composite.batch.CompositeBatchTransaction;
+import com.salesforce.client.composite.dto.CompositeBatchResponse;
 import java.io.IOException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 public class CompositeBatchTransactionTest {
 
@@ -116,8 +118,8 @@ public class CompositeBatchTransactionTest {
                           + "\":\"DELETE_FAILED\",\"message\":\"Your attempt to delete Edge Communications could not be completed because some opportunities in that account were closed won. The opportunities that could not be deleted are shown below.: Edge Emergency Generator, Edge Installation, Edge SLA\\n\"}],\"statusCode\":400}]}\n";
     Account account = new Account();
     account.setId(any());
-
     mockCompositeBatchResponse(responseJson);
+
 
 
 
