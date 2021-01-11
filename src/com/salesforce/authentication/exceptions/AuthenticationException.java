@@ -12,7 +12,8 @@ public class AuthenticationException extends Exception {
     UNSUPPORTED_ENCODING_EXCEPTION,
     SIGNATURE_EXCEPTION,
     INVALID_KEY_EXCEPTION,
-    FILE_NOT_FOUND_EXCEPTION
+    FILE_NOT_FOUND_EXCEPTION,
+    INVALID_CREDENTIALS
   }
 
   Code code;

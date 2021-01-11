@@ -35,6 +35,11 @@ public class SecretsUtil {
         .setConsumerSecret(jsonObject.getString("consumer_secret"))
         .setSecurityToken(jsonObject.getString("security_token"))
         .setLoginUrl(jsonObject.getString("login_url"))
+        .setTokenUrl(jsonObject.getString("token_url"))
+        .setAuthenticationMethod(jsonObject.getString("authentication_method"))
+        .setJksFileName(jsonObject.getString("jks_file_name"))
+        .setJksKeyname(jsonObject.getString("jks_keyname"))
+        .setJksPassword(jsonObject.getString("jks_password"))
         .createSecrets();
   }
 }

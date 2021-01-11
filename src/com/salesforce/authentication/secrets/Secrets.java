@@ -13,6 +13,10 @@ public class Secrets {
     String loginUrl;
     String tokenUrl;
     Integer apiVersion;
+    String authenticationMethod;
+    String jksFileName;
+    String jksPassword;
+    String jksKeyname;
 
     Key privateKey;
     RSAPublicKey publicKey;
@@ -20,7 +24,8 @@ public class Secrets {
     Secrets(final String username, final String password, final String securityToken,
             final String clientId,
             final String clientSecret, final String loginUrl, final String tokenUrl,
-            final Integer apiVersion) {
+            final Integer apiVersion, final String authenticationMethod, final String jksFileName,
+            final String jksPassword, final String jksKeyname) {
         this.username = username;
         this.password = password;
         this.securityToken = securityToken;
@@ -29,6 +34,10 @@ public class Secrets {
         this.loginUrl = loginUrl;
         this.tokenUrl = tokenUrl;
         this.apiVersion = apiVersion;
+        this.authenticationMethod = authenticationMethod;
+        this.jksFileName = jksFileName;
+        this.jksPassword = jksPassword;
+        this.jksKeyname = jksKeyname;
     }
 
     public String getUsername() {
@@ -109,5 +118,25 @@ public class Secrets {
 
     private void setApiVersion(final Integer apiVersion) {
         this.apiVersion = apiVersion;
+    }
+
+    public String getAuthenticationMethod() {
+        return authenticationMethod;
+    }
+
+    public String getJksFileName() {
+        return jksFileName;
+    }
+
+    public String getJksPassword() {
+        return jksPassword;
+    }
+
+    public void setJksKeyname(final String jksKeyname) {
+        this.jksKeyname = jksKeyname;
+    }
+
+    public String getJksKeyname() {
+        return jksKeyname;
     }
 }

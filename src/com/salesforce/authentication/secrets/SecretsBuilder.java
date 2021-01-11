@@ -10,6 +10,10 @@ public class SecretsBuilder {
   private String loginUrl;
   private String tokenUrl;
   private Integer apiVersion;
+  private String authenticationMethod;
+  private String jksFileName;
+  private String jksPassword;
+  private String jksKeyname;
 
   public SecretsBuilder setUsername(final String username) {
     this.username = username;
@@ -51,8 +55,28 @@ public class SecretsBuilder {
     return this;
   }
 
+  public SecretsBuilder setAuthenticationMethod(final String authenticationMethod) {
+    this.authenticationMethod = authenticationMethod;
+    return this;
+  }
+
+  public SecretsBuilder setJksFileName(final String jksFileName) {
+    this.jksFileName = jksFileName;
+    return this;
+  }
+
+  public SecretsBuilder setJksPassword(final String jksPassword) {
+    this.jksPassword = jksPassword;
+    return this;
+  }
+
+  public SecretsBuilder setJksKeyname(final String jksKeyname) {
+    this.jksKeyname = jksKeyname;
+    return this;
+  }
+
   public Secrets createSecrets() {
     return new Secrets(username, password, securityToken, consumerKey, consumerSecret, loginUrl,
-        tokenUrl, apiVersion);
+        tokenUrl, apiVersion, authenticationMethod, jksFileName, jksPassword, jksKeyname);
   }
 }

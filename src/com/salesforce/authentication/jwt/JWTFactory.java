@@ -1,6 +1,7 @@
 package com.salesforce.authentication.jwt;
 
 import static com.salesforce.authentication.exceptions.AuthenticationException.Code.CERTIFICATE_EXCEPTION;
+import static com.salesforce.authentication.exceptions.AuthenticationException.Code.INVALID_CREDENTIALS;
 import static com.salesforce.authentication.exceptions.AuthenticationException.Code.INVALID_KEY_EXCEPTION;
 import static com.salesforce.authentication.exceptions.AuthenticationException.Code.KEY_STORE_EXCEPTION;
 import static com.salesforce.authentication.exceptions.AuthenticationException.Code.NO_SUCH_ALGORITHM_EXCEPTION;
@@ -34,8 +35,54 @@ public class JWTFactory {
 
   public JWTFactory(Secrets secrets)
       throws IOException, AuthenticationException {
+    validateCredentials(secrets);
     this.secrets = secrets;
     readKey();
+  }
+
+  private void validateCredentials(Secrets secrets) throws AuthenticationException {
+    String exceptionMessage = "";
+    if (isNullOrBlank(secrets.getUsername())) {
+      exceptionMessage += "\n No username specified in secrets file";
+    }
+    if (isNullOrBlank(secrets.getPassword())) {
+      exceptionMessage += "\n No password specified in secrets file";
+    }
+    if (isNullOrBlank(secrets.getSecurityToken())) {
+      exceptionMessage += "\n No Security Token specified in secrets file";
+    }
+    if (isNullOrBlank(secrets.getConsumerSecret())) {
+      exceptionMessage += "\n No consumer secret specified in secrets file";
+    }
+    if (isNullOrBlank(secrets.getConsumerKey())) {
+      exceptionMessage += "\n No consumer key specified in secrets file";
+    }
+    if (isNullOrBlank(secrets.getLoginUrl())) {
+      exceptionMessage += "\n No login url specified in secrets file";
+    }
+    if (isNullOrBlank(secrets.getTokenUrl())) {
+      exceptionMessage += "\n No token url specified in secrets file";
+    }
+    if (isNullOrBlank(secrets.getAuthenticationMethod())) {
+      exceptionMessage += "\n No authentication method specified in secrets file";
+    }
+
+    if (!isNullOrBlank(secrets.getAuthenticationMethod()) &&
+        secrets.getAuthenticationMethod() == "JWT") {
+      if (isNullOrBlank(secrets.getJksFileName())) {
+        exceptionMessage += "\n No jks file name specified in secrets file";
+      }
+      if (isNullOrBlank(secrets.getJksPassword())) {
+        exceptionMessage += "\n No jks password specified in secrets file";
+      }
+      if (isNullOrBlank(secrets.getJksKeyname())) {
+        exceptionMessage += "\n No jks keyname specified in secrets file";
+      }
+    }
+
+    if (!exceptionMessage.isBlank()) {
+      throw new AuthenticationException(INVALID_CREDENTIALS, exceptionMessage);
+    }
   }
 
   public String createJWT() throws AuthenticationException {
@@ -86,22 +133,26 @@ public class JWTFactory {
     return signedPayload;
   }
 
+  private boolean isNullOrBlank(String str) {
+    return (str == null || str.isBlank());
+  }
+
   public static String encode64Safe(byte[] byteArr) {
     return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(byteArr);
   }
 
   public static void readKey() throws AuthenticationException, IOException {
-    String keyStorePassword = "test2020"; // The password that the keystore
+    String keyStorePassword = secrets.getJksPassword(); // The password that the keystore
     // is locked with
     KeyStore keystore = null;
     try {
       keystore = KeyStore.getInstance("JKS");
       FileInputStream fis =
-          new FileInputStream(ClassLoader.getSystemResource("here.jks").getPath());
+          new FileInputStream(ClassLoader.getSystemResource(secrets.getJksFileName()+".jks").getPath());
 
       keystore.load(fis, keyStorePassword.toCharArray());
       privateKey = (PrivateKey)
-          keystore.getKey("mykey",
+          keystore.getKey(secrets.getJksKeyname(),
               keyStorePassword.toCharArray());
       secrets.setPrivateKey(privateKey);
 
