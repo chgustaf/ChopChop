@@ -30,13 +30,14 @@ How to use:
 this json template:
     ```json
     {
-      "username": "",
-      "password": "",
-      "security_token": "",
-      "consumer_key": "",
-      "consumer_secret": "",
-      "login_url": "https://login.salesforce.com",
-      "token_url": "https://login.salesforce.com/services/oauth2/token"
+       "username": "",
+       "password": "",
+       "security_token": "",
+       "consumer_key": "",
+       "consumer_secret": "",
+       "login_url": "",
+       "token_url": "",
+       "authentication_method": ""
     }
     ```
 
@@ -68,7 +69,24 @@ specify something you'll remember.
 just select (Full Access (full))
     6. Ensure the Require Secret for Web Server Flow
 5. Add the jks file to the resources folder in your java project.
-
+6. Add three more parameters to your json in the secrets.json file; jks_file_name which is the 
+name of the .jks file; jks_keyname which is the name of the key you created in salesforce and 
+jks_password which is the password you specified before downloading the jks:
+    ```json
+    {
+       "username": "",
+       "password": "",
+       "security_token": "",
+       "consumer_key": "",
+       "consumer_secret": "",
+       "login_url": "",
+       "token_url": "",
+       "authentication_method": "",
+       "jks_file_name": "",
+       "jks_keyname" : "",
+       "jks_password": ""
+    }
+    ```
 
 ### Appendix 2 - Setting up username-password authentication
 1.
