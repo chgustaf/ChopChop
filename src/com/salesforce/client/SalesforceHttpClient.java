@@ -61,9 +61,11 @@ public class SalesforceHttpClient {
       throws AuthenticationException, IOException {
     switch (authenticationFlow) {
       case USER_PASSWORD:
+        System.out.println("Username-Password Authentication selected");
         authentication = new UserPasswordAuthentication(secrets, httpClient);
         break;
       case JWT:
+        System.out.println("JWT Authentication selected");
         authentication = new JWTAuthentication(secrets, httpClient);
         break;
       default:

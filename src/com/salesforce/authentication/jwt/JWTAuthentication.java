@@ -38,7 +38,6 @@ public class JWTAuthentication extends Authentication {
   public AccessParameters getAccessToken(String loginURL, String jwt)
       throws IOException, AuthenticationException {
     HttpPost httpPost = new HttpPost(loginURL);
-    httpPost.setHeader("Host", "login.example.com");
     httpPost.setHeader("Content-type", "application/x-www-form-urlencoded");
     httpPost.setEntity(getJWTEntity(jwt));
     String returnJson = post(httpPost);

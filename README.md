@@ -65,8 +65,9 @@ specify something you'll remember.
     3. Set the Callback URL to "https://localhost"
     4. Activate Use digital signatures and upload the certificate (the .crt file you downloaded 
     in step 2)
-    5. Select an appropriate Oauth scope. If you're not so concerned about limiting the scope then 
-just select (Full Access (full))
+    5. Select "Perform requests on your behalf at any time (refresh_token, offline_access)" as 
+    well as another appropriate Oauth scope. If you are working in your own developer org and are
+     just working on some experiment/prototyping then just select "Full Access (full)".
     6. Ensure the Require Secret for Web Server Flow
 5. Add the jks file to the resources folder in your java project.
 6. Add three more parameters to your json in the secrets.json file; jks_file_name which is the 
@@ -87,6 +88,10 @@ jks_password which is the password you specified before downloading the jks:
        "jks_password": ""
     }
     ```
-
+7. You need to pre-authorize the user you've selected; Go into the setup and Apps> Manage Connected 
+Apps and client Edit Policies
+8. Set the picklist "Permitted Users" to "Admin approved users are pre-authorized" and click save.
+9. Two new related lists are now shown Profile and Permission Sets. Either authorize the profile 
+of the user you are going to use or authorize a permission set that is assigned to the user. 
 ### Appendix 2 - Setting up username-password authentication
 1.
