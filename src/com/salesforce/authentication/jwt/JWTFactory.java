@@ -10,11 +10,14 @@ import static com.salesforce.authentication.exceptions.AuthenticationException.C
 import static com.salesforce.authentication.exceptions.AuthenticationException.Code.UNSUPPORTED_ENCODING_EXCEPTION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.salesforce.authentication.secrets.Secrets;
 import com.salesforce.authentication.exceptions.AuthenticationException;
+import com.salesforce.authentication.secrets.Secrets;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -146,9 +149,21 @@ public class JWTFactory {
     // is locked with
     KeyStore keystore = null;
     try {
+      Path resourceDirectory;
+      // If unit test is running
+      if (secrets.getUsername().equals("test_user@innovationmadness.com")) {
+        resourceDirectory = Paths.get("src","test","resources");
+
+      } else {
+        resourceDirectory = Paths.get("src","resources");
+      }
+      String absolutePath = resourceDirectory.toFile().getAbsolutePath();
       keystore = KeyStore.getInstance("JKS");
+
+      File file = new File(absolutePath + "/" + secrets.getJksFileName());
+      System.out.println("Path " + file.getAbsolutePath());
       FileInputStream fis =
-          new FileInputStream(ClassLoader.getSystemResource(secrets.getJksFileName()+".jks").getPath());
+          new FileInputStream(file);
 
       keystore.load(fis, keyStorePassword.toCharArray());
       privateKey = (PrivateKey)

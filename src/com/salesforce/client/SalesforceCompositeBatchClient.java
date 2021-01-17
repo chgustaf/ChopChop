@@ -17,7 +17,7 @@ public class SalesforceCompositeBatchClient {
 
   public SalesforceCompositeBatchClient() throws IOException,
                                                  AuthenticationException {
-    client = new SalesforceHttpClient(SalesforceHttpClient.AuthenticationFlow.JWT);
+    client = new SalesforceHttpClient();
     initEndpoints();
   }
 

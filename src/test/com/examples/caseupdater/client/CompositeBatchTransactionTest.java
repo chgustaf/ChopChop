@@ -114,15 +114,14 @@ public class CompositeBatchTransactionTest {
   @Test
   public void batchDelete_FailChildRecords() throws IOException, AuthenticationException {
 
+    String id = "123456788";
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"DELETE_FAILED\",\"message\":\"Your attempt to delete Edge Communications could not be completed because some opportunities in that account were closed won. The opportunities that could not be deleted are shown below.: Edge Emergency Generator, Edge Installation, Edge SLA\\n\"}],\"statusCode\":400}]}\n";
     Account account = new Account();
-    account.setId(any());
+    account.setId(id);
     mockCompositeBatchResponse(responseJson);
 
-
-
-
+    //TODO: fix all test scenarios
 
   }
 

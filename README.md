@@ -70,18 +70,19 @@ How to use:
     mvn clean install
     ```
 
-4. Create new secrets file named in your projects resource folder and add your credentials with 
+4. Create new secrets file named "secrets.json" in your projects resource folder and add your 
+credentials with 
 this json template:
     ```json
     {
-       "username": "",
-       "password": "",
-       "security_token": "",
-       "consumer_key": "",
-       "consumer_secret": "",
-       "login_url": "",
-       "token_url": "",
-       "authentication_method": ""
+      "username": "",
+      "password": "",
+      "security_token": "",
+      "consumer_key": "",
+      "consumer_secret": "",
+      "login_url": "https://login.salesforce.com",
+      "token_url": "https://login.salesforce.com/services/oauth2/token",
+      "authentication_method": ""
     }
     ```
 
@@ -113,9 +114,12 @@ specify something you'll remember.
     well as another appropriate Oauth scope. If you are working in your own developer org and are
      just working on some experiment/prototyping then just select "Full Access (full)".
     6. Ensure the Require Secret for Web Server Flow
-5. Add the jks file to the resources folder in your java project.
-6. Add three more parameters to your json in the secrets.json file; jks_file_name which is the 
-name of the .jks file; jks_keyname which is the name of the key you created in salesforce and 
+5. Put the username, password, security token, consumer key, consumer secret into the secrets
+.json file in your project. Also set the authentication_method to "JWT".
+6. Add the jks file to the resources folder in your java project.
+7. Add three more parameters to your json in the secrets.json file; jks_file_name which is the 
+name of the .jks file; jks_keyname which is the name of the key you created in 
+salesforce and 
 jks_password which is the password you specified before downloading the jks:
     ```json
     {
@@ -124,18 +128,20 @@ jks_password which is the password you specified before downloading the jks:
        "security_token": "",
        "consumer_key": "",
        "consumer_secret": "",
-       "login_url": "",
-       "token_url": "",
+       "login_url": "https://login.salesforce.com",
+       "token_url": "https://login.salesforce.com/services/oauth2/token",
        "authentication_method": "",
        "jks_file_name": "",
        "jks_keyname" : "",
        "jks_password": ""
     }
     ```
-7. You need to pre-authorize the user you've selected; Go into the setup and Apps> Manage Connected 
-Apps and client Edit Policies
-8. Set the picklist "Permitted Users" to "Admin approved users are pre-authorized" and click save.
-9. Two new related lists are now shown Profile and Permission Sets. Either authorize the profile 
+8. You need to pre-authorize the user you've selected; Go into the setup and Apps> Manage 
+Connected 
+Apps, open your connected app and click Edit Policies (a button in the top of the connected app 
+page)
+9. Set the picklist "Permitted Users" to "Admin approved users are pre-authorized" and click save.
+10. Two new related lists are now shown Profile and Permission Sets. Either authorize the profile 
 of the user you are going to use or authorize a permission set that is assigned to the user. 
 ### Appendix 2 - Setting up username-password authentication
 1.

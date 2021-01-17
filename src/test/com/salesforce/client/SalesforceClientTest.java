@@ -1,7 +1,5 @@
 package com.salesforce.client;
 
-import static com.salesforce.client.SalesforceHttpClient.AuthenticationFlow.JWT;
-import static com.salesforce.client.SalesforceHttpClient.AuthenticationFlow.USER_PASSWORD;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -26,8 +24,8 @@ public class SalesforceClientTest {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
 
-    Secrets secrets = SecretsUtil.readTestCredentials("secrets.json");
-    SalesforceHttpClient client = new SalesforceHttpClient(JWT, baseHTTPClient, secrets);
+    Secrets secrets = SecretsUtil.readTestCredentials("secrets_jwt.json");
+    SalesforceHttpClient client = new  SalesforceHttpClient(baseHTTPClient, secrets);
     assertNotNull(client.getAccessParameters().accessToken);
   }
 
@@ -39,8 +37,9 @@ public class SalesforceClientTest {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
 
-    Secrets secrets = SecretsUtil.readTestCredentials("secrets.json");
-    SalesforceHttpClient client = new SalesforceHttpClient(USER_PASSWORD, baseHTTPClient, secrets);
+    Secrets secrets = SecretsUtil.readTestCredentials("secrets_usernamepassword.json");
+
+    SalesforceHttpClient client = new SalesforceHttpClient(baseHTTPClient, secrets);
   }
 
   public static String readResourceJSON(String fileName) throws IOException {

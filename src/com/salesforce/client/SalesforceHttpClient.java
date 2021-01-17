@@ -39,21 +39,21 @@ public class SalesforceHttpClient {
   private final Secrets secrets;
 
 
-  public SalesforceHttpClient(AuthenticationFlow authenticationFlow)
+  public SalesforceHttpClient()
       throws AuthenticationException, IOException {
     this.httpClient = new BaseHTTPClient();
     this.secrets = SecretsUtil.readCredentials("secrets.json");
-    initClass(authenticationFlow, secrets, httpClient);
+    initClass(getAuthenticationFlow(secrets), secrets, httpClient);
   }
 
   // For testing
-  public SalesforceHttpClient(AuthenticationFlow authenticationFlow, BaseHTTPClient httpClient,
+  public SalesforceHttpClient(BaseHTTPClient httpClient,
                               Secrets secrets)
       throws IOException, AuthenticationException {
     this.httpClient = httpClient;
     this.secrets = secrets;
     this.apiVersion = secrets.getApiVersion();
-    initClass(authenticationFlow, secrets, httpClient);
+    initClass(getAuthenticationFlow(secrets), secrets, httpClient);
   }
 
   private void initClass(AuthenticationFlow authenticationFlow, Secrets secrets,
@@ -129,5 +129,16 @@ public class SalesforceHttpClient {
     return accessParameters;
   }
 
-  //TODO: Retry JWT process and document
+  public AuthenticationFlow getAuthenticationFlow(Secrets secrets) throws AuthenticationException {
+    if (secrets  != null) {
+      if (secrets.getAuthenticationMethod().toUpperCase().trim().equals("JWT")) {
+        return AuthenticationFlow.JWT;
+      } else if (secrets.getAuthenticationMethod().toUpperCase().trim().equals("USERNAME_PASSWORD")) {
+        return AuthenticationFlow.USER_PASSWORD;
+      }
+    }
+    throw new AuthenticationException(
+        UNKNOWN_AUTHENTICATION_FLOW,
+        "Unknown authentication flow: " + secrets.getAuthenticationMethod());
+  }
 }
