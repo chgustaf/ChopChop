@@ -4,7 +4,7 @@ ChopChop - A Salesforce Client that will quickly get you started
 ===============
 
 The ChopChop client is distributed through Github Packages. Setup your maven application so that 
-you can import github packages throught the dependencies in your pom.xml file. You'll find 
+you can import github packages through the dependencies in your pom.xml file. You'll find 
 instructions on how to do this here:
 
 
@@ -113,7 +113,7 @@ specify something you'll remember.
     5. Select "Perform requests on your behalf at any time (refresh_token, offline_access)" as 
     well as another appropriate Oauth scope. If you are working in your own developer org and are
      just working on some experiment/prototyping then just select "Full Access (full)".
-    6. Ensure the Require Secret for Web Server Flow
+    6. Ensure that the "Require Secret for Web Server Flow" checkbox is checked
 5. Put the username, password, security token, consumer key, consumer secret into the secrets
 .json file in your project. Also set the authentication_method to "JWT".
 6. Add the jks file to the resources folder in your java project.
@@ -144,4 +144,11 @@ page)
 10. Two new related lists are now shown Profile and Permission Sets. Either authorize the profile 
 of the user you are going to use or authorize a permission set that is assigned to the user. 
 ### Appendix 2 - Setting up username-password authentication
-1.
+1. Create a new Connected App.
+    1. Give the app a name and provide and email
+    2. Enable Oauth Settings
+    3. Set the Callback URL to "https://localhost"
+    4. Select "Full Access (full)"
+    5. Ensure that the "Require Secret for Web Server Flow" checkbox is checked
+2. Put the username, password, security token, consumer key, consumer secret into the secrets
+.json file in your project. Also set the authentication_method to "USERNAME_PASSWORD"
