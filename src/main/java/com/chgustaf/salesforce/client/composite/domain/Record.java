@@ -20,7 +20,7 @@ public abstract class Record<T> {
   protected ObjectMapper mapper;
   protected String sobjectName;
   protected Boolean success;
-  protected Class<T> entityClass;
+  private Class<T> entityClass;
 
   protected Record(Class<T> entityClass) {
     this.entityClass = entityClass;

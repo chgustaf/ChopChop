@@ -266,7 +266,7 @@ public class CompositeBatchTransaction {
     return null;
   }
 
-  public <T extends Record> List<T> getQueryResult(String referenceId, Class<T> clazz)
+    public <T extends Record> List<T> getQueryResult(String referenceId, Class<T> clazz)
       throws IOException {
     // Find the request with the specific referenceId
     Optional<CombinedRequestResponse> result =

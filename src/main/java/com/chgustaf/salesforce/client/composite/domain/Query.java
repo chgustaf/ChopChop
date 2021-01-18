@@ -1,14 +1,16 @@
 package com.chgustaf.salesforce.client.composite.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.UUID;
 
-public class Query {
+public class Query<T> {
 
   public String query;
   public String referenceId;
-  public String sobjectName;
+  public Class<T> sobject;
 
-  public Query() {
+  public Query(Class<T> clazz) {
+    sobject = clazz;
     this.referenceId = UUID.randomUUID().toString();
   }
 
@@ -29,10 +31,11 @@ public class Query {
   }
 
   public String getSobjectName() {
-    return sobjectName;
+    return sobject.getClass().getName();
   }
 
-  public void setSobjectName(final String sobjectName) {
-    this.sobjectName = sobjectName;
+  @JsonIgnore
+  public Class<T> getEntityClass() {
+    return sobject;
   }
 }

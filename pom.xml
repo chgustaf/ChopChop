@@ -4,7 +4,7 @@
 
     <groupId>com.chgustaf</groupId>
     <artifactId>chopchop</artifactId>
-    <version>1.2</version>
+    <version>1.2.1</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>ChopChop is a salesforce client for java</description>

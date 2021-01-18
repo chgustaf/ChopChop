@@ -1,6 +1,5 @@
 package com.chgustaf.salesforce.client.composite.batch;
 
-import com.chgustaf.examples.caseupdater.client.domain.Account;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Query;
@@ -88,11 +87,12 @@ public class Operations {
       return null;
     }
 
+    // TODO Find a different way of returning the record. This is an unchecked return
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
   }
 
-  // TODO Make the query method generic
-  public static List<Account> query(Query query,
+
+  public static <T extends Record> List<T> query(Query<T> query,
                                     SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException {
     CompositeBatchTransaction transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient);
@@ -100,6 +100,6 @@ public class Operations {
     if (!transaction.execute()) {
       return null;
     }
-    return transaction.getQueryResult(query.getReferenceId(), Account.class);
+    return transaction.getQueryResult(query.getReferenceId(), query.getEntityClass());
   }
 }

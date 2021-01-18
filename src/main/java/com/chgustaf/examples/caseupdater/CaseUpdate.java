@@ -1,10 +1,11 @@
 package com.chgustaf.examples.caseupdater;
 
+import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
+
 import com.chgustaf.examples.caseupdater.client.domain.Account;
 import com.chgustaf.examples.caseupdater.client.domain.Case;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
-import com.chgustaf.salesforce.client.composite.batch.AsynchronousOperations;
 import com.chgustaf.salesforce.client.composite.batch.Operations;
 import com.chgustaf.salesforce.client.composite.domain.Query;
 import java.io.IOException;
@@ -21,21 +22,33 @@ public class CaseUpdate {
       throws IOException, AuthenticationException, ExecutionException, InterruptedException {
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
-
-    Query query = new Query();
+/*
+    Query query = new Query<Account>();
     query.setQuery(URLEncoder.encode("SELECT id, name FROM Account",
         StandardCharsets.UTF_8));
     AsynchronousOperations.queryAsync(query, salesforceCompositeBatchClient);
 
-    Query query2 = new Query();
+    Query query2 = new Query<Account>();
     query2.setQuery(URLEncoder.encode("SELECT id, description FROM Account",
         StandardCharsets.UTF_8));
     AsynchronousOperations.queryAsync(query2, salesforceCompositeBatchClient);
-
-    Query query3 = new Query();
-    query3.setQuery(URLEncoder.encode("SELECT id, description FROM Account",
+*/
+    Query<Account> query3 = new Query<>(Account.class);
+    query3.setQuery(URLEncoder.encode("SELECT id, description, name FROM Account",
         StandardCharsets.UTF_8));
-    AsynchronousOperations.queryAsync(query3, salesforceCompositeBatchClient);
+    List<Account> accounts1 = query(query3, salesforceCompositeBatchClient);
+    System.out.println("Account list size " + accounts1.size());
+    System.out.println("The first acounts name " + accounts1.get(0).name);
+
+    Query<Case> caseQuery = new Query<>(Case.class);
+    caseQuery.setQuery(URLEncoder.encode("SELECT id FROM Case", StandardCharsets.UTF_8));
+    List<Case> caseList = query(caseQuery, salesforceCompositeBatchClient);
+            /*AsynchronousOperations.queryAsync(caseQuery, salesforceCompositeBatchClient)
+                .thenApply(x -> {System.out.println("NUMBER OF CASE RECORDS "+x); return x;});*/
+    System.out.println("Case list size " + caseList.size());
+    System.out.println("The first case subject " + caseList.get(0).subject);
+
+
 
     Account account1 = new Account();
     account1.setName("Test Account Ompa "+System.currentTimeMillis());
