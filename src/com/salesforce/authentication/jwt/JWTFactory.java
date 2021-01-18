@@ -152,10 +152,10 @@ public class JWTFactory {
       Path resourceDirectory;
       // If unit test is running
       if (secrets.getUsername().equals("test_user@innovationmadness.com")) {
-        resourceDirectory = Paths.get("src","test","resources");
+        resourceDirectory = Paths.get("src","test", "resources");
 
       } else {
-        resourceDirectory = Paths.get("src","resources");
+        resourceDirectory = Paths.get("src","main", "resources");
       }
       String absolutePath = resourceDirectory.toFile().getAbsolutePath();
       keystore = KeyStore.getInstance("JKS");
