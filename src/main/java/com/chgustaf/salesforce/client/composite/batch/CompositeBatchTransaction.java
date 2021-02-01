@@ -1,6 +1,8 @@
 package com.chgustaf.salesforce.client.composite.batch;
 
+import com.chgustaf.salesforce.client.composite.domain.Error;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -137,13 +139,13 @@ public class CompositeBatchTransaction {
 
     // I the number results differ from the number of batches then something is really wrong
     if (compositeBatchResponse.getResults().length != (records.size()+queries.size())) {
-      throw new RuntimeException("Something is meeeeessed up");
+      throw new RuntimeException("Number of results in the composite response differs from number "
+                                 + "of requests");
     }
 
     resultList = new ArrayList<>();
     for (int i = 0; i < compositeBatchResponse.getResults().length;i++) {
-
-      // TODO fix so that the java application will call while done != true
+      // TODO Allow for large calls - fix so that the java application will call while done != true
       if (requests.get(i).getType().equals(BatchRequest.Type.SOBJECT)) {
         if (requests.get(i).getMethod() == "DELETE" || requests.get(i).getMethod() == "PATCH") {
           resultList.add(
@@ -166,24 +168,21 @@ public class CompositeBatchTransaction {
                 compositeBatchResponse.getResults()[i].getStatusCode()));
       }
     }
-
     alreadyExecuted = true;
     if (compositeBatchResponse.getHasErrors()) {
       return false;
     }
-
     return true;
   }
 
   public CompositeBatchResponse parseCompositeBatchResponse(String stringResponse)
       throws JsonProcessingException {
+    System.out.println("String response "+ stringResponse);
 
-    System.out.println(stringResponse);
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
     return mapper.readValue(stringResponse, CompositeBatchResponse.class);
-
   }
 
 
@@ -203,8 +202,30 @@ public class CompositeBatchTransaction {
     return this.records;
   }
 
+  public CompositeBatchResponse getCompositeBatchResponse() {
+    return this.compositeBatchResponse;
+  }
+
+  public <T extends Record> T getError(String referenceId, Class<T> clazz) {
+    // Find the requestresponse with the specific referenceId
+    Optional<CombinedRequestResponse> result =
+        resultList
+            .stream()
+            .filter(res -> res.getRequest() != null)
+            .filter(res -> res.getRequest().getReferenceId().equals(referenceId))
+            .findFirst();
+    if (result.isPresent()) {
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+
+      //result.get().getRequest().
+    }
+    // TODO: Fix getError
+    return null;
+  }
+
   public <T extends Record> T getRecord(String referenceId, Class<T> clazz)
-      throws JsonProcessingException {
+      throws IOException {
 
     // Find the request with the specific referenceId
     Optional<CombinedRequestResponse> result =
@@ -231,6 +252,10 @@ public class CompositeBatchTransaction {
           record = mapper.readValue(json, clazz);
           if (success) {
             record.setId(innerResult.get("id").textValue());
+          } else {
+            ObjectReader reader = mapper.readerFor(new TypeReference<List<Error>>() {});
+            List<Error> errorList = reader.readValue(innerResult);
+            record.setErrors(errorList);
           }
           record.setSuccess(success);
           record.setReferenceId(UUID.randomUUID().toString());

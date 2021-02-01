@@ -1,4 +1,4 @@
-package com.chgustaf.examples.caseupdater.client.domain;
+package com.chgustaf.examples.caseupdater.exampleclient.domain;
 
 
 import org.junit.jupiter.api.Test;

@@ -152,3 +152,47 @@ of the user you are going to use or authorize a permission set that is assigned 
     5. Ensure that the "Require Secret for Web Server Flow" checkbox is checked
 2. Put the username, password, security token, consumer key, consumer secret into the secrets
 .json file in your project. Also set the authentication_method to "USERNAME_PASSWORD"
+
+### Define your sObjects
+You will have to define classes corresponding to the sObjects that you are going to work with in 
+the Java application. 
+You will have to create a class for the object and extend it from the abstract class Record. It 
+will require you to implement one method (getAllFields()) and that method's implementation is always 
+the same, please see this example sObject; 
+    
+    ```java
+    public class PrimaryTestObject extends Record {
+      
+        private Boolean testCheckbox;
+        private Float testCurrency;
+        private Date testDate;
+        private ZonedDateTime testDateTime;
+        private String testEmail;
+        private String testFormulaField;
+        private String testGeolocation;
+        private String testMultiSelectPicklist;
+        private String testName;
+        private String testNumber;
+        private Float testPercentage;
+        private String testPhone;
+        private String testPicklist;
+        private String testText;
+        private String testTextAreaLong;
+        private String testTextAreaRich;
+        private String testTextEncrypted;
+        private Instant testTime;
+        private String url;
+      
+        protected PrimaryTestObject(final Class entityClass) {
+          super(entityClass);
+        }
+      
+        @Override
+        public List<String> getAllFields() {
+          return super.getAllFieldsHelper(this.getClass());
+        }
+      
+      }
+    
+    ```
+    

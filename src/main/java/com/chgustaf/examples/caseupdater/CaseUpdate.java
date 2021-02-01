@@ -1,18 +1,12 @@
 package com.chgustaf.examples.caseupdater;
 
-import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
 
-import com.chgustaf.examples.caseupdater.client.domain.Account;
-import com.chgustaf.examples.caseupdater.client.domain.Case;
+import com.chgustaf.examples.caseupdater.exampleclient.domain.Primary_Test_Object__c;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
-import com.chgustaf.salesforce.client.composite.batch.Operations;
-import com.chgustaf.salesforce.client.composite.domain.Query;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class CaseUpdate {
@@ -22,7 +16,20 @@ public class CaseUpdate {
       throws IOException, AuthenticationException, ExecutionException, InterruptedException {
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
-/*
+
+    Primary_Test_Object__c primaryTestObjectC = new Primary_Test_Object__c();
+    primaryTestObjectC.setTestEmail("contact@innovationmadness.com");
+    primaryTestObjectC.setTestCheckbox(true);
+
+    try {
+      Primary_Test_Object__c primaryTestObjectC1 = create(primaryTestObjectC,
+          salesforceCompositeBatchClient);
+    } catch (TransactionException e) {
+      e.printStackTrace();
+    }
+
+    System.out.println("Primary test Object " + primaryTestObjectC);
+    /*
     Query query = new Query<Account>();
     query.setQuery(URLEncoder.encode("SELECT id, name FROM Account",
         StandardCharsets.UTF_8));
@@ -32,7 +39,7 @@ public class CaseUpdate {
     query2.setQuery(URLEncoder.encode("SELECT id, description FROM Account",
         StandardCharsets.UTF_8));
     AsynchronousOperations.queryAsync(query2, salesforceCompositeBatchClient);
-*/
+*/ /*
     Query<Account> query3 = new Query<>(Account.class);
     query3.setQuery(URLEncoder.encode("SELECT id, description, name FROM Account",
         StandardCharsets.UTF_8));
@@ -44,7 +51,7 @@ public class CaseUpdate {
     caseQuery.setQuery(URLEncoder.encode("SELECT id FROM Case", StandardCharsets.UTF_8));
     List<Case> caseList = query(caseQuery, salesforceCompositeBatchClient);
             /*AsynchronousOperations.queryAsync(caseQuery, salesforceCompositeBatchClient)
-                .thenApply(x -> {System.out.println("NUMBER OF CASE RECORDS "+x); return x;});*/
+                .thenApply(x -> {System.out.println("NUMBER OF CASE RECORDS "+x); return x;});
     System.out.println("Case list size " + caseList.size());
     System.out.println("The first case subject " + caseList.get(0).subject);
 
@@ -59,7 +66,7 @@ public class CaseUpdate {
     accounts.add(account1);
     accounts.add(account2);
     accounts = Operations.createRecords(accounts, salesforceCompositeBatchClient);
-    // TODO Find a way so there is no need to pass around the client
+    // TODO Find a way so there is no need to pass around the exampleclient
     account1 = accounts.get(0);
     account2 = accounts.get(1);
     System.out.println("Good gracious account1 created " + account1 + " and " + account2);
@@ -85,14 +92,15 @@ public class CaseUpdate {
 
 
 
-    // TODO: Add support for custom client web services
+
+    // TODO: Add support for calling custom web services
 
     //Account account = delete(accountList.get(0), salesforceCompositeBatchClient);
     //System.out.println("Account has been deleted " + account.getStatusCode());
 
     //account1 = delete(account1, salesforceCompositeBatchClient);
     //System.out.println("This account1 was deleted " + account1);
-
+*/
   }
 
 }

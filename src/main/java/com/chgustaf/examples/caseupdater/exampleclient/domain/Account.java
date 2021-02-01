@@ -1,12 +1,7 @@
-package com.chgustaf.examples.caseupdater.client.domain;
+package com.chgustaf.examples.caseupdater.exampleclient.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.chgustaf.salesforce.client.composite.domain.Record;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties
 public class Account extends Record {
@@ -21,24 +16,6 @@ public class Account extends Record {
   public Account(String name) {
     this();
     this.name = name;
-  }
-
-  @Override
-  @JsonIgnore
-  public List<String> getAllFields() {
-    return super.getAllFieldsHelper(this.getClass());
-  }
-
-  @JsonIgnore
-  public String getJSON() throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-    return mapper.writeValueAsString(this);
-  }
-
-  @Override
-  public Class getClazz() {
-    return this.getClass();
   }
 
   public String getName() {

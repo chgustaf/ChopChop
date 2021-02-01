@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.chgustaf.salesforce.client.composite.dto.Attributes;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -15,12 +16,16 @@ public abstract class Record<T> {
 
   protected String id;
   protected Integer statusCode;
+  protected String errorCode;
+  protected String message;
   protected Attributes attributes;
   @JsonIgnore
   protected ObjectMapper mapper;
   protected String sobjectName;
   protected Boolean success;
+  protected List<Error> errors;
   private Class<T> entityClass;
+
 
   protected Record(Class<T> entityClass) {
     this.entityClass = entityClass;
@@ -51,6 +56,16 @@ public abstract class Record<T> {
 
   public void setStatusCode(final Integer statusCode) {
     this.statusCode = statusCode;
+  }
+
+  @JsonIgnore
+  public void setErrors(final List<Error> errors) {
+    this.errors = errors;
+  }
+
+  @JsonIgnore
+  public List<Error> getErrors() {
+    return errors;
   }
 
   @JsonIgnore
@@ -107,11 +122,15 @@ public abstract class Record<T> {
   }
 
   @JsonIgnore
-  public abstract List<String> getAllFields();
+  public List<String> getAllFields() {
+    return getAllFieldsHelper(entityClass);
+  }
 
   @JsonIgnore
-  public abstract String getJSON() throws JsonProcessingException;
+  public String getJSON() throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    return mapper.writeValueAsString(this);
+  }
 
-  @JsonIgnore
-  public abstract Class getClazz();
 }
