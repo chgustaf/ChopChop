@@ -60,9 +60,9 @@ public class Operations {
       System.out.println("Has errors " + compositeBatchResponse.getHasErrors());
       System.out.println(compositeBatchResponse.getResults()[0].getStatusCode());
       System.out.println(compositeBatchResponse.getResults()[0].getResult().textValue());
-      Record<T> recprd = transaction.getRecord(record.getReferenceId(), record.getEntityClass());
-
-      return null;
+      //for (Arrays.stream(compositeBatchResponse.getResults()).map( ))
+      String exceptionMessage = "Unable to create";
+      throw new TransactionException(exceptionMessage);
     }
 
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());

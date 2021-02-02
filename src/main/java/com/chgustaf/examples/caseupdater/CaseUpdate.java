@@ -22,13 +22,10 @@ public class CaseUpdate {
     primaryTestObjectC.setTestCheckbox(true);
 
     try {
-      Primary_Test_Object__c primaryTestObjectC1 = create(primaryTestObjectC,
-          salesforceCompositeBatchClient);
+      primaryTestObjectC = create(primaryTestObjectC,salesforceCompositeBatchClient);
     } catch (TransactionException e) {
       e.printStackTrace();
     }
-
-    System.out.println("Primary test Object " + primaryTestObjectC);
     /*
     Query query = new Query<Account>();
     query.setQuery(URLEncoder.encode("SELECT id, name FROM Account",

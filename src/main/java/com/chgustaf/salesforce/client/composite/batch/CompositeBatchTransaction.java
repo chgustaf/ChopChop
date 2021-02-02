@@ -1,6 +1,6 @@
 package com.chgustaf.salesforce.client.composite.batch;
 
-import com.chgustaf.salesforce.client.composite.domain.Error;
+import com.chgustaf.salesforce.client.composite.domain.TransactionError;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -253,8 +253,8 @@ public class CompositeBatchTransaction {
           if (success) {
             record.setId(innerResult.get("id").textValue());
           } else {
-            ObjectReader reader = mapper.readerFor(new TypeReference<List<Error>>() {});
-            List<Error> errorList = reader.readValue(innerResult);
+            ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionError>>() {});
+            List<TransactionError> errorList = reader.readValue(innerResult);
             record.setErrors(errorList);
           }
           record.setSuccess(success);

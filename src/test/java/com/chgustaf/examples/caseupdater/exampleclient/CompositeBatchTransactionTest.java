@@ -14,6 +14,7 @@ import com.chgustaf.examples.caseupdater.exampleclient.domain.Account;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.batch.CompositeBatchTransaction;
+import com.chgustaf.salesforce.client.composite.domain.TransactionError;
 import com.chgustaf.salesforce.client.composite.dto.CompositeBatchResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,6 +53,9 @@ public class CompositeBatchTransactionTest {
     account = compositeBatchTransaction.getRecord(account.getReferenceId(), account.getClass());
     assertFalse(account.getSuccess());
     assertEquals(1, account.getErrors().size());
+    assertEquals("UNKNOWN_EXCEPTION", ((TransactionError)account.getErrors().get(0)).getErrorCode());
+    assertTrue(((TransactionError) account.getErrors().get(0)).getMessage().contains("An unexpected error "
+                                                                                     + "occurred"));
   }
 
   @Test
@@ -71,9 +75,11 @@ public class CompositeBatchTransactionTest {
 
     Account account1 = compositeBatchTransaction.getRecord(account.getReferenceId(), Account.class);
 
-    System.out.println("account1 " + account1.toString());
-    assertFalse(account1.getSuccess());
-    // assertTrue(account1.getMessage().contains("INVALID_FIELD"));
+    assertFalse(account.getSuccess());
+    assertEquals(1, account.getErrors().size());
+    assertEquals("UNKNOWN_EXCEPTION", ((TransactionError)account.getErrors().get(0)).getErrorCode());
+    assertTrue(((TransactionError) account.getErrors().get(0)).getMessage().contains("An unexpected error "
+                                                                                     + "occurred"));
   }
 
   @Test

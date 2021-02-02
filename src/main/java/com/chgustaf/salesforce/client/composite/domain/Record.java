@@ -1,12 +1,13 @@
 package com.chgustaf.salesforce.client.composite.domain;
 
+import com.chgustaf.salesforce.client.composite.dto.Attributes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.chgustaf.salesforce.client.composite.dto.Attributes;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -16,14 +17,12 @@ public abstract class Record<T> {
 
   protected String id;
   protected Integer statusCode;
-  protected String errorCode;
-  protected String message;
   protected Attributes attributes;
   @JsonIgnore
   protected ObjectMapper mapper;
   protected String sobjectName;
   protected Boolean success;
-  protected List<Error> errors;
+  protected List<TransactionError> errors;
   private Class<T> entityClass;
 
 
@@ -31,6 +30,7 @@ public abstract class Record<T> {
     this.entityClass = entityClass;
     this.sobjectName = entityClass.getSimpleName();
     this.attributes = new Attributes("Account", UUID.randomUUID().toString());
+    this.errors = new ArrayList<>();
     this.mapper = new ObjectMapper();
   }
 
@@ -59,12 +59,12 @@ public abstract class Record<T> {
   }
 
   @JsonIgnore
-  public void setErrors(final List<Error> errors) {
+  public void setErrors(final List<TransactionError> errors) {
     this.errors = errors;
   }
 
   @JsonIgnore
-  public List<Error> getErrors() {
+  public List<TransactionError> getErrors() {
     return errors;
   }
 
