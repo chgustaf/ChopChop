@@ -7,6 +7,8 @@ import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import java.io.IOException;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 
 public class CaseUpdate {
@@ -20,7 +22,12 @@ public class CaseUpdate {
     Primary_Test_Object__c primaryTestObjectC = new Primary_Test_Object__c();
     primaryTestObjectC.setTestEmail("contact@innovationmadness.com");
     primaryTestObjectC.setTestCheckbox(true);
-
+    primaryTestObjectC.setTestCurrency(123.456f);
+    primaryTestObjectC.setTestDate(Date.from(Instant.now()));
+    //primaryTestObjectC.setTestDateTime(Instant.now().atZone(ZoneId.of("UTC")));
+    //primaryTestObjectC.setTestFormulaField("This is a formula field so it shouldn't work");
+    //primaryTestObjectC.setTestGeolocation();
+    primaryTestObjectC.setTestMultiSelectPicklist("Test Value One; Test Value Two");
     try {
       primaryTestObjectC = create(primaryTestObjectC,salesforceCompositeBatchClient);
     } catch (TransactionException e) {

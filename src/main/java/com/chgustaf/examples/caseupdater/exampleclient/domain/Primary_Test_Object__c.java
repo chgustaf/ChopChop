@@ -36,6 +36,7 @@ public class Primary_Test_Object__c extends Record {
     super(Primary_Test_Object__c.class);
   }
 
+  @JsonProperty("Test_Checkbox__c")
   public Boolean getTestCheckbox() {
     return testCheckbox;
   }
@@ -48,6 +49,7 @@ public class Primary_Test_Object__c extends Record {
     return testCurrency;
   }
 
+  @JsonProperty("Test_Currency__c")
   public void setTestCurrency(final Float testCurrency) {
     this.testCurrency = testCurrency;
   }
@@ -56,6 +58,7 @@ public class Primary_Test_Object__c extends Record {
     return testDate;
   }
 
+  @JsonProperty("Test_Date__c")
   public void setTestDate(final Date testDate) {
     this.testDate = testDate;
   }
@@ -64,16 +67,16 @@ public class Primary_Test_Object__c extends Record {
     return testDateTime;
   }
 
+  @JsonProperty("Test_Datetime__c")
   public void setTestDateTime(final ZonedDateTime testDateTime) {
     this.testDateTime = testDateTime;
   }
 
-  @JsonProperty("Test_Eail__c")
+  @JsonProperty("Test_Email__c")
   public String getTestEmail() {
     return testEmail;
   }
 
-  @JsonProperty("Test_Eail__c")
   public void setTestEmail(final String testEmail) {
     this.testEmail = testEmail;
   }
@@ -82,6 +85,7 @@ public class Primary_Test_Object__c extends Record {
     return testFormulaField;
   }
 
+  @JsonProperty("Test_Formula_Field__c")
   public void setTestFormulaField(final String testFormulaField) {
     this.testFormulaField = testFormulaField;
   }
@@ -98,6 +102,7 @@ public class Primary_Test_Object__c extends Record {
     return testMultiSelectPicklist;
   }
 
+  @JsonProperty("Test_Multiselect_Picklist__c")
   public void setTestMultiSelectPicklist(final String testMultiSelectPicklist) {
     this.testMultiSelectPicklist = testMultiSelectPicklist;
   }

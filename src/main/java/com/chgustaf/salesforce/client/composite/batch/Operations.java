@@ -5,6 +5,7 @@ import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Query;
 import com.chgustaf.salesforce.client.composite.domain.Record;
+import com.chgustaf.salesforce.client.composite.domain.TransactionError;
 import com.chgustaf.salesforce.client.composite.dto.CompositeBatchResponse;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,10 +62,11 @@ public class Operations {
       System.out.println(compositeBatchResponse.getResults()[0].getStatusCode());
       System.out.println(compositeBatchResponse.getResults()[0].getResult().textValue());
       //for (Arrays.stream(compositeBatchResponse.getResults()).map( ))
-      String exceptionMessage = "Unable to create";
-      throw new TransactionException(exceptionMessage);
-    }
+      Record record1 = transaction.getRecord(record.getReferenceId(), record.getEntityClass());
 
+      List<TransactionError> exceptions = record1.getErrors();
+      throw constructTransactionException(record1.getErrors());
+    }
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
   }
 
@@ -109,5 +111,14 @@ public class Operations {
       return null;
     }
     return transaction.getQueryResult(query.getReferenceId(), query.getEntityClass());
+  }
+
+  private static TransactionException constructTransactionException(
+      List<TransactionError> transactionErrors) {
+    String errorMessage = "";
+    for (TransactionError transactionError : transactionErrors) {
+      errorMessage += transactionError.getErrorCode()+ " - " + transactionError.getMessage();
+    }
+    return new TransactionException(errorMessage);
   }
 }
