@@ -19,17 +19,28 @@ public class CaseUpdate {
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
 
-    Primary_Test_Object__c primaryTestObjectC = new Primary_Test_Object__c();
-    primaryTestObjectC.setTestEmail("contact@innovationmadness.com");
-    primaryTestObjectC.setTestCheckbox(true);
-    primaryTestObjectC.setTestCurrency(123.456f);
-    primaryTestObjectC.setTestDate(Date.from(Instant.now()));
-    //primaryTestObjectC.setTestDateTime(Instant.now().atZone(ZoneId.of("UTC")));
-    //primaryTestObjectC.setTestFormulaField("This is a formula field so it shouldn't work");
-    //primaryTestObjectC.setTestGeolocation();
-    primaryTestObjectC.setTestMultiSelectPicklist("Test Value One; Test Value Two");
+    Primary_Test_Object__c primaryTestObject = new Primary_Test_Object__c();
+    primaryTestObject.setTestEmail("contact@innovationmadness.com");
+    primaryTestObject.setTestCheckbox(true);
+    primaryTestObject.setTestCurrency(123.456f);
+    primaryTestObject.setTestDate(Date.from(Instant.now()));
+    //primaryTestObject.setTestDateTime(Instant.now().atZone(ZoneId.of("UTC")));
+    //primaryTestObject.setTestFormulaField("This is a formula field so it shouldn't work");
+    //primaryTestObject.setTestGeolocation();
+    primaryTestObject.setTestMultiSelectPicklist("Test Value One; Test Value Two");
+    primaryTestObject.setTestNumber(1234);
+    primaryTestObject.setTestPercentage(98.89f);
+    primaryTestObject.setTestPhone("+46727313212");
+    primaryTestObject.setTestPicklist("Value One");
+    primaryTestObject.setTestText("Text");
+    primaryTestObject.setTestTextArea("Text Area");
+    primaryTestObject.setTestTextAreaLong("Text Area Long");
+    primaryTestObject.setTestTextAreaRich("<html><h1>Text Area Rich</h1></html>");
+    primaryTestObject.setTestTextEncrypted("Test encrypted");
+    primaryTestObject.setTestTime(Instant.now());
+    primaryTestObject.setTestUrl("https://google.com");
     try {
-      primaryTestObjectC = create(primaryTestObjectC,salesforceCompositeBatchClient);
+      primaryTestObject = create(primaryTestObject,salesforceCompositeBatchClient);
     } catch (TransactionException e) {
       e.printStackTrace();
     }

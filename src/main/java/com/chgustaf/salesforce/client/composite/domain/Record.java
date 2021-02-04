@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,15 +100,6 @@ public abstract class Record<T> {
     this.attributes = attributes;
   }
 
-
-  public ObjectMapper getMapper() {
-    return mapper;
-  }
-
-  public void setMapper(final ObjectMapper mapper) {
-    this.mapper = mapper;
-  }
-
   @JsonIgnore
   public String getSObjectName() {
     return this.getClass().getSimpleName();
@@ -130,6 +124,9 @@ public abstract class Record<T> {
   public String getJSON() throws JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    mapper.registerModule(new Jdk8Module());
+    mapper.registerModule(new ParameterNamesModule());
+    mapper.registerModule(new JavaTimeModule());
     return mapper.writeValueAsString(this);
   }
 

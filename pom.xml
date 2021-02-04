@@ -96,12 +96,26 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.12.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-parameter-names -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+            <version>2.4.1</version>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.2.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.12.1</version>
+        </dependency>
+
+
 
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
         <dependency>
@@ -115,6 +129,11 @@
             <artifactId>mockito-core</artifactId>
             <version>3.6.28</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+            <version>2.11.3</version>
         </dependency>
     </dependencies>
     <build>

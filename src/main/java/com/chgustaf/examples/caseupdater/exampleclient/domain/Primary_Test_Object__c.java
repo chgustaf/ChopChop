@@ -1,6 +1,7 @@
 package com.chgustaf.examples.caseupdater.exampleclient.domain;
 
 import com.chgustaf.salesforce.client.composite.domain.Record;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -21,16 +22,17 @@ public class Primary_Test_Object__c extends Record {
   private String testGeolocation;
   private String testMultiSelectPicklist;
   private String testName;
-  private String testNumber;
+  private Integer testNumber;
   private Float testPercentage;
   private String testPhone;
   private String testPicklist;
   private String testText;
+  private String testTextArea;
   private String testTextAreaLong;
   private String testTextAreaRich;
   private String testTextEncrypted;
   private Instant testTime;
-  private String url;
+  private String testUrl;
 
   public Primary_Test_Object__c() {
     super(Primary_Test_Object__c.class);
@@ -62,7 +64,7 @@ public class Primary_Test_Object__c extends Record {
   public void setTestDate(final Date testDate) {
     this.testDate = testDate;
   }
-
+/*
   public ZonedDateTime getTestDateTime() {
     return testDateTime;
   }
@@ -70,7 +72,7 @@ public class Primary_Test_Object__c extends Record {
   @JsonProperty("Test_Datetime__c")
   public void setTestDateTime(final ZonedDateTime testDateTime) {
     this.testDateTime = testDateTime;
-  }
+  }*/
 
   @JsonProperty("Test_Email__c")
   public String getTestEmail() {
@@ -111,15 +113,12 @@ public class Primary_Test_Object__c extends Record {
     return testName;
   }
 
-  public void setTestName(final String testName) {
-    this.testName = testName;
-  }
-
-  public String getTestNumber() {
+  public Integer getTestNumber() {
     return testNumber;
   }
 
-  public void setTestNumber(final String testNumber) {
+  @JsonProperty("Test_Number__c")
+  public void setTestNumber(final Integer testNumber) {
     this.testNumber = testNumber;
   }
 
@@ -127,6 +126,7 @@ public class Primary_Test_Object__c extends Record {
     return testPercentage;
   }
 
+  @JsonProperty("Test_Percentage__c")
   public void setTestPercentage(final Float testPercentage) {
     this.testPercentage = testPercentage;
   }
@@ -135,6 +135,7 @@ public class Primary_Test_Object__c extends Record {
     return testPhone;
   }
 
+  @JsonProperty("Test_Phone__c")
   public void setTestPhone(final String testPhone) {
     this.testPhone = testPhone;
   }
@@ -143,6 +144,7 @@ public class Primary_Test_Object__c extends Record {
     return testPicklist;
   }
 
+  @JsonProperty("Test_Picklist__c")
   public void setTestPicklist(final String testPicklist) {
     this.testPicklist = testPicklist;
   }
@@ -151,14 +153,25 @@ public class Primary_Test_Object__c extends Record {
     return testText;
   }
 
+  @JsonProperty("Test_Text__c")
   public void setTestText(final String testText) {
     this.testText = testText;
+  }
+
+  public String getTestTextArea() {
+    return testTextAreaLong;
+  }
+
+  @JsonProperty("Test_Text_Area__c")
+  public void setTestTextArea(final String testTextArea) {
+    this.testTextArea = testTextArea;
   }
 
   public String getTestTextAreaLong() {
     return testTextAreaLong;
   }
 
+  @JsonProperty("Test_Text_Area_Long__c")
   public void setTestTextAreaLong(final String testTextAreaLong) {
     this.testTextAreaLong = testTextAreaLong;
   }
@@ -167,6 +180,7 @@ public class Primary_Test_Object__c extends Record {
     return testTextAreaRich;
   }
 
+  @JsonProperty("Test_Text_Area_Rich__c")
   public void setTestTextAreaRich(final String testTextAreaRich) {
     this.testTextAreaRich = testTextAreaRich;
   }
@@ -175,6 +189,7 @@ public class Primary_Test_Object__c extends Record {
     return testTextEncrypted;
   }
 
+  @JsonProperty("Test_Text_Encrypted__c")
   public void setTestTextEncrypted(final String testTextEncrypted) {
     this.testTextEncrypted = testTextEncrypted;
   }
@@ -183,15 +198,18 @@ public class Primary_Test_Object__c extends Record {
     return testTime;
   }
 
+  @JsonProperty("Test_Time__c")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
   public void setTestTime(final Instant testTime) {
     this.testTime = testTime;
   }
 
-  public String getUrl() {
-    return url;
+  public String getTestUrl() {
+    return testUrl;
   }
 
-  public void setUrl(final String url) {
-    this.url = url;
+  @JsonProperty("Test_URL__c")
+  public void setTestUrl(final String testUrl) {
+    this.testUrl = testUrl;
   }
 }
