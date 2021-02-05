@@ -19,7 +19,8 @@ public class Primary_Test_Object__c extends Record {
   private ZonedDateTime testDateTime;
   private String testEmail;
   private String testFormulaField;
-  private String testGeolocation;
+  private double testGeolocationLatitude;
+  private double testGeolocationLongitude;
   private String testMultiSelectPicklist;
   private String testName;
   private Integer testNumber;
@@ -92,12 +93,24 @@ public class Primary_Test_Object__c extends Record {
     this.testFormulaField = testFormulaField;
   }
 
-  public String getTestGeolocation() {
-    return testGeolocation;
+  @JsonProperty("Test_Geolocation__latitude__s")
+  public double getTestGeolocationLatitude() {
+    return testGeolocationLatitude;
   }
 
-  public void setTestGeolocation(final String testGeolocation) {
-    this.testGeolocation = testGeolocation;
+  @JsonProperty("Test_Geolocation__latitude__s")
+  public void setTestGeolocationLatitude(final double testGeolocationLatitude) {
+    this.testGeolocationLatitude = testGeolocationLatitude;
+  }
+
+  @JsonProperty("Test_Geolocation__longitude__s")
+  public double getTestGeolocationLongitude() {
+    return testGeolocationLongitude;
+  }
+
+  @JsonProperty("Test_Geolocation__longitude__s")
+  public void setTestGeolocationLongitude(final double testGeolocationLongitude) {
+    this.testGeolocationLongitude = testGeolocationLongitude;
   }
 
   public String getTestMultiSelectPicklist() {
