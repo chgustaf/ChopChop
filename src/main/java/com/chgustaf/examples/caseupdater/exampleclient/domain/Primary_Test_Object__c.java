@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -32,7 +31,7 @@ public class Primary_Test_Object__c extends Record {
   private String testTextAreaLong;
   private String testTextAreaRich;
   private String testTextEncrypted;
-  private Instant testTime;
+  private String testTime;
   private String testUrl;
 
   public Primary_Test_Object__c() {
@@ -65,7 +64,7 @@ public class Primary_Test_Object__c extends Record {
   public void setTestDate(final Date testDate) {
     this.testDate = testDate;
   }
-/*
+
   public ZonedDateTime getTestDateTime() {
     return testDateTime;
   }
@@ -73,7 +72,7 @@ public class Primary_Test_Object__c extends Record {
   @JsonProperty("Test_Datetime__c")
   public void setTestDateTime(final ZonedDateTime testDateTime) {
     this.testDateTime = testDateTime;
-  }*/
+  }
 
   @JsonProperty("Test_Email__c")
   public String getTestEmail() {
@@ -207,13 +206,13 @@ public class Primary_Test_Object__c extends Record {
     this.testTextEncrypted = testTextEncrypted;
   }
 
-  public Instant getTestTime() {
+  public String getTestTime() {
     return testTime;
   }
 
   @JsonProperty("Test_Time__c")
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-  public void setTestTime(final Instant testTime) {
+  public void setTestTime(final String testTime) {
     this.testTime = testTime;
   }
 

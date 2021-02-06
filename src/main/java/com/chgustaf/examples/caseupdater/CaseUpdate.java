@@ -7,6 +7,9 @@ import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 public class CaseUpdate {
@@ -18,15 +21,15 @@ public class CaseUpdate {
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
 
     Primary_Test_Object__c primaryTestObject = new Primary_Test_Object__c();
-    /*primaryTestObject.setTestEmail("contact@innovationmadness.com");
+    primaryTestObject.setTestEmail("contact@innovationmadness.com");
     primaryTestObject.setTestCheckbox(true);
     primaryTestObject.setTestCurrency(123.456f);
-    primaryTestObject.setTestDate(Date.from(Instant.now()));*/
-    //primaryTestObject.setTestDateTime(Instant.now().atZone(ZoneId.of("UTC")));
+    primaryTestObject.setTestDate(Date.from(Instant.now()));
+    primaryTestObject.setTestDateTime(Instant.now().atZone(ZoneId.of("UTC")));
     //primaryTestObject.setTestFormulaField("This is a formula field so it shouldn't work");
     primaryTestObject.setTestGeolocationLatitude(59.334591d);
     primaryTestObject.setTestGeolocationLatitude(18.063242d);
-   /* primaryTestObject.setTestMultiSelectPicklist("Test Value One; Test Value Two");
+    primaryTestObject.setTestMultiSelectPicklist("Test Value One; Test Value Two");
     primaryTestObject.setTestNumber(1234);
     primaryTestObject.setTestPercentage(98.89f);
     primaryTestObject.setTestPhone("+46727313212");
@@ -35,8 +38,8 @@ public class CaseUpdate {
     primaryTestObject.setTestTextArea("Text Area");
     primaryTestObject.setTestTextAreaLong("Text Area Long");
     primaryTestObject.setTestTextAreaRich("<html><h1>Text Area Rich</h1></html>");
-    primaryTestObject.setTestTextEncrypted("Test encrypted");*/
-    //primaryTestObject.setTestTime(Instant.now());
+    primaryTestObject.setTestTextEncrypted("Test encrypted");
+    primaryTestObject.setTestTime("11:00:01");
     primaryTestObject.setTestUrl("https://google.com");
     try {
       primaryTestObject = create(primaryTestObject,salesforceCompositeBatchClient);
