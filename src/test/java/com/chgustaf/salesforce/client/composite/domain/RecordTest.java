@@ -1,4 +1,4 @@
-package com.chgustaf.examples.caseupdater.exampleclient.domain;
+package com.chgustaf.salesforce.client.composite.domain;
 
 
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.chgustaf.salesforce.client;
+package com.chgustaf.salesforce.client.composite;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.authentication.secrets.Secrets;
 import com.chgustaf.salesforce.authentication.secrets.SecretsUtil;
+import com.chgustaf.salesforce.client.BaseHTTPClient;
+import com.chgustaf.salesforce.client.SalesforceHttpClient;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
