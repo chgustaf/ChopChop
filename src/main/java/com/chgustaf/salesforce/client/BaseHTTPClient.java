@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -19,7 +18,6 @@ import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 
 public class BaseHTTPClient {
 
@@ -35,7 +33,6 @@ public class BaseHTTPClient {
 
   public String post(HttpPost postRequest) throws IOException, AuthenticationException {
     CloseableHttpClient httpClient = HttpClients.createDefault();
-    printRequest(postRequest);
     HttpResponse response = httpClient.execute(postRequest);
     checkResponse(response, "POST");
     String responseText = getResponseText(response);
@@ -45,7 +42,6 @@ public class BaseHTTPClient {
 
   public String get(HttpGet getRequest) throws IOException, AuthenticationException {
     CloseableHttpClient httpClient = HttpClients.createDefault();
-    printRequest(getRequest);
     HttpResponse response = httpClient.execute(getRequest);
     checkResponse(response, "GET");
     String text = getResponseText(response);
@@ -55,10 +51,8 @@ public class BaseHTTPClient {
 
   public String delete(HttpDelete deleteRequest) throws IOException, AuthenticationException {
     CloseableHttpClient httpClient = HttpClients.createDefault();
-    printRequest(deleteRequest);
     HttpResponse response = httpClient.execute(deleteRequest);
     checkResponse(response, "DELETE");
-    //String responseText = getResponseText(response);
     httpClient.close();
     return "";
   }
@@ -72,7 +66,7 @@ public class BaseHTTPClient {
     return responseText ;
   }
 
-  private void checkResponse(HttpResponse response, String httpMethod) throws AuthenticationException {
+  void checkResponse(HttpResponse response, String httpMethod) throws AuthenticationException {
     if (response.getStatusLine().getStatusCode() == 401) {
       throw new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST");
     }
@@ -82,41 +76,12 @@ public class BaseHTTPClient {
     }
   }
 
-  private String getResponseText(HttpResponse response) throws IOException {
+  String getResponseText(HttpResponse response) throws IOException {
     if (response != null) {
       return IOUtils.toString(
           response.getEntity().getContent(),
           UTF_8.name());
     }
     return "";
-  }
-
-  public void printRequest(HttpPost postRequest) {
-    System.out.println("Sending POST request to " + postRequest.getURI());
-    System.out.println("Available headers:");
-    for (Header header : postRequest.getAllHeaders()) {
-      System.out.println(header.getName() + ": " + header.getValue());
-    }
-    try {
-      System.out.println(EntityUtils.toString(postRequest.getEntity()));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public void printRequest(HttpDelete deleteRequest) {
-    System.out.println("Sending DELETE request to " + deleteRequest.getURI());
-    System.out.println("Available headers:");
-    for (Header header : deleteRequest.getAllHeaders()) {
-      System.out.println(header.getName() + ": " + header.getValue());
-    }
-  }
-
-  public void printRequest(HttpGet getRequest) {
-    System.out.println("Sending GET request to " + getRequest.getURI());
-    System.out.println("Available headers:");
-    for (Header header : getRequest.getAllHeaders()) {
-      System.out.println(header.getName() + ": " + header.getValue());
-    }
   }
 }

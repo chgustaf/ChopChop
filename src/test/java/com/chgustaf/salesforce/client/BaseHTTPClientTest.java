@@ -1,18 +1,19 @@
-package com.chgustaf.salesforce.client.composite;
+package com.chgustaf.salesforce.client;
 
 import static com.chgustaf.salesforce.authentication.exceptions.AuthenticationException.Code.UNAUTHORIZED;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
-import com.chgustaf.salesforce.client.BaseHTTPClient;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
@@ -54,7 +55,7 @@ class BaseHTTPClientTest extends Mockito {
   }
 
   @Test
-  void post_fail() throws IOException {
+  void post_fail_unauthorized() throws IOException {
     returnStatusCode(401);
     returnBody("Unauthorized");
     when(closeableHttpClient.execute(any())).thenReturn(closeableHttpResponse);
@@ -68,6 +69,25 @@ class BaseHTTPClientTest extends Mockito {
       AuthenticationException thrownException = assertThrows(AuthenticationException.class,
           () -> httpClient.post(postRequest));
       assertEquals(UNAUTHORIZED, thrownException.getCode());
+    }
+  }
+
+  @Test
+  void post_fail_wrongStatusCode() throws IOException, AuthenticationException {
+    returnStatusCode(301);
+    returnBody("Moved Permanently");
+    when(closeableHttpClient.execute(any())).thenReturn(closeableHttpResponse);
+    try (MockedStatic<HttpClients> httpClientClass = Mockito.mockStatic(HttpClients.class)) {
+      httpClientClass.when(HttpClients::createDefault).thenReturn(closeableHttpClient);
+      BaseHTTPClient httpClient = new BaseHTTPClient();
+      HttpPost postRequest = new HttpPost("https://salesforce.com");
+      postRequest.addHeader("Content-Type", "application/json");
+      postRequest.addHeader("Authorization", "Bearer ");
+      postRequest.setEntity(new StringEntity("Test", UTF_8));
+      RuntimeException thrownException = assertThrows(RuntimeException.class,
+          () -> httpClient.post(postRequest));
+      System.out.println(thrownException.getMessage());
+      assertTrue(thrownException.getMessage().contains("Request failed : HTTP error code 301"));
     }
   }
 
@@ -104,17 +124,23 @@ class BaseHTTPClientTest extends Mockito {
 
   @Test
   void delete_success() throws IOException, AuthenticationException {
-    returnStatusCode(200);
-    returnBody("OK");
+    returnStatusCode(204);
+    returnBody("No Content");
     when(closeableHttpClient.execute(any())).thenReturn(closeableHttpResponse);
     try (MockedStatic<HttpClients> httpClientClass = Mockito.mockStatic(HttpClients.class)) {
       httpClientClass.when(HttpClients::createDefault).thenReturn(closeableHttpClient);
       BaseHTTPClient httpClient = new BaseHTTPClient();
-      HttpGet getRequest = new HttpGet("https://salesforce.com");
-      getRequest.addHeader("Content-Type", "application/json");
-      getRequest.addHeader("Authorization", "Bearer ");
-      httpClient.get(getRequest);
+      HttpDelete deleteRequest = new HttpDelete("https://salesforce.com");
+      deleteRequest.addHeader("Content-Type", "application/json");
+      deleteRequest.addHeader("Authorization", "Bearer ");
+      httpClient.delete(deleteRequest);
     }
+  }
+
+  @Test
+  void getResponseText_null() throws IOException {
+    BaseHTTPClient baseHTTPClient = new BaseHTTPClient();
+    assertEquals("", baseHTTPClient.getResponseText(null));
   }
 
   private void returnStatusCode(int statusCode) {

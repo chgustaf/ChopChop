@@ -1,4 +1,4 @@
-package com.chgustaf.salesforce.client.composite;
+package com.chgustaf.salesforce.client;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
