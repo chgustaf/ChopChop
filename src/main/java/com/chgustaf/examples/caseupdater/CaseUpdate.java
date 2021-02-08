@@ -26,7 +26,6 @@ public class CaseUpdate {
     primaryTestObject.setTestCurrency(123.456f);
     primaryTestObject.setTestDate(Date.from(Instant.now()));
     primaryTestObject.setTestDateTime(Instant.now().atZone(ZoneId.of("UTC")));
-    //primaryTestObject.setTestFormulaField("This is a formula field so it shouldn't work");
     primaryTestObject.setTestGeolocationLatitude(59.334591d);
     primaryTestObject.setTestGeolocationLatitude(18.063242d);
     primaryTestObject.setTestMultiSelectPicklist("Test Value One; Test Value Two");

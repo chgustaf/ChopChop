@@ -19,6 +19,7 @@ import com.chgustaf.salesforce.client.composite.dto.CombinedRequestResponse;
 import com.chgustaf.salesforce.client.composite.dto.CompositeBatchRequest;
 import com.chgustaf.salesforce.client.composite.dto.CompositeBatchRequestBuilder;
 import com.chgustaf.salesforce.client.composite.dto.CompositeBatchResponse;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -238,6 +239,7 @@ public class CompositeBatchTransaction {
     if (result.isPresent()) {
       ObjectMapper mapper = new ObjectMapper();
       mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+      mapper.registerModule(new JavaTimeModule());
 
       String json;
       T record;

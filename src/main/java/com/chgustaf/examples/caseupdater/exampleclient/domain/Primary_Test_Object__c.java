@@ -70,6 +70,8 @@ public class Primary_Test_Object__c extends Record {
   }
 
   @JsonProperty("Test_Datetime__c")
+  @JsonFormat
+      (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
   public void setTestDateTime(final ZonedDateTime testDateTime) {
     this.testDateTime = testDateTime;
   }

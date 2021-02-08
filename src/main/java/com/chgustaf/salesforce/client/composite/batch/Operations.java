@@ -6,7 +6,6 @@ import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Query;
 import com.chgustaf.salesforce.client.composite.domain.Record;
 import com.chgustaf.salesforce.client.composite.domain.TransactionError;
-import com.chgustaf.salesforce.client.composite.dto.CompositeBatchResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,16 +55,8 @@ public class Operations {
 
     transaction.create(record);
     if (!transaction.execute()) {
-      System.out.println("Unable to create "+record.getClass().getSimpleName()+" record");
-      CompositeBatchResponse compositeBatchResponse = transaction.getCompositeBatchResponse();
-      System.out.println("Has errors " + compositeBatchResponse.getHasErrors());
-      System.out.println(compositeBatchResponse.getResults()[0].getStatusCode());
-      System.out.println(compositeBatchResponse.getResults()[0].getResult().textValue());
-      //for (Arrays.stream(compositeBatchResponse.getResults()).map( ))
-      Record record1 = transaction.getRecord(record.getReferenceId(), record.getEntityClass());
-
-      List<TransactionError> exceptions = record1.getErrors();
-      throw constructTransactionException(record1.getErrors());
+      Record returnRecord = transaction.getRecord(record.getReferenceId(), record.getEntityClass());
+      throw constructTransactionException(returnRecord.getErrors());
     }
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
   }
