@@ -11,8 +11,6 @@ import com.chgustaf.salesforce.authentication.secrets.Secrets;
 import com.chgustaf.salesforce.authentication.secrets.SecretsUtil;
 import com.chgustaf.salesforce.authentication.userpassword.UserPasswordAuthentication;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -51,11 +49,11 @@ public class SalesforceHttpClient {
       throws IOException, AuthenticationException {
     this.httpClient = httpClient;
     this.secrets = secrets;
-    this.apiVersion = secrets.getApiVersion();
     initClass(getAuthenticationFlow(secrets), secrets, httpClient);
   }
 
-  private void initClass(AuthenticationFlow authenticationFlow, Secrets secrets,
+  private void initClass(AuthenticationFlow authenticationFlow,
+                         Secrets secrets,
                          BaseHTTPClient httpClient)
       throws AuthenticationException, IOException {
     switch (authenticationFlow) {
@@ -67,22 +65,10 @@ public class SalesforceHttpClient {
         System.out.println("JWT Authentication selected");
         authentication = new JWTAuthentication(secrets, httpClient);
         break;
-      default:
-        throw new AuthenticationException(
-            UNKNOWN_AUTHENTICATION_FLOW,
-            "Undefined authentication flow provided");
     }
+    this.apiVersion = secrets.getApiVersion();
     accessParameters = authentication.authenticate();
     System.out.println("Access Token " + accessParameters);
-  }
-
-  public String get(String url)
-      throws IOException, AuthenticationException {
-    HttpGet getRequest = new HttpGet(url);
-    getRequest.addHeader("accept", "application/json");
-    getRequest.addHeader("Authorization", "Bearer " + accessParameters.accessToken);
-
-    return executeHttpRequest(getRequest);
   }
 
   public String executeHttpRequest(HttpRequest request)
@@ -108,7 +94,7 @@ public class SalesforceHttpClient {
             System.out.println("Re-Authenticating");
             accessParameters = authentication.authenticate();
             request.removeHeaders("Authorization");
-            request.addHeader("Authorization", accessParameters.accessToken);
+            request.addHeader("Authorization", accessParameters.getAccessToken());
           }
         }
       }
@@ -118,23 +104,15 @@ public class SalesforceHttpClient {
     return returnString;
   }
 
-  public String query(String query) throws IOException, AuthenticationException {
-    String url = accessParameters.instanceUrl + queryEndpoint + URLEncoder.encode(query,
-        StandardCharsets.UTF_8);
-    return get(url);
-  }
-
-  public synchronized AccessParameters getAccessParameters() {
+  synchronized AccessParameters getAccessParameters() {
     return accessParameters;
   }
 
-  public AuthenticationFlow getAuthenticationFlow(Secrets secrets) throws AuthenticationException {
-    if (secrets  != null) {
-      if (secrets.getAuthenticationMethod().toUpperCase().trim().equals("JWT")) {
-        return AuthenticationFlow.JWT;
-      } else if (secrets.getAuthenticationMethod().toUpperCase().trim().equals("USERNAME_PASSWORD")) {
-        return AuthenticationFlow.USER_PASSWORD;
-      }
+  AuthenticationFlow getAuthenticationFlow(Secrets secrets) throws AuthenticationException {
+    if (secrets.getAuthenticationMethod().toUpperCase().trim().equals("JWT")) {
+      return AuthenticationFlow.JWT;
+    } else if (secrets.getAuthenticationMethod().toUpperCase().trim().equals("USERNAME_PASSWORD")) {
+      return AuthenticationFlow.USER_PASSWORD;
     }
     throw new AuthenticationException(
         UNKNOWN_AUTHENTICATION_FLOW,

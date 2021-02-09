@@ -13,13 +13,13 @@ public class AsynchronousOperations {
 
   public static <T extends Record> CompletableFuture<List<T>> queryAsync(Query<T> query,
                                                                         SalesforceCompositeBatchClient salesforceCompositeBatchClient) {
-     return CompletableFuture.supplyAsync(
+    return CompletableFuture.supplyAsync(
         () -> {
           System.out.println("Hello here we go");
           List<T> recordList = new ArrayList<>();
           try {
             recordList = Operations.query(query, salesforceCompositeBatchClient);
-
+            System.out.println("Here are the records "+recordList);
           } catch (IOException e) {
             e.printStackTrace();
           } catch (AuthenticationException e) {

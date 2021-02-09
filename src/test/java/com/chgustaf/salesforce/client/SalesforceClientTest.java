@@ -8,8 +8,6 @@ import static org.mockito.Mockito.when;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.authentication.secrets.Secrets;
 import com.chgustaf.salesforce.authentication.secrets.SecretsUtil;
-import com.chgustaf.salesforce.client.BaseHTTPClient;
-import com.chgustaf.salesforce.client.SalesforceHttpClient;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +28,7 @@ public class SalesforceClientTest {
     Secrets secrets = SecretsUtil
         .readTestCredentials("secrets_jwt.json");
     SalesforceHttpClient client = new SalesforceHttpClient(baseHTTPClient, secrets);
-    assertNotNull(client.getAccessParameters().accessToken);
+    assertNotNull(client.getAccessParameters().getAccessToken());
   }
 
   @Test

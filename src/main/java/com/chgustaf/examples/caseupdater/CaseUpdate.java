@@ -1,22 +1,31 @@
 package com.chgustaf.examples.caseupdater;
 
 import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
 
+import com.chgustaf.examples.caseupdater.exampleclient.domain.Account;
+import com.chgustaf.examples.caseupdater.exampleclient.domain.Case;
 import com.chgustaf.examples.caseupdater.exampleclient.domain.Primary_Test_Object__c;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
+import com.chgustaf.salesforce.client.BaseHTTPClient;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
+import com.chgustaf.salesforce.client.composite.batch.AsynchronousOperations;
+import com.chgustaf.salesforce.client.composite.domain.Query;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 
 public class CaseUpdate {
 
 
   public static void main(String[] args)
-      throws IOException, AuthenticationException, ExecutionException, InterruptedException {
+      throws IOException, AuthenticationException {
+    BaseHTTPClient baseHTTPClient = new BaseHTTPClient();
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
 
@@ -45,12 +54,12 @@ public class CaseUpdate {
     } catch (TransactionException e) {
       e.printStackTrace();
     }
-    /*
-    Query query = new Query<Account>();
+
+    Query query = new Query<>(Account.class);
     query.setQuery(URLEncoder.encode("SELECT id, name FROM Account",
         StandardCharsets.UTF_8));
     AsynchronousOperations.queryAsync(query, salesforceCompositeBatchClient);
-
+/*
     Query query2 = new Query<Account>();
     query2.setQuery(URLEncoder.encode("SELECT id, description FROM Account",
         StandardCharsets.UTF_8));
@@ -62,10 +71,11 @@ public class CaseUpdate {
     List<Account> accounts1 = query(query3, salesforceCompositeBatchClient);
     System.out.println("Account list size " + accounts1.size());
     System.out.println("The first acounts name " + accounts1.get(0).name);
-
+*/
     Query<Case> caseQuery = new Query<>(Case.class);
     caseQuery.setQuery(URLEncoder.encode("SELECT id FROM Case", StandardCharsets.UTF_8));
     List<Case> caseList = query(caseQuery, salesforceCompositeBatchClient);
+    System.out.println("CaseList " + caseList);
             /*AsynchronousOperations.queryAsync(caseQuery, salesforceCompositeBatchClient)
                 .thenApply(x -> {System.out.println("NUMBER OF CASE RECORDS "+x); return x;});
     System.out.println("Case list size " + caseList.size());
