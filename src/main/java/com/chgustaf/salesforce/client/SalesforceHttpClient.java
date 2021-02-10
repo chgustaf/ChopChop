@@ -24,23 +24,12 @@ public class SalesforceHttpClient {
     JWT
   }
   private Authentication authentication;
-
-  private Integer apiVersion = 50;
-  private final String baseEndpoint = "/services/data/v"+apiVersion+".0/";
-  private final String queryEndpoint = baseEndpoint+"query/?q=";
-  private final String queryAllEndpoint = baseEndpoint+"query/?q=";
-  private final String sobjectEndpoint = baseEndpoint + "sobjects/";
-  private final String multipleRecordsEndpoint = baseEndpoint + "composite/tree/";
   private volatile AccessParameters accessParameters;
   private final BaseHTTPClient httpClient;
-  private final Secrets secrets;
-
 
   public SalesforceHttpClient()
       throws AuthenticationException, IOException {
-    this.httpClient = new BaseHTTPClient();
-    this.secrets = SecretsUtil.readCredentials("secrets.json");
-    initClass(getAuthenticationFlow(secrets), secrets, httpClient);
+    this(new BaseHTTPClient(), SecretsUtil.readCredentials("secrets.json"));
   }
 
   // For testing
@@ -48,7 +37,6 @@ public class SalesforceHttpClient {
                               Secrets secrets)
       throws IOException, AuthenticationException {
     this.httpClient = httpClient;
-    this.secrets = secrets;
     initClass(getAuthenticationFlow(secrets), secrets, httpClient);
   }
 
@@ -66,7 +54,6 @@ public class SalesforceHttpClient {
         authentication = new JWTAuthentication(secrets, httpClient);
         break;
     }
-    this.apiVersion = secrets.getApiVersion();
     accessParameters = authentication.authenticate();
     System.out.println("Access Token " + accessParameters);
   }

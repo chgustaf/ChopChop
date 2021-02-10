@@ -1,5 +1,6 @@
 package com.chgustaf.salesforce.client;
 
+import static com.chgustaf.salesforce.authentication.exceptions.AuthenticationException.Code.UNAUTHORIZED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -139,6 +140,61 @@ public class SalesforceHttpClientTest {
     SalesforceHttpClient client = new SalesforceHttpClient(baseHTTPClient, secrets);
     HttpDelete delete = new HttpDelete();
     client.executeHttpRequest(delete);
+  }
+
+  @Test
+  public void test401onAuthentication_POST()
+      throws IOException,
+             AuthenticationException {
+    when(baseHTTPClient.post(any(HttpPost.class))).thenThrow(new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST"));
+    Secrets secrets = SecretsUtil.readTestCredentials("secrets_jwt.json");
+    AuthenticationException authenticationException = assertThrows(AuthenticationException.class,
+        () -> new SalesforceHttpClient(baseHTTPClient,
+        secrets));
+
+    assertEquals(UNAUTHORIZED, authenticationException.getCode());
+    assertEquals("401 Unauthorized during POST", authenticationException.getMessage());
+  }
+
+  @Test
+  public void test401onSecondPostCallFailedReauthentication_POST()
+      throws IOException,
+             AuthenticationException {
+    String response = readResourceJSON("username-password-authenticate-success.json");
+    when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response).thenThrow(new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST"));
+    Secrets secrets = SecretsUtil.readTestCredentials("secrets_jwt.json");
+
+
+    SalesforceHttpClient client = new SalesforceHttpClient(baseHTTPClient, secrets);
+    HttpPost post = new HttpPost();
+    AuthenticationException authenticationException = assertThrows(AuthenticationException.class,
+        () -> client.executeHttpRequest(post));
+
+
+    assertEquals(UNAUTHORIZED, authenticationException.getCode());
+    assertEquals("401 Unauthorized during POST", authenticationException.getMessage());
+  }
+
+  @Test
+  public void test401onSecondPostCallButReauthenticationSuccessful_POST()
+      throws IOException,
+             AuthenticationException {
+    String response = readResourceJSON("username-password-authenticate-success.json");
+    when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response)
+        .thenThrow(new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST"))
+        .thenReturn(response);
+    Secrets secrets = SecretsUtil.readTestCredentials("secrets_jwt.json");
+
+    SalesforceHttpClient client = new SalesforceHttpClient(baseHTTPClient, secrets);
+    HttpPost post = new HttpPost();
+    client.executeHttpRequest(post);
+
+    assertNotNull(client.getAccessParameters().getAccessToken());
+  }
+
+  @Test
+  public void executeHttpRequestThrowsError() {
+
   }
 
   public static String readResourceJSON(String fileName) throws IOException {
