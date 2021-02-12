@@ -12,33 +12,54 @@ import java.util.Date;
 @JsonRootName(value = "Primary_Test_Object__c")
 public class Primary_Test_Object__c extends Record {
 
+  @JsonProperty("Test_Checkbox__c")
   private Boolean testCheckbox;
+  @JsonProperty("Test_Currency__c")
   private Float testCurrency;
+  @JsonProperty("Test_Date__c")
   private Date testDate;
+  @JsonProperty("Test_Datetime__c")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
   private ZonedDateTime testDateTime;
+  @JsonProperty("Test_Email__c")
   private String testEmail;
+  @JsonProperty("Test_Formula_Field__c")
   private String testFormulaField;
+  @JsonProperty("Test_Geolocation__latitude__s")
   private double testGeolocationLatitude;
+  @JsonProperty("Test_Geolocation__longitude__s")
   private double testGeolocationLongitude;
+  @JsonProperty("Test_Multiselect_Picklist__c")
   private String testMultiSelectPicklist;
   private String testName;
+  @JsonProperty("Test_Number__c")
   private Integer testNumber;
+  @JsonProperty("Test_Percentage__c")
   private Float testPercentage;
+  @JsonProperty("Test_Phone__c")
   private String testPhone;
+  @JsonProperty("Test_Picklist__c")
   private String testPicklist;
+  @JsonProperty("Test_Text__c")
   private String testText;
+  @JsonProperty("Test_Text_Area__c")
   private String testTextArea;
+  @JsonProperty("Test_Text_Area_Long__c")
   private String testTextAreaLong;
+  @JsonProperty("Test_Text_Area_Rich__c")
   private String testTextAreaRich;
+  @JsonProperty("Test_Text_Encrypted__c")
   private String testTextEncrypted;
+  @JsonProperty("Test_Time__c")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
   private String testTime;
+  @JsonProperty("Test_URL__c")
   private String testUrl;
 
   public Primary_Test_Object__c() {
     super(Primary_Test_Object__c.class);
   }
 
-  @JsonProperty("Test_Checkbox__c")
   public Boolean getTestCheckbox() {
     return testCheckbox;
   }
@@ -51,7 +72,7 @@ public class Primary_Test_Object__c extends Record {
     return testCurrency;
   }
 
-  @JsonProperty("Test_Currency__c")
+
   public void setTestCurrency(final Float testCurrency) {
     this.testCurrency = testCurrency;
   }
@@ -60,7 +81,7 @@ public class Primary_Test_Object__c extends Record {
     return testDate;
   }
 
-  @JsonProperty("Test_Date__c")
+
   public void setTestDate(final Date testDate) {
     this.testDate = testDate;
   }
@@ -69,14 +90,12 @@ public class Primary_Test_Object__c extends Record {
     return testDateTime;
   }
 
-  @JsonProperty("Test_Datetime__c")
-  @JsonFormat
-      (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+
   public void setTestDateTime(final ZonedDateTime testDateTime) {
     this.testDateTime = testDateTime;
   }
 
-  @JsonProperty("Test_Email__c")
+
   public String getTestEmail() {
     return testEmail;
   }
@@ -89,27 +108,26 @@ public class Primary_Test_Object__c extends Record {
     return testFormulaField;
   }
 
-  @JsonProperty("Test_Formula_Field__c")
+
   public void setTestFormulaField(final String testFormulaField) {
     this.testFormulaField = testFormulaField;
   }
 
-  @JsonProperty("Test_Geolocation__latitude__s")
+
   public double getTestGeolocationLatitude() {
     return testGeolocationLatitude;
   }
 
-  @JsonProperty("Test_Geolocation__latitude__s")
+
   public void setTestGeolocationLatitude(final double testGeolocationLatitude) {
     this.testGeolocationLatitude = testGeolocationLatitude;
   }
 
-  @JsonProperty("Test_Geolocation__longitude__s")
+
   public double getTestGeolocationLongitude() {
     return testGeolocationLongitude;
   }
 
-  @JsonProperty("Test_Geolocation__longitude__s")
   public void setTestGeolocationLongitude(final double testGeolocationLongitude) {
     this.testGeolocationLongitude = testGeolocationLongitude;
   }
@@ -118,7 +136,7 @@ public class Primary_Test_Object__c extends Record {
     return testMultiSelectPicklist;
   }
 
-  @JsonProperty("Test_Multiselect_Picklist__c")
+
   public void setTestMultiSelectPicklist(final String testMultiSelectPicklist) {
     this.testMultiSelectPicklist = testMultiSelectPicklist;
   }
@@ -131,7 +149,7 @@ public class Primary_Test_Object__c extends Record {
     return testNumber;
   }
 
-  @JsonProperty("Test_Number__c")
+
   public void setTestNumber(final Integer testNumber) {
     this.testNumber = testNumber;
   }
@@ -140,7 +158,7 @@ public class Primary_Test_Object__c extends Record {
     return testPercentage;
   }
 
-  @JsonProperty("Test_Percentage__c")
+
   public void setTestPercentage(final Float testPercentage) {
     this.testPercentage = testPercentage;
   }
@@ -149,7 +167,7 @@ public class Primary_Test_Object__c extends Record {
     return testPhone;
   }
 
-  @JsonProperty("Test_Phone__c")
+
   public void setTestPhone(final String testPhone) {
     this.testPhone = testPhone;
   }
@@ -158,7 +176,7 @@ public class Primary_Test_Object__c extends Record {
     return testPicklist;
   }
 
-  @JsonProperty("Test_Picklist__c")
+
   public void setTestPicklist(final String testPicklist) {
     this.testPicklist = testPicklist;
   }
@@ -167,7 +185,7 @@ public class Primary_Test_Object__c extends Record {
     return testText;
   }
 
-  @JsonProperty("Test_Text__c")
+
   public void setTestText(final String testText) {
     this.testText = testText;
   }
@@ -176,7 +194,7 @@ public class Primary_Test_Object__c extends Record {
     return testTextAreaLong;
   }
 
-  @JsonProperty("Test_Text_Area__c")
+
   public void setTestTextArea(final String testTextArea) {
     this.testTextArea = testTextArea;
   }
@@ -185,7 +203,7 @@ public class Primary_Test_Object__c extends Record {
     return testTextAreaLong;
   }
 
-  @JsonProperty("Test_Text_Area_Long__c")
+
   public void setTestTextAreaLong(final String testTextAreaLong) {
     this.testTextAreaLong = testTextAreaLong;
   }
@@ -194,7 +212,7 @@ public class Primary_Test_Object__c extends Record {
     return testTextAreaRich;
   }
 
-  @JsonProperty("Test_Text_Area_Rich__c")
+
   public void setTestTextAreaRich(final String testTextAreaRich) {
     this.testTextAreaRich = testTextAreaRich;
   }
@@ -203,7 +221,7 @@ public class Primary_Test_Object__c extends Record {
     return testTextEncrypted;
   }
 
-  @JsonProperty("Test_Text_Encrypted__c")
+
   public void setTestTextEncrypted(final String testTextEncrypted) {
     this.testTextEncrypted = testTextEncrypted;
   }
@@ -212,8 +230,7 @@ public class Primary_Test_Object__c extends Record {
     return testTime;
   }
 
-  @JsonProperty("Test_Time__c")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+
   public void setTestTime(final String testTime) {
     this.testTime = testTime;
   }
@@ -222,7 +239,6 @@ public class Primary_Test_Object__c extends Record {
     return testUrl;
   }
 
-  @JsonProperty("Test_URL__c")
   public void setTestUrl(final String testUrl) {
     this.testUrl = testUrl;
   }

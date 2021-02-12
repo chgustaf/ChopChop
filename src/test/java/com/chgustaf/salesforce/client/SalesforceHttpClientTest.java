@@ -192,11 +192,6 @@ public class SalesforceHttpClientTest {
     assertNotNull(client.getAccessParameters().getAccessToken());
   }
 
-  @Test
-  public void executeHttpRequestThrowsError() {
-
-  }
-
   public static String readResourceJSON(String fileName) throws IOException {
     File file = new File("src/test/resources/" + fileName);
     String json = Files.readString(file.toPath());

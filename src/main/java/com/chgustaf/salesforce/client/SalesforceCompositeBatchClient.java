@@ -9,43 +9,33 @@ import org.apache.http.entity.StringEntity;
 
 public class SalesforceCompositeBatchClient {
 
-  private SalesforceHttpClient client;
+  private SalesforceHttpClient salesforceHttpClient;
 
-  private String compositeSobjectEndpoint;
-  private String compositeEndpoint;
-  private String compositeBatchEndpoint;
+  String compositeBatchEndpoint;
 
   public SalesforceCompositeBatchClient() throws IOException,
                                                  AuthenticationException {
-    client = new SalesforceHttpClient();
+    this(new SalesforceHttpClient());
+  }
+
+  public SalesforceCompositeBatchClient(SalesforceHttpClient salesforceHttpClient) {
+    this.salesforceHttpClient = salesforceHttpClient;
     initEndpoints();
   }
 
   private void initEndpoints() {
-    final String instanceUrl = client.getAccessParameters().getInstanceUrl();
+    final String instanceUrl = salesforceHttpClient.getAccessParameters().getInstanceUrl();
     final Integer apiVersion = 50;
     final String baseEndpoint = instanceUrl + "/services/data/v" + apiVersion + ".0/";
-    compositeSobjectEndpoint = baseEndpoint + "composite/sobjects";
     compositeBatchEndpoint = baseEndpoint + "composite/batch";
-    compositeEndpoint = baseEndpoint + "composite";
-    final String readEndpoint = instanceUrl + baseEndpoint;
-  }
-
-  public String compositeCall(String requestString)
-      throws IOException, AuthenticationException {
-    HttpPost postRequest = new HttpPost(compositeEndpoint);
-    postRequest.addHeader("Content-Type", "application/json");
-    postRequest.addHeader("Authorization", "Bearer " + client.getAccessParameters().getAccessToken());
-    postRequest.setEntity(new StringEntity(requestString, UTF_8));
-    return client.executeHttpRequest(postRequest);
   }
 
   public String compositeBatchCall(String requestString)
       throws IOException, AuthenticationException {
     HttpPost postRequest = new HttpPost(compositeBatchEndpoint);
     postRequest.addHeader("Content-Type", "application/json");
-    postRequest.addHeader("Authorization", "Bearer " + client.getAccessParameters().getAccessToken());
+    postRequest.addHeader("Authorization", "Bearer " + salesforceHttpClient.getAccessParameters().getAccessToken());
     postRequest.setEntity(new StringEntity(requestString, UTF_8));
-    return client.executeHttpRequest(postRequest);
+    return salesforceHttpClient.executeHttpRequest(postRequest);
   }
 }

@@ -33,17 +33,31 @@ public class SalesforceHttpClient {
   }
 
   // For testing
-  public SalesforceHttpClient(BaseHTTPClient httpClient,
+  SalesforceHttpClient(BaseHTTPClient httpClient,
                               Secrets secrets)
       throws IOException, AuthenticationException {
     this.httpClient = httpClient;
     initClass(getAuthenticationFlow(secrets), secrets, httpClient);
   }
 
-  private void initClass(AuthenticationFlow authenticationFlow,
+  void initClass(AuthenticationFlow authenticationFlow,
                          Secrets secrets,
                          BaseHTTPClient httpClient)
       throws AuthenticationException, IOException {
+    determineFlow(authenticationFlow, secrets, httpClient);
+    authentication = determineFlow(authenticationFlow, secrets, httpClient);
+    accessParameters = authentication.authenticate();
+    System.out.println("Access Token " + accessParameters);
+  }
+
+  AccessParameters authenticate(Authentication authentication) throws IOException, AuthenticationException {
+    return authentication.authenticate();
+  }
+
+  Authentication determineFlow(AuthenticationFlow authenticationFlow,
+                             Secrets secrets,
+                             BaseHTTPClient httpClient) {
+    Authentication authentication = null;
     switch (authenticationFlow) {
       case USER_PASSWORD:
         System.out.println("Username-Password Authentication selected");
@@ -54,8 +68,7 @@ public class SalesforceHttpClient {
         authentication = new JWTAuthentication(secrets, httpClient);
         break;
     }
-    accessParameters = authentication.authenticate();
-    System.out.println("Access Token " + accessParameters);
+    return authentication;
   }
 
   public String executeHttpRequest(HttpRequest request)
