@@ -2,11 +2,10 @@ package com.chgustaf.examples.caseupdater;
 
 import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
 
-import com.chgustaf.examples.caseupdater.exampleclient.domain.Primary_Test_Object__c;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
-import com.chgustaf.salesforce.client.BaseHTTPClient;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
+import com.chgustaf.salesforce.client.composite.domain.Primary_Test_Object__c;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -17,7 +16,6 @@ public class CaseUpdate {
 
   public static void main(String[] args)
       throws IOException, AuthenticationException {
-    BaseHTTPClient baseHTTPClient = new BaseHTTPClient();
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
 
@@ -42,7 +40,7 @@ public class CaseUpdate {
     primaryTestObject.setTestTime("11:00:01");
     primaryTestObject.setTestUrl("https://google.com");
     try {
-      primaryTestObject = create(primaryTestObject,salesforceCompositeBatchClient);
+      primaryTestObject = create(primaryTestObject, salesforceCompositeBatchClient);
     } catch (TransactionException e) {
       e.printStackTrace();
     }

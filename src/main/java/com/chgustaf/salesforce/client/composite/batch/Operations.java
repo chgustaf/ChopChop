@@ -15,8 +15,8 @@ public class Operations {
   public static <T extends Record> List<T> createRecords(List<T> records,
                                                          SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException {
-    CompositeBatchTransaction transaction = new CompositeBatchTransaction(
-        salesforceCompositeBatchClient);
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
     for (T record : records) {
       transaction.create(record);
     }
@@ -35,8 +35,8 @@ public class Operations {
   public static <T extends Record> T get(T record,
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException {
-    CompositeBatchTransaction transaction = new CompositeBatchTransaction(
-        salesforceCompositeBatchClient);
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
 
     transaction.get(record);
     if (!transaction.execute()) {
@@ -51,7 +51,7 @@ public class Operations {
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction = new CompositeBatchTransaction(
-        salesforceCompositeBatchClient);
+        salesforceCompositeBatchClient, false);
 
     transaction.create(record);
     if (!transaction.execute()) {
@@ -65,7 +65,7 @@ public class Operations {
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException {
     CompositeBatchTransaction transaction = new CompositeBatchTransaction(
-        salesforceCompositeBatchClient);
+        salesforceCompositeBatchClient, false);
 
     transaction.update(record);
     if (!transaction.execute()) {
@@ -80,14 +80,13 @@ public class Operations {
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException {
     CompositeBatchTransaction transaction = new CompositeBatchTransaction(
-        salesforceCompositeBatchClient);
+        salesforceCompositeBatchClient, false);
 
     transaction.delete(record);
     if (!transaction.execute()) {
       System.out.println("Unable to create "+record.getClass().getSimpleName()+" record");
       return null;
     }
-
     // TODO Find a different way of returning the record. This is an unchecked return
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
   }
@@ -96,7 +95,8 @@ public class Operations {
   public static <T extends Record> List<T> query(Query<T> query,
                                     SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException {
-    CompositeBatchTransaction transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient);
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
     transaction.query(query);
     if (!transaction.execute()) {
       return null;

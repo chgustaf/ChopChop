@@ -1,6 +1,5 @@
-package com.chgustaf.examples.caseupdater.exampleclient.domain;
+package com.chgustaf.salesforce.client.composite.domain;
 
-import com.chgustaf.salesforce.client.composite.domain.Record;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,6 +30,7 @@ public class Primary_Test_Object__c extends Record {
   private double testGeolocationLongitude;
   @JsonProperty("Test_Multiselect_Picklist__c")
   private String testMultiSelectPicklist;
+  @JsonProperty("Name")
   private String testName;
   @JsonProperty("Test_Number__c")
   private Integer testNumber;
@@ -58,6 +58,14 @@ public class Primary_Test_Object__c extends Record {
 
   public Primary_Test_Object__c() {
     super(Primary_Test_Object__c.class);
+  }
+
+  private void setName(final String testName) {
+    this.testName = testName;
+  }
+
+  public String getTestName() {
+    return testName;
   }
 
   public Boolean getTestCheckbox() {
@@ -139,10 +147,6 @@ public class Primary_Test_Object__c extends Record {
 
   public void setTestMultiSelectPicklist(final String testMultiSelectPicklist) {
     this.testMultiSelectPicklist = testMultiSelectPicklist;
-  }
-
-  public String getTestName() {
-    return testName;
   }
 
   public Integer getTestNumber() {

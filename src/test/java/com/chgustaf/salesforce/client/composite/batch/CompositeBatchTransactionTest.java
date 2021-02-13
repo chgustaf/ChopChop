@@ -1,4 +1,4 @@
-package com.chgustaf.examples.caseupdater.exampleclient;
+package com.chgustaf.salesforce.client.composite.batch;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,10 +10,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.chgustaf.examples.caseupdater.exampleclient.domain.Account;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
-import com.chgustaf.salesforce.client.composite.batch.CompositeBatchTransaction;
+import com.chgustaf.salesforce.client.composite.domain.Primary_Test_Object__c;
 import com.chgustaf.salesforce.client.composite.domain.TransactionError;
 import com.chgustaf.salesforce.client.composite.dto.CompositeBatchResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,138 +36,156 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchPost_unknownException() throws IOException, AuthenticationException {
-    String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
-                          + "\":\"UNKNOWN_EXCEPTION\",\"message\":\"An unexpected error occurred. Please include this ErrorId if you contact support: 8425053-14906 (608530858)\"}],\"statusCode\":500}]}";
-    Account account = new Account();
-    account.setName("Test Account");
-
-    SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
-
-    CompositeBatchTransaction compositeBatchTransaction = new CompositeBatchTransaction(
-        salesforceCompositeBatchClient);
-    compositeBatchTransaction.create(account);
-    assertFalse(compositeBatchTransaction.execute());
-
-    account = compositeBatchTransaction.getRecord(account.getReferenceId(), account.getClass());
-    assertFalse(account.getSuccess());
-    assertEquals(1, account.getErrors().size());
-    assertEquals("UNKNOWN_EXCEPTION", ((TransactionError)account.getErrors().get(0)).getErrorCode());
-    assertTrue(((TransactionError) account.getErrors().get(0)).getMessage().contains("An unexpected error "
-                                                                                     + "occurred"));
-  }
-
-  @Test
-  public void batchPost_invalidFieldException() throws IOException, AuthenticationException {
-   /* String responseJson =
-        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"No such column &#39;aFieldThatDoesNotExist&#39; on sobject of type Account\"}],\"statusCode\":400}]}";
-    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
-        mockCompositeBatchResponse(responseJson);
-
-    Account account = new Account("Example Account");
-
-    CompositeBatchTransaction compositeBatchTransaction =
-        new CompositeBatchTransaction(salesforceCompositeBatchClient);
-    compositeBatchTransaction.create(account);
-    Boolean success = compositeBatchTransaction.execute();
-    assertFalse(success);
-
-    Account account1 = compositeBatchTransaction.getRecord(account.getReferenceId(), Account.class);
-
-    assertFalse(account.getSuccess());
-    assertEquals(1, account.getErrors().size());
-    assertEquals("UNKNOWN_EXCEPTION", ((TransactionError)account.getErrors().get(0)).getErrorCode());
-    assertTrue(((TransactionError) account.getErrors().get(0)).getMessage().contains("An unexpected error "
-                                                                                     +
-                                                                                     "occurred"));*/
-
-  }
-
-  @Test
   public void batchPost_success() throws IOException, AuthenticationException {
     String id = "0013V000009id1YQAQ";
-    String accountName = "Example Account 1";
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":201,\"result\":\n"
                           + "{\"id\":\""+id+"\",\"success\":true,\"errors\":[]}}]}";
 
     CompositeBatchTransaction compositeBatchTransaction =
         getCompositeBatchTransaction(responseJson);
 
-    Account account = new Account();
-    account.setId(id);
-    account.setName(accountName);
-    compositeBatchTransaction.create(account);
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setTestNumber(1);
+    compositeBatchTransaction.create(testObject);
 
     assertTrue(compositeBatchTransaction.execute());
 
-    account = compositeBatchTransaction.getRecord(account.getReferenceId(), account.getClass());
-    assertEquals(id, account.getId());
-    assertEquals(accountName, account.getName());
-    assertTrue(account.getSuccess());
+    testObject = compositeBatchTransaction.getRecord(testObject.getReferenceId(), testObject.getClass());
+    assertEquals(id, testObject.getId());
+    assertTrue(1 == testObject.getTestNumber());
+    assertTrue(testObject.getSuccess());
+  }
 
-    // TODO Add test methods to all known scenarios
+  @Test
+  public void batchPost_unknownException() throws IOException, AuthenticationException {
+    String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
+                          + "\":\"UNKNOWN_EXCEPTION\",\"message\":\"An unexpected error occurred. Please include this ErrorId if you contact support: 8425053-14906 (608530858)\"}],\"statusCode\":500}]}";
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setTestNumber(1);
+
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
+
+    CompositeBatchTransaction compositeBatchTransaction = new CompositeBatchTransaction(
+        salesforceCompositeBatchClient, false);
+    compositeBatchTransaction.create(testObject);
+    assertFalse(compositeBatchTransaction.execute());
+
+    testObject = compositeBatchTransaction.getRecord(testObject.getReferenceId(), testObject.getClass());
+    assertFalse(testObject.getSuccess());
+    assertEquals(1, testObject.getErrors().size());
+    assertEquals("UNKNOWN_EXCEPTION", ((TransactionError)testObject.getErrors().get(0)).getErrorCode());
+    assertTrue(((TransactionError) testObject.getErrors().get(0)).getMessage().contains("An unexpected error occurred"));
+  }
+
+  @Test
+  public void batchPost_invalidFieldException() throws IOException, AuthenticationException {
+    String responseJson =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"No such column &#39;aFieldThatDoesNotExist&#39; on sobject of type Account\"}],\"statusCode\":400}]}";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mockCompositeBatchResponse(responseJson);
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setTestNumber(1);
+
+    CompositeBatchTransaction compositeBatchTransaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+    compositeBatchTransaction.create(testObject);
+    Boolean success = compositeBatchTransaction.execute();
+    assertFalse(success);
+
+    testObject = compositeBatchTransaction.getRecord(testObject.getReferenceId(),
+        Primary_Test_Object__c.class);
+
+    assertFalse(testObject.getSuccess());
+    assertEquals(1, testObject.getErrors().size());
+    assertEquals(
+        "INVALID_FIELD",
+        ((TransactionError) testObject.getErrors().get(0)).getErrorCode());
+    assertTrue(
+        ((TransactionError) testObject.getErrors().get(0))
+            .getMessage()
+            .contains("No such column"));
   }
 
   @Test
   public void batchDelete_success() throws IOException, AuthenticationException {
-    String id = "123456789";
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,"
                           + "\"result\":null}]}";
-    SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
+    SalesforceCompositeBatchClient
+        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
 
-    Account account = new Account();
-    account.setId(id);
-    account.setDescription("Some description");
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setTestNumber(1);
 
-    assertNotEquals(null, account.getAttributes());
+    assertNotEquals(null, testObject.getAttributes());
     CompositeBatchTransaction compositeBatchTransaction = new CompositeBatchTransaction(
-        salesforceCompositeBatchClient);
-    compositeBatchTransaction.delete(account);
+        salesforceCompositeBatchClient, false);
+    compositeBatchTransaction.delete(testObject);
     boolean success = compositeBatchTransaction.execute();
 
     assertTrue(success);
 
-    account = compositeBatchTransaction.getRecord(account.getReferenceId(), account.getClass());
-    assertEquals(id, account.getId());
-    assertEquals(true, account.getSuccess());
+    testObject = compositeBatchTransaction.getRecord(testObject.getReferenceId(), testObject.getClass());
+    assertEquals(true, testObject.getSuccess());
   }
 
   @Test
   public void batchDelete_FailChildRecords() throws IOException, AuthenticationException {
-
     String id = "123456788";
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"DELETE_FAILED\",\"message\":\"Your attempt to delete Edge Communications could not be completed because some opportunities in that account were closed won. The opportunities that could not be deleted are shown below.: Edge Emergency Generator, Edge Installation, Edge SLA\\n\"}],\"statusCode\":400}]}\n";
-    Account account = new Account();
-    account.setId(id);
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setTestNumber(1);
     mockCompositeBatchResponse(responseJson);
-
-    //TODO: fix all test scenarios
-
   }
 
   @Test
   public void batchGet_success() throws IOException, AuthenticationException {
     String id = "0013V000009ikVtQAI";
+    String name = "PTO-1609674290821";
     String responseJson =
         "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":\n"
-            + "    {\"attributes\":{\"type\":\"Account\",\"url\":\"/services/data/v50.0/sobjects/Account/0013V000009ikVtQAI\"},\"Id\":\"0013V000009ikVtQAI\",\"Name\":\"Test Account 1609674290821\"}}]}\n"
+            + "    {\"attributes\":{\"type\":\"Primary_Test_Object__c\","
+        + "\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/0013V000009ikVtQAI\"},"
+        + "\"Id\":\"0013V000009ikVtQAI\",\"Name\":\"PTO-1609674290821\"}}]}\n"
             + "    ";
     SalesforceCompositeBatchClient salesforceCompositeBatchClient =
     mockCompositeBatchResponse(responseJson);
 
-    Account account = new Account();
-    account.setId(id);
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setId(id);
 
     CompositeBatchTransaction compositeBatchTransaction = new CompositeBatchTransaction(
-        salesforceCompositeBatchClient);
-    compositeBatchTransaction.get(account);
+        salesforceCompositeBatchClient, false);
+    compositeBatchTransaction.get(testObject);
     boolean success = compositeBatchTransaction.execute();
 
-    Account account1 = compositeBatchTransaction.getRecord(account.getReferenceId(), account.getClass());
+    testObject = compositeBatchTransaction.getRecord(testObject.getReferenceId(), testObject.getClass());
 
     assertTrue(success);
+    assertEquals(name, testObject.getTestName());
+  }
 
+  @Test
+  public void batchGet_notFound() throws IOException, AuthenticationException {
+    String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
+                          + "\":\"NOT_FOUND\",\"message\":\"Provided external ID field does not exist or is not accessible: null\"}],\"statusCode\":404}]}";
+    SalesforceCompositeBatchClient
+        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setTestNumber(1);
+    CompositeBatchTransaction compositeBatchTransaction = new CompositeBatchTransaction(
+        salesforceCompositeBatchClient, false);
+    compositeBatchTransaction.get(testObject);
+    boolean success = compositeBatchTransaction.execute();
+
+    testObject = compositeBatchTransaction.getRecord(testObject.getReferenceId(),
+        testObject.getClass());
+    assertFalse(success);
   }
 
   @Test
@@ -181,12 +198,6 @@ public class CompositeBatchTransactionTest {
 
   }
 
-  @Test
-  public void batchGet_notFound() {
-    String responseJSON = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
-                          + "\":\"NOT_FOUND\",\"message\":\"Provided external ID field does not exist or is not accessible: null\"}],\"statusCode\":404}]}";
-
-  }
 
   @Test
   public void query_success() {
@@ -221,6 +232,6 @@ public class CompositeBatchTransactionTest {
   private CompositeBatchTransaction getCompositeBatchTransaction(String responseJson)
       throws IOException, AuthenticationException {
     SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
-    return new CompositeBatchTransaction(salesforceCompositeBatchClient);
+    return new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
   }
 }

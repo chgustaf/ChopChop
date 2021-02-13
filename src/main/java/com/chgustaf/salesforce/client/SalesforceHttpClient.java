@@ -44,7 +44,6 @@ public class SalesforceHttpClient {
                          Secrets secrets,
                          BaseHTTPClient httpClient)
       throws AuthenticationException, IOException {
-    determineFlow(authenticationFlow, secrets, httpClient);
     authentication = determineFlow(authenticationFlow, secrets, httpClient);
     accessParameters = authentication.authenticate();
     System.out.println("Access Token " + accessParameters);
