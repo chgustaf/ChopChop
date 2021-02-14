@@ -1,6 +1,5 @@
 package com.chgustaf.salesforce.client.composite.batch;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -136,9 +135,23 @@ public class CompositeBatchTransactionTest {
     String id = "123456788";
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"DELETE_FAILED\",\"message\":\"Your attempt to delete Edge Communications could not be completed because some opportunities in that account were closed won. The opportunities that could not be deleted are shown below.: Edge Emergency Generator, Edge Installation, Edge SLA\\n\"}],\"statusCode\":400}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mockCompositeBatchResponse(responseJson);
     Primary_Test_Object__c testObject = new Primary_Test_Object__c();
-    testObject.setTestNumber(1);
-    mockCompositeBatchResponse(responseJson);
+    testObject.setId(id);
+
+    CompositeBatchTransaction compositeBatchTransaction = new CompositeBatchTransaction(
+        salesforceCompositeBatchClient, false);
+    compositeBatchTransaction.get(testObject);
+    boolean success = compositeBatchTransaction.execute();
+    assertFalse(success);
+    testObject = compositeBatchTransaction.getRecord(testObject.getReferenceId(),
+        testObject.getClass());
+
+    assertFalse(testObject.getErrors().isEmpty());
+    assertEquals(
+        "DELETE_FAILED",
+        ((TransactionError) testObject.getErrors().get(0)).getErrorCode());
   }
 
   @Test
@@ -189,13 +202,29 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchUpdate_success() {
+  public void batchUpdate_success() throws IOException, AuthenticationException {
     String id = "123456789";
-    String accountName = "";
+    int testNumber = 1;
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,"
                           + "\"result\":null}]}";
+    SalesforceCompositeBatchClient
+        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
 
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setId(id);
+    testObject.setTestNumber(testNumber);
+    CompositeBatchTransaction compositeBatchTransaction = new CompositeBatchTransaction(
+        salesforceCompositeBatchClient, false);
+    compositeBatchTransaction.update(testObject);
+    boolean success = compositeBatchTransaction.execute();
+    assertTrue(success);
 
+    testObject = compositeBatchTransaction.getRecord(testObject.getReferenceId(),
+        testObject.getClass());
+    assertTrue(testObject.getSuccess());
+    assertEquals(id, testObject.getId());
+    assertEquals(Integer.valueOf(testNumber), testObject.getTestNumber());
   }
 
 
@@ -218,6 +247,11 @@ public class CompositeBatchTransactionTest {
   public void parse_Errors() {
     String noSuchFieldError = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                               + "\":\"INVALID_FIELD\",\"message\":\"No such column &#39;testCheckbox&#39; on sobject of type Primary_Test_Object__c\"}],\"statusCode\":400}]}";
+
+  }
+
+  @Test
+  public void query_withNextRecordsUrl() {
 
   }
 

@@ -32,8 +32,7 @@ public class CompositeBatchTransaction {
 
   CompositeBatchTransaction(SalesforceCompositeBatchClient salesforceCompositeBatchClient,
                             boolean haltOnError) {
-    this(salesforceCompositeBatchClient, haltOnError,
-        false);
+    this(salesforceCompositeBatchClient, haltOnError, false);
   }
 
   CompositeBatchTransaction(
@@ -45,30 +44,6 @@ public class CompositeBatchTransaction {
     this.alreadyExecuted = alreadyExecuted;
   }
 
-  void query(Query query) {
-    BatchRequest batchRequest =
-        new BatchRequestBuilder()
-            .setMethod("GET")
-            .setUrl(QUERY_URL + "?q=" + query.getQuery())
-            .setType(BatchRequest.Type.QUERY)
-            .setReferenceId(query.getReferenceId())
-            .createBatchRequest();
-    requests.add(batchRequest);
-  }
-
-  void update(Record record) throws JsonProcessingException {
-    BatchRequest batchRequest =
-        new BatchRequestBuilder()
-            .setMethod("PATCH")
-            .setUrl(SOBJECT_URL + record.getSObjectName() + "/" + record.getId())
-            .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
-            .setReferenceId(record.getReferenceId())
-            .setId(record.getId())
-            .setType(BatchRequest.Type.SOBJECT)
-            .createBatchRequest();
-    requests.add(batchRequest);
-  }
-
   void create(Record record) throws JsonProcessingException {
     BatchRequest batchRequest =
         new BatchRequestBuilder()
@@ -77,19 +52,6 @@ public class CompositeBatchTransaction {
             .setType(BatchRequest.Type.SOBJECT)
             .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
             .setReferenceId(record.getReferenceId())
-            .createBatchRequest();
-    requests.add(batchRequest);
-  }
-
-  void delete(Record record) throws JsonProcessingException {
-    BatchRequest batchRequest =
-        new BatchRequestBuilder()
-            .setMethod("DELETE")
-            .setUrl(SOBJECT_URL + record.getSObjectName() + "/" + record.getId())
-            .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
-            .setReferenceId(record.getReferenceId())
-            .setId(record.getId())
-            .setType(BatchRequest.Type.SOBJECT)
             .createBatchRequest();
     requests.add(batchRequest);
   }
@@ -110,6 +72,65 @@ public class CompositeBatchTransaction {
             .setType(BatchRequest.Type.SOBJECT)
             .setId(record.getId())
             .createBatchRequest();
+    requests.add(batchRequest);
+  }
+
+  void get(String url, String referenceId) throws JsonProcessingException {
+    BatchRequest batchRequest =
+        new BatchRequestBuilder()
+            .setMethod("GET")
+            .setUrl(url)
+            .setReferenceId(referenceId)
+            .setType(BatchRequest.Type.SOBJECT)
+            .createBatchRequest();
+    requests.add(batchRequest);
+  }
+
+  void update(Record record) throws JsonProcessingException {
+    BatchRequest batchRequest =
+        new BatchRequestBuilder()
+            .setMethod("PATCH")
+            .setUrl(SOBJECT_URL + record.getSObjectName() + "/" + record.getId())
+            .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
+            .setReferenceId(record.getReferenceId())
+            .setId(record.getId())
+            .setType(BatchRequest.Type.SOBJECT)
+            .createBatchRequest();
+    requests.add(batchRequest);
+  }
+
+  void delete(Record record) throws JsonProcessingException {
+    BatchRequest batchRequest =
+        new BatchRequestBuilder()
+            .setMethod("DELETE")
+            .setUrl(SOBJECT_URL + record.getSObjectName() + "/" + record.getId())
+            .setRichInput(record.getJSON().replaceAll("\\\\\"", "\""))
+            .setReferenceId(record.getReferenceId())
+            .setId(record.getId())
+            .setType(BatchRequest.Type.SOBJECT)
+            .createBatchRequest();
+    requests.add(batchRequest);
+  }
+
+  void query(Query query) {
+    BatchRequest batchRequest;
+    if (query.getUrl()!= null) {
+      batchRequest =
+          new BatchRequestBuilder()
+              .setMethod("GET")
+              .setUrl(query.getUrl())
+              .setType(BatchRequest.Type.QUERY)
+              .setReferenceId(query.getReferenceId())
+              .createBatchRequest();
+    } else {
+      batchRequest =
+          new BatchRequestBuilder()
+              .setMethod("GET")
+              .setUrl(QUERY_URL + "?q=" + query.getQuery())
+              .setType(BatchRequest.Type.QUERY)
+              .setReferenceId(query.getReferenceId())
+              .createBatchRequest();
+    }
     requests.add(batchRequest);
   }
 
@@ -164,5 +185,9 @@ public class CompositeBatchTransaction {
       return null;
     }
     return resultHandler.getQueryResult(referenceId, clazz);
+  }
+
+  public String hasMore(String referenceId) throws JsonProcessingException {
+    return resultHandler.hasMore(referenceId);
   }
 }

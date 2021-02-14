@@ -6,12 +6,16 @@ import com.chgustaf.salesforce.client.composite.domain.TransactionError;
 import com.chgustaf.salesforce.client.composite.dto.BatchRequest;
 import com.chgustaf.salesforce.client.composite.dto.CombinedRequestResponse;
 import com.chgustaf.salesforce.client.composite.dto.CompositeBatchResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,7 +127,12 @@ public class CompositeBatchResultHandler {
             .findFirst();
     List<T> returnList = new ArrayList<>();
     if (result.isPresent()) {
-      ObjectMapper mapper = new ObjectMapper();
+      ObjectMapper mapper = JsonMapper.builder()
+          .addModule(new ParameterNamesModule())
+          .addModule(new Jdk8Module())
+          .addModule(new JavaTimeModule())
+          .build();
+
       mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
       JsonNode jsonNode = result.get().getResult();
       QueryResult queryResult = mapper.treeToValue(jsonNode, QueryResult.class);
@@ -133,6 +142,29 @@ public class CompositeBatchResultHandler {
       returnList.addAll(Arrays.asList(arrayofT));
     }
     return returnList;
+  }
+
+  String hasMore(String referenceId) throws JsonProcessingException {
+    // Find the request with the specific referenceId
+    Optional<CombinedRequestResponse> result =
+        results.stream()
+            .filter(res -> res.getRequest() != null)
+            .filter(res -> res.getRequest().getReferenceId().equals(referenceId))
+            .findFirst();
+    if (result.isPresent()) {
+      ObjectMapper mapper =
+          JsonMapper.builder()
+              .addModule(new ParameterNamesModule())
+              .addModule(new Jdk8Module())
+              .addModule(new JavaTimeModule())
+              .build();
+
+      mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+      JsonNode jsonNode = result.get().getResult();
+      QueryResult queryResult = mapper.treeToValue(jsonNode, QueryResult.class);
+      return queryResult.nextRecordsUrl;
+    }
+    return null;
   }
 
   private <T extends Record> T retrieveGetRecord(CombinedRequestResponse result,

@@ -17,77 +17,77 @@ How to use:
 [Configuring Apache Maven for use with GitHub Packages](https://docs.github.com/en/free-pro-team@latest/packages/guides/configuring-apache-maven-for-use-with-github-packages#authenticating-to-github-packages)
                        
 2. Setup a new maven java project and add the dependency for the Github package 
-    ```XML
-      <dependency>
+```XML
+    <dependency>
         <groupId>com.chgustaf</groupId>
         <artifactId>chopchop</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
-    ```
+```
     
     Here is an example pom.xml you could use:
-    ```xml
-       <?xml version="1.0" encoding="UTF-8"?>
-       <project xmlns="http://maven.apache.org/POM/4.0.0"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-           <modelVersion>4.0.0</modelVersion>
-       
+```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <project xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+       <modelVersion>4.0.0</modelVersion>
+   
+       <groupId>com.chgustaf</groupId>
+       <artifactId>SalesforceClientExample</artifactId>
+       <version>1.0-SNAPSHOT</version>
+   
+       <dependencies>
+           <dependency>
            <groupId>com.chgustaf</groupId>
-           <artifactId>SalesforceClientExample</artifactId>
+           <artifactId>chopchop</artifactId>
            <version>1.0-SNAPSHOT</version>
-       
-           <dependencies>
-               <dependency>
-               <groupId>com.chgustaf</groupId>
-               <artifactId>chopchop</artifactId>
-               <version>1.0-SNAPSHOT</version>
-           </dependency>
-           </dependencies>
-       
-           <build>
-               <plugins>
-                   <plugin>
-                       <groupId>org.apache.maven.plugins</groupId>
-                       <artifactId>maven-compiler-plugin</artifactId>
-                       <version>3.8.0</version>
-                       <configuration>
-                           <release>11</release>
-                       </configuration>
-                   </plugin>
-                   <plugin>
-                       <groupId>org.apache.maven.plugins</groupId>
-                       <artifactId>maven-resources-plugin</artifactId>
-                       <version>3.2.0</version>
-                       <configuration>
-                           <encoding>UTF-8</encoding>
-                       </configuration>
-                   </plugin>
-               </plugins>
-           </build>
-       </project>
-    ```
+       </dependency>
+       </dependencies>
+   
+       <build>
+           <plugins>
+               <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-compiler-plugin</artifactId>
+                   <version>3.8.0</version>
+                   <configuration>
+                       <release>11</release>
+                   </configuration>
+               </plugin>
+               <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-resources-plugin</artifactId>
+                   <version>3.2.0</version>
+                   <configuration>
+                       <encoding>UTF-8</encoding>
+                   </configuration>
+               </plugin>
+           </plugins>
+       </build>
+   </project>
+```
  
 3. Run 
-    ```
+```
     mvn clean install
-    ```
+```
 
 4. Create new secrets file named "secrets.json" in your projects resource folder and add your 
 credentials with 
 this json template:
-    ```json
-    {
-      "username": "",
-      "password": "",
-      "security_token": "",
-      "consumer_key": "",
-      "consumer_secret": "",
-      "login_url": "https://login.salesforce.com",
-      "token_url": "https://login.salesforce.com/services/oauth2/token",
-      "authentication_method": ""
-    }
-    ```
+```json
+{
+  "username": "",
+  "password": "",
+  "security_token": "",
+  "consumer_key": "",
+  "consumer_secret": "",
+  "login_url": "https://login.salesforce.com",
+  "token_url": "https://login.salesforce.com/services/oauth2/token",
+  "authentication_method": ""
+}
+```
 
 5. If you want to setup JWT authentication:
     
@@ -124,21 +124,21 @@ specify something you'll remember.
 name of the .jks file; jks_keyname which is the name of the key you created in 
 salesforce and 
 jks_password which is the password you specified before downloading the jks:
-    ```json
-    {
-       "username": "",
-       "password": "",
-       "security_token": "",
-       "consumer_key": "",
-       "consumer_secret": "",
-       "login_url": "https://login.salesforce.com",
-       "token_url": "https://login.salesforce.com/services/oauth2/token",
-       "authentication_method": "",
-       "jks_file_name": "",
-       "jks_keyname" : "",
-       "jks_password": ""
-    }
-    ```
+```json
+{
+   "username": "",
+   "password": "",
+   "security_token": "",
+   "consumer_key": "",
+   "consumer_secret": "",
+   "login_url": "https://login.salesforce.com",
+   "token_url": "https://login.salesforce.com/services/oauth2/token",
+   "authentication_method": "",
+   "jks_file_name": "",
+   "jks_keyname" : "",
+   "jks_password": ""
+}
+```
 8. You need to pre-authorize the user you've selected; Go into the setup and Apps> Manage 
 Connected 
 Apps, open your connected app and click Edit Policies (a button in the top of the connected app 
@@ -159,43 +159,89 @@ of the user you are going to use or authorize a permission set that is assigned 
 ### Define your sObjects
 You will have to define classes corresponding to the sObjects that you are going to work with in 
 the Java application. 
-You will have to create a class for the object and extend it from the abstract class Record. It 
-will require you to implement one method (getAllFields()) and that method's implementation is always 
-the same, please see this example sObject; 
+You will have to create a class for the Salesforce object and extend it from the abstract class 
+Record. Don't add the id (i.e. the record id) variable to your sobject class, it is already added
+ to the Record class from which you extend your class from. You'll have to annotate each variable
+  with an @JsonProperty(*<api name of the salesforce field>* and annotate the class with the name 
+  of the salesforce object name. Lastly, annotate your 
+class with @JsonInclude(JsonInclude.Include.NON_NULL) so that null values won't be included in the 
+json after serialization. Here is an example class showing these three kind of annotations:
+```java
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonRootName(value = "Primary_Test_Object__c")
+public class Primary_Test_Object__c extends Record {
+  
+    @JsonProperty("Test_checkbox__c")
+    private Boolean testCheckbox;
     
-    ```java
-    public class PrimaryTestObject extends Record {
-      
-        private Boolean testCheckbox;
-        private Float testCurrency;
-        private Date testDate;
-        private ZonedDateTime testDateTime;
-        private String testEmail;
-        private String testFormulaField;
-        private String testGeolocation;
-        private String testMultiSelectPicklist;
-        private String testName;
-        private String testNumber;
-        private Float testPercentage;
-        private String testPhone;
-        private String testPicklist;
-        private String testText;
-        private String testTextAreaLong;
-        private String testTextAreaRich;
-        private String testTextEncrypted;
-        private Instant testTime;
-        private String url;
-      
-        protected PrimaryTestObject(final Class entityClass) {
-          super(entityClass);
-        }
-      
-        @Override
-        public List<String> getAllFields() {
-          return super.getAllFieldsHelper(this.getClass());
-        }
-      
-      }
+    public Boolean getTestCheckbox() {
+      return testCheckbox;
+    }
     
-    ```
-    
+    public void setTestCheckbox(final Boolean testCheckbox) {
+      this.testCheckbox = testCheckbox;
+    }
+}
+```
+
+### Start writing your code
+You should by this stage be ready to start doing the real work; writing your code.
+It's rather simple. To create a record:
+```java
+SalesforceCompositeBatchClient salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
+Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+testObject.setTestCheckbox(true);
+try {
+  primaryTestObject = create(primaryTestObject, salesforceCompositeBatchClient);
+} catch (TransactionException e) {
+  e.printStackTrace();
+}
+```
+
+To update a record:
+```java
+Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+testObject.setId("a0009000003yZTwAAM");
+testObject.setTestCheckbox(true);
+
+try {
+  primaryTestObject = update(primaryTestObject, salesforceCompositeBatchClient);
+} catch (TransactionException e) {
+  e.printStackTrace();
+}
+```
+
+To delete a record:
+```java
+Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+testObject.setId("a0009000003yZTwAAM");
+try {
+  primaryTestObject = delete(primaryTestObject, salesforceCompositeBatchClient);
+} catch (TransactionException e) {
+  e.printStackTrace();
+}
+```
+
+To get a record (i.e. fetch all declared fields in the class):
+```java
+Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+testObject.setId("a0009000003yZTwAAM");
+try {
+  primaryTestObject = get(primaryTestObject, salesforceCompositeBatchClient);
+} catch (TransactionException e) {
+  e.printStackTrace();
+}
+```
+
+To query for records:
+```java
+String queryStringCases = "SELECT Subject FROM Case";
+List<Case> caseList = null;
+try {
+  caseList = query(
+      new Query<>(queryStringCases, Case.class),
+      salesforceCompositeBatchClient);
+} catch (TransactionException e) {
+  e.printStackTrace();
+}
+```

@@ -34,14 +34,14 @@ public class Operations {
 
   public static <T extends Record> T get(T record,
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction =
         new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
 
     transaction.get(record);
     if (!transaction.execute()) {
-      System.out.println("Unable to create "+record.getClass().getSimpleName()+" record");
-      return null;
+      Record returnRecord = transaction.getRecord(record.getReferenceId(), record.getEntityClass());
+      throw constructTransactionException(returnRecord.getErrors());
     }
 
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
@@ -63,14 +63,14 @@ public class Operations {
 
   public static <T extends Record> T update(T record,
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction = new CompositeBatchTransaction(
         salesforceCompositeBatchClient, false);
 
     transaction.update(record);
     if (!transaction.execute()) {
-      System.out.println("Unable to create "+record.getClass().getSimpleName()+" record");
-      return null;
+      Record returnRecord = transaction.getRecord(record.getReferenceId(), record.getEntityClass());
+      throw constructTransactionException(returnRecord.getErrors());
     }
 
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
@@ -78,14 +78,14 @@ public class Operations {
 
   public static <T extends Record> T delete(T record,
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction = new CompositeBatchTransaction(
         salesforceCompositeBatchClient, false);
 
     transaction.delete(record);
     if (!transaction.execute()) {
-      System.out.println("Unable to create "+record.getClass().getSimpleName()+" record");
-      return null;
+      Record returnRecord = transaction.getRecord(record.getReferenceId(), record.getEntityClass());
+      throw constructTransactionException(returnRecord.getErrors());
     }
     // TODO Find a different way of returning the record. This is an unchecked return
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
@@ -94,14 +94,30 @@ public class Operations {
 
   public static <T extends Record> List<T> query(Query<T> query,
                                     SalesforceCompositeBatchClient salesforceCompositeBatchClient)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction =
         new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
     transaction.query(query);
     if (!transaction.execute()) {
-      return null;
+      Record returnRecord = transaction.getRecord(query.getReferenceId(), query.getEntityClass());
+      throw constructTransactionException(returnRecord.getErrors());
     }
-    return transaction.getQueryResult(query.getReferenceId(), query.getEntityClass());
+    List<T> recordList = transaction.getQueryResult(query.getReferenceId(), query.getEntityClass());
+    String nextUrl = transaction.hasMore(query.getReferenceId());
+    while (nextUrl != null) {
+      Query nextQuery = new Query<>(query.getEntityClass());
+      nextQuery.setUrl(nextUrl);
+      transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+      transaction.query(nextQuery);
+      if (!transaction.execute()) {
+        Record returnRecord = transaction.getRecord(query.getReferenceId(), query.getEntityClass());
+        throw constructTransactionException(returnRecord.getErrors());
+      }
+      recordList.addAll(transaction.getQueryResult(nextQuery.getReferenceId(), query.getEntityClass()));
+      nextUrl = transaction.hasMore(nextQuery.getReferenceId());
+    }
+    System.out.println("Here are all records " + recordList.size());
+    return recordList;
   }
 
   private static TransactionException constructTransactionException(

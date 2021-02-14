@@ -5,13 +5,20 @@ import java.util.UUID;
 
 public class Query<T> {
 
-  public String query;
-  public String referenceId;
-  public Class<T> sobject;
+  String query;
+  // Used for nextUrl when number of records are too many to return in one go
+  String url;
+  String referenceId;
+  Class<T> sobject;
 
-  public Query(Class<T> clazz) {
-    sobject = clazz;
+  public Query(final Class<T> sobject) {
+    this.sobject = sobject;
     this.referenceId = UUID.randomUUID().toString();
+  }
+
+  public Query(String query, Class<T> clazz) {
+    this(clazz);
+    this.query = query;
   }
 
   public String getQuery() {
@@ -32,6 +39,14 @@ public class Query<T> {
 
   public String getSobjectName() {
     return sobject.getClass().getName();
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(final String url) {
+    this.url = url;
   }
 
   @JsonIgnore

@@ -7,4 +7,5 @@ public class QueryResult {
   public int totalSize;
   public boolean done;
   public JsonNode records;
+  public String nextRecordsUrl;
 }

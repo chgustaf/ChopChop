@@ -1,6 +1,7 @@
 package com.chgustaf.salesforce.client.composite.batch;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Query;
 import com.chgustaf.salesforce.client.composite.domain.Record;
@@ -20,9 +21,7 @@ public class AsynchronousOperations {
           try {
             recordList = Operations.query(query, salesforceCompositeBatchClient);
             System.out.println("Here are the records "+recordList);
-          } catch (IOException e) {
-            e.printStackTrace();
-          } catch (AuthenticationException e) {
+          } catch (IOException | AuthenticationException | TransactionException e) {
             e.printStackTrace();
           }
           return recordList;

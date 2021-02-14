@@ -1,15 +1,19 @@
 package com.chgustaf.examples.caseupdater;
 
 import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
 
+import com.chgustaf.examples.caseupdater.exampleclient.domain.Case;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Primary_Test_Object__c;
+import com.chgustaf.salesforce.client.composite.domain.Query;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 public class CaseUpdate {
 
@@ -44,6 +48,36 @@ public class CaseUpdate {
     } catch (TransactionException e) {
       e.printStackTrace();
     }
+
+    String queryString = "SELECT Test_Checkbox__c, Test_Currency__c, Test_Date__c, "
+                        + "Test_Datetime__c, "
+                   + "Test_Email__c, Test_Formula_Field__c, Test_Geolocation__latitude__s, "
+                   + "Test_Geolocation__longitude__s, Test_Multiselect_Picklist__c, Name, "
+                   + "Test_Number__c, Test_Percentage__c, Test_Phone__c, Test_Picklist__c, "
+                   + "Test_Text__c, Test_Text_Area__c, Test_Text_Area_Long__c, "
+                   + "Test_Text_Area_Rich__c, Test_Text_Encrypted__c, Test_Time__c, Test_URL__c "
+                   + "FROM Primary_Test_Object__c";
+    Query<Primary_Test_Object__c> query = new Query<>(queryString, Primary_Test_Object__c.class);
+    List<Primary_Test_Object__c> queryResultList = null;
+    try {
+      queryResultList = query(query, salesforceCompositeBatchClient);
+    } catch (TransactionException e) {
+      e.printStackTrace();
+    }
+    queryResultList.stream().forEach(pto -> System.out.println("Here is one record of the Primary "
+                                                           + "Test Object " + pto));
+    String queryStringCases = "SELECT Subject FROM Case";
+    List<Case> caseList = null;
+    try {
+      caseList = query(
+          new Query<>(queryStringCases, Case.class),
+          salesforceCompositeBatchClient);
+    } catch (TransactionException e) {
+      e.printStackTrace();
+    }
+    System.out.println("Here are the cases " + caseList.size());
+
+    // TODO: fix so that one can create/update/delete in bulk
 /*
     Query query = new Query<>(Account.class);
     query.setQuery(URLEncoder.encode("SELECT id, name FROM Account",
@@ -106,9 +140,6 @@ public class CaseUpdate {
     account1 = Operations.update(account1, salesforceCompositeBatchClient);
     System.out.println("Account updated " + account1);
 
-
-
-
     // TODO: Add support for calling custom web services
 
     //Account account = delete(accountList.get(0), salesforceCompositeBatchClient);
@@ -117,6 +148,22 @@ public class CaseUpdate {
     //account1 = delete(account1, salesforceCompositeBatchClient);
     //System.out.println("This account1 was deleted " + account1);
 */
+    /*Account account = new Account();
+    account.setName("Test Account 1");
+    account.setDescription("This account will own a shit tonne of cases");
+    account = create(account, salesforceCompositeBatchClient);
+    if (account.getId() != null) {
+      for(int i=0; i< 1000; i++) {
+        Case c = new Case();
+        c.setSubject("Test case " + i);
+        c.setAccountId(account.getId());
+        c = create(c, salesforceCompositeBatchClient);
+        if (!c.getSuccess()) {
+          c.getErrors().stream().forEach(err -> System.out.println(err.toString()));
+          System.out.println("Didn't work. Exiting ");
+          break;
+        }
+      }
+    }*/
   }
-
 }
