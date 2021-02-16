@@ -117,7 +117,7 @@ public class CompositeBatchResultHandler {
     return null;
   }
 
-  <T extends Record> List<T> getQueryResult(String referenceId, Class<T> clazz)
+  <T extends Record> List<T> getQueryResultList(String referenceId, Class<T> clazz)
       throws IOException {
     // Find the request with the specific referenceId
     Optional<CombinedRequestResponse> result =
@@ -144,7 +144,23 @@ public class CompositeBatchResultHandler {
     return returnList;
   }
 
-  String hasMore(String referenceId) throws JsonProcessingException {
+  String nextRecordsUrl(String referenceId) throws JsonProcessingException {
+    QueryResult queryResult = getQueryResult(referenceId);
+    if (queryResult != null) {
+      return queryResult.nextRecordsUrl;
+    }
+    return null;
+  }
+
+  boolean done(String referenceId) throws JsonProcessingException {
+    QueryResult queryResult = getQueryResult(referenceId);
+    if (queryResult != null) {
+      return queryResult.done;
+    }
+    return false;
+  }
+
+  QueryResult getQueryResult(String referenceId) throws JsonProcessingException {
     // Find the request with the specific referenceId
     Optional<CombinedRequestResponse> result =
         results.stream()
@@ -161,11 +177,11 @@ public class CompositeBatchResultHandler {
 
       mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
       JsonNode jsonNode = result.get().getResult();
-      QueryResult queryResult = mapper.treeToValue(jsonNode, QueryResult.class);
-      return queryResult.nextRecordsUrl;
+      return mapper.treeToValue(jsonNode, QueryResult.class);
     }
     return null;
   }
+
 
   private <T extends Record> T retrieveGetRecord(CombinedRequestResponse result,
                                                  ObjectMapper mapper, Class<T> clazz)

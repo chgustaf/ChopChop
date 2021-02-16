@@ -91,32 +91,34 @@ public class Operations {
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
   }
 
-
   public static <T extends Record> List<T> query(Query<T> query,
-                                    SalesforceCompositeBatchClient salesforceCompositeBatchClient)
+                                                 SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException, TransactionException {
-    CompositeBatchTransaction transaction =
-        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
-    transaction.query(query);
-    if (!transaction.execute()) {
-      Record returnRecord = transaction.getRecord(query.getReferenceId(), query.getEntityClass());
-      throw constructTransactionException(returnRecord.getErrors());
-    }
-    List<T> recordList = transaction.getQueryResult(query.getReferenceId(), query.getEntityClass());
-    String nextUrl = transaction.hasMore(query.getReferenceId());
-    while (nextUrl != null) {
-      Query nextQuery = new Query<>(query.getEntityClass());
-      nextQuery.setUrl(nextUrl);
+    boolean thereAreMoreRecords = true;
+    CompositeBatchTransaction transaction;
+    List<T> recordList = new ArrayList<>();
+    Query<T> currentQuery = query;
+    String nextUrl = null;
+    do {
+      if (nextUrl != null) {
+        currentQuery = new Query<>(query.getEntityClass());
+        currentQuery.setUrl(nextUrl);
+      }
       transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
-      transaction.query(nextQuery);
+      transaction.query(currentQuery);
+
       if (!transaction.execute()) {
-        Record returnRecord = transaction.getRecord(query.getReferenceId(), query.getEntityClass());
+        Record returnRecord = transaction.getRecord(currentQuery.getReferenceId(), currentQuery.getEntityClass());
         throw constructTransactionException(returnRecord.getErrors());
       }
-      recordList.addAll(transaction.getQueryResult(nextQuery.getReferenceId(), query.getEntityClass()));
-      nextUrl = transaction.hasMore(nextQuery.getReferenceId());
-    }
-    System.out.println("Here are all records " + recordList.size());
+      recordList.addAll(transaction.getQueryResult(currentQuery.getReferenceId(), currentQuery.getEntityClass()));
+
+      if (!transaction.done(currentQuery.getReferenceId())) {
+        nextUrl = transaction.nextRecordsUrl(currentQuery.getReferenceId());
+      } else {
+        thereAreMoreRecords = false;
+      }
+    } while (thereAreMoreRecords);
     return recordList;
   }
 

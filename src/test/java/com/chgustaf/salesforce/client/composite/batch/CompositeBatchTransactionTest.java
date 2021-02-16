@@ -12,11 +12,13 @@ import static org.mockito.Mockito.when;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Primary_Test_Object__c;
+import com.chgustaf.salesforce.client.composite.domain.Query;
 import com.chgustaf.salesforce.client.composite.domain.TransactionError;
 import com.chgustaf.salesforce.client.composite.dto.CompositeBatchResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 
@@ -229,10 +231,23 @@ public class CompositeBatchTransactionTest {
 
 
   @Test
-  public void query_success() {
-    String responseJSON = "{\"totalSize\":13,\"done\":true,"
-                          + "\"records\":[{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Case\",\"url\":\"/services/data/v50.0/sobjects/Case/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}\n";
-
+  public void query_success() throws IOException, AuthenticationException {
+    String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":\n"
+                          + "{\"totalSize\":13,\"done\":true,"
+                          + "\"records\":[{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}";
+    SalesforceCompositeBatchClient
+        salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
+    String queryString = "SELECT id FROM Primary_Test_Object__c";
+    Query<Primary_Test_Object__c> query = new Query<>(queryString, Primary_Test_Object__c.class);
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+    transaction.query(query);
+    transaction.execute();
+    List<Primary_Test_Object__c> queryResult =
+        transaction.getQueryResult(query.getReferenceId(),
+        query.getEntityClass());
+    assertEquals(13, queryResult.size());
   }
 
   @Test
@@ -244,9 +259,12 @@ public class CompositeBatchTransactionTest {
 
 
   @Test
-  public void parse_Errors() {
-    String noSuchFieldError = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
-                              + "\":\"INVALID_FIELD\",\"message\":\"No such column &#39;testCheckbox&#39; on sobject of type Primary_Test_Object__c\"}],\"statusCode\":400}]}";
+  public void parse_Errors() throws IOException, AuthenticationException {
+    String invalidFieldError =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\","
+        + "\"message\":\"\\nSELECT Subjec FROM Primary_Test_Object__c\\n       ^\\nERROR at "
+        + "Row:1:Column:8\\nNo such column &#39;Subjec&#39; on entity &#39;Case&#39;. If you are attempting to use a custom field, be sure to append the &#39;__c&#39; after the custom field name. Please reference your WSDL or the describe call for the appropriate names.\"}],\"statusCode\":400}]}\n";
+
 
   }
 

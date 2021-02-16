@@ -9,10 +9,6 @@ public class CompositeBatchResponse {
     return hasErrors;
   }
 
-  public void setHasErrors(final Boolean hasErrors) {
-    this.hasErrors = hasErrors;
-  }
-
   public Result[] getResults() {
     return results;
   }
@@ -21,11 +17,7 @@ public class CompositeBatchResponse {
     this.results = results;
   }
 
-  private boolean isHasErrors() {
-    return hasErrors;
-  }
-
-  private void setHasErrors(final boolean hasErrors) {
+  public void setHasErrors(final boolean hasErrors) {
     this.hasErrors = hasErrors;
   }
 }

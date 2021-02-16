@@ -184,10 +184,14 @@ public class CompositeBatchTransaction {
     if (resultHandler == null) {
       return null;
     }
-    return resultHandler.getQueryResult(referenceId, clazz);
+    return resultHandler.getQueryResultList(referenceId, clazz);
   }
 
-  public String hasMore(String referenceId) throws JsonProcessingException {
-    return resultHandler.hasMore(referenceId);
+  public String nextRecordsUrl(final String referenceId) throws JsonProcessingException {
+    return resultHandler.nextRecordsUrl(referenceId);
+  }
+
+  public boolean done(final String referenceId) throws JsonProcessingException {
+    return resultHandler.done(referenceId);
   }
 }

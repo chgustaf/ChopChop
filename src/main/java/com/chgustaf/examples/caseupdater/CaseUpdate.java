@@ -48,7 +48,7 @@ public class CaseUpdate {
     } catch (TransactionException e) {
       e.printStackTrace();
     }
-
+/*
     String queryString = "SELECT Test_Checkbox__c, Test_Currency__c, Test_Date__c, "
                         + "Test_Datetime__c, "
                    + "Test_Email__c, Test_Formula_Field__c, Test_Geolocation__latitude__s, "
@@ -65,8 +65,8 @@ public class CaseUpdate {
       e.printStackTrace();
     }
     queryResultList.stream().forEach(pto -> System.out.println("Here is one record of the Primary "
-                                                           + "Test Object " + pto));
-    String queryStringCases = "SELECT Subject FROM Case";
+                                                           + "Test Object " + pto));*/
+    String queryStringCases = "SELECT Subjec FROM Case";
     List<Case> caseList = null;
     try {
       caseList = query(
@@ -76,7 +76,21 @@ public class CaseUpdate {
       e.printStackTrace();
     }
     System.out.println("Here are the cases " + caseList.size());
+/*
+    String queryStringTest = "SELECT id, Test_Formula_Field__c FROM Primary_Test_Object__c LIMIT "
+                             + "10";
+    List<Primary_Test_Object__c> testList = null;
+    try {
+      testList = query(
+          new Query<>(queryStringTest, Primary_Test_Object__c.class),
+          salesforceCompositeBatchClient);
+    } catch (TransactionException e) {
+      e.printStackTrace();
+    }
+    System.out.println("Here are the cases " + testList.size());
 
+    // TODO: Write tests for queries
+    // TODO:
     // TODO: fix so that one can create/update/delete in bulk
 /*
     Query query = new Query<>(Account.class);
