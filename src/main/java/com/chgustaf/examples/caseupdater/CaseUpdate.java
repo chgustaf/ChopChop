@@ -66,7 +66,7 @@ public class CaseUpdate {
     }
     queryResultList.stream().forEach(pto -> System.out.println("Here is one record of the Primary "
                                                            + "Test Object " + pto));*/
-    String queryStringCases = "SELECT Subjec FROM Case";
+    String queryStringCases = "SELECT subjec FROM Case";
     List<Case> caseList = null;
     try {
       caseList = query(
@@ -90,7 +90,6 @@ public class CaseUpdate {
     System.out.println("Here are the cases " + testList.size());
 
     // TODO: Write tests for queries
-    // TODO:
     // TODO: fix so that one can create/update/delete in bulk
 /*
     Query query = new Query<>(Account.class);

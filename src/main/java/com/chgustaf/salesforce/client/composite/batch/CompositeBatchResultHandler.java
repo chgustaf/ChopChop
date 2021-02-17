@@ -119,28 +119,17 @@ public class CompositeBatchResultHandler {
 
   <T extends Record> List<T> getQueryResultList(String referenceId, Class<T> clazz)
       throws IOException {
-    // Find the request with the specific referenceId
-    Optional<CombinedRequestResponse> result =
-        results.stream()
-            .filter(res -> res.getRequest() != null)
-            .filter(res -> res.getRequest().getReferenceId().equals(referenceId))
-            .findFirst();
-    List<T> returnList = new ArrayList<>();
-    if (result.isPresent()) {
-      ObjectMapper mapper = JsonMapper.builder()
+    QueryResult queryResult = getQueryResult(referenceId);
+    ObjectMapper mapper =
+      JsonMapper.builder()
           .addModule(new ParameterNamesModule())
           .addModule(new Jdk8Module())
           .addModule(new JavaTimeModule())
           .build();
-
-      mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
-      JsonNode jsonNode = result.get().getResult();
-      QueryResult queryResult = mapper.treeToValue(jsonNode, QueryResult.class);
-
-      ObjectReader reader = mapper.readerForArrayOf(clazz);
-      T[] arrayofT = reader.readValue(queryResult.records);
-      returnList.addAll(Arrays.asList(arrayofT));
-    }
+    ObjectReader reader = mapper.readerForArrayOf(clazz);
+    List<T> returnList = new ArrayList<>();
+    T[] arrayofT = reader.readValue(queryResult.records);
+    returnList.addAll(Arrays.asList(arrayofT));
     return returnList;
   }
 

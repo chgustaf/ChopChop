@@ -251,19 +251,50 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void query_invalidField() {
-    String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
-                          + "\":\"INVALID_FIELD\",\"message\":\"\\nSELECT id, name, non_existing_field FROM Account\\n\\nERROR at Row:1:Column:18\\nNo such column &#39;non_existing_field&#39; on entity &#39;Account&#39;. If you are attempting to use a custom field, be sure to append the &#39;__c&#39; after the custom field name. Please reference your WSDL or the describe call for the appropriate names.\"}],\"statusCode\":400}]}\n";
+  public void query_nextRecordsUrl() throws IOException, AuthenticationException {
+    String responseJson =
+        "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":{\"totalSize\":13,"
+        + "\"done\":false,\"nextRecordsUrl\":\"/services/data/v50.0/query/01g09000000h1LvAAI-2000\",\"records\":[{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(responseJson);
+    String queryString = "SELECT id FROM Primary_Test_Object__c";
+    Query<Primary_Test_Object__c> query = new Query<>(queryString, Primary_Test_Object__c.class);
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+    transaction.query(query);
+    transaction.execute();
+    List<Primary_Test_Object__c> queryResult =
+        transaction.getQueryResult(query.getReferenceId(),
+            query.getEntityClass());
+    assertEquals(13, queryResult.size());
+  }
+
+  @Test
+  public void query_invalidField() throws IOException, AuthenticationException {
+    String invalidFieldError =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\","
+        + "\"message\":\"\\nSELECT Subjec FROM Primary_Test_Object__c\\n       ^\\nERROR at "
+        + "Row:1:Column:8\\nNo such column &#39;Subjec&#39; on entity &#39;Case&#39;. If you are attempting to use a custom field, be sure to append the &#39;__c&#39; after the custom field name. Please reference your WSDL or the describe call for the appropriate names.\"}],\"statusCode\":400}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(invalidFieldError);
+    String queryString = "SELECT subjec FROM Primary_Test_Object__c";
+    Query<Primary_Test_Object__c> query = new Query<>(queryString, Primary_Test_Object__c.class);
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+    transaction.query(query);
+    transaction.execute();
+    List<Primary_Test_Object__c> queryResult =
+        transaction.getQueryResult(query.getReferenceId(),
+            query.getEntityClass());
+    assertEquals(13, queryResult.size());
 
   }
 
 
   @Test
   public void parse_Errors() throws IOException, AuthenticationException {
-    String invalidFieldError =
-        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\","
-        + "\"message\":\"\\nSELECT Subjec FROM Primary_Test_Object__c\\n       ^\\nERROR at "
-        + "Row:1:Column:8\\nNo such column &#39;Subjec&#39; on entity &#39;Case&#39;. If you are attempting to use a custom field, be sure to append the &#39;__c&#39; after the custom field name. Please reference your WSDL or the describe call for the appropriate names.\"}],\"statusCode\":400}]}\n";
 
 
   }
