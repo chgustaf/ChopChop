@@ -3,6 +3,7 @@ package com.chgustaf.salesforce.client;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import java.io.IOException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -14,7 +15,7 @@ public class SalesforceCompositeBatchClient {
   String compositeBatchEndpoint;
 
   public SalesforceCompositeBatchClient() throws IOException,
-                                                 AuthenticationException {
+                                                 AuthenticationException, TransactionException {
     this(new SalesforceHttpClient());
   }
 
@@ -31,7 +32,7 @@ public class SalesforceCompositeBatchClient {
   }
 
   public String compositeBatchCall(String requestString)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     HttpPost postRequest = new HttpPost(compositeBatchEndpoint);
     postRequest.addHeader("Content-Type", "application/json");
     postRequest.addHeader("Authorization", "Bearer " + salesforceHttpClient.getAccessParameters().getAccessToken());

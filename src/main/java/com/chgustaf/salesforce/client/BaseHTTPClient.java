@@ -4,6 +4,7 @@ import static com.chgustaf.salesforce.authentication.exceptions.AuthenticationEx
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,25 +32,29 @@ public class BaseHTTPClient {
     acceptableResponseCodes.put("DELETE", new HashSet<>(Arrays.asList(200, 202, 204)));
   }
 
-  public String post(HttpPost postRequest) throws IOException, AuthenticationException {
+  public String post(HttpPost postRequest)
+      throws IOException, AuthenticationException, TransactionException {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     HttpResponse response = httpClient.execute(postRequest);
     checkResponse(response, "POST");
+    String responseText = getResponseText(response);
+    System.out.println("ResponseText " + responseText);
+    httpClient.close();
+    return responseText;
+  }
+
+  public String get(HttpGet getRequest)
+      throws IOException, AuthenticationException, TransactionException {
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    HttpResponse response = httpClient.execute(getRequest);
+    checkResponse(response, "GET");
     String responseText = getResponseText(response);
     httpClient.close();
     return responseText;
   }
 
-  public String get(HttpGet getRequest) throws IOException, AuthenticationException {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
-    HttpResponse response = httpClient.execute(getRequest);
-    checkResponse(response, "GET");
-    String text = getResponseText(response);
-    httpClient.close();
-    return text;
-  }
-
-  public String delete(HttpDelete deleteRequest) throws IOException, AuthenticationException {
+  public String delete(HttpDelete deleteRequest)
+      throws IOException, AuthenticationException, TransactionException {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     HttpResponse response = httpClient.execute(deleteRequest);
     checkResponse(response, "DELETE");
@@ -57,7 +62,8 @@ public class BaseHTTPClient {
     return "";
   }
 
-  public String patch(HttpPatch patchRequest) throws IOException, AuthenticationException {
+  public String patch(HttpPatch patchRequest)
+      throws IOException, AuthenticationException, TransactionException {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     HttpResponse response = httpClient.execute(patchRequest);
     checkResponse(response, "PATCH");
@@ -66,13 +72,15 @@ public class BaseHTTPClient {
     return responseText ;
   }
 
-  void checkResponse(HttpResponse response, String httpMethod) throws AuthenticationException {
+  void checkResponse(HttpResponse response, String httpMethod)
+      throws AuthenticationException, IOException, TransactionException {
     if (response.getStatusLine().getStatusCode() == 401) {
-      throw new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST");
+      throw new AuthenticationException(UNAUTHORIZED, "401 Unauthorized");
     }
 
     if (!acceptableResponseCodes.get(httpMethod).contains(response.getStatusLine().getStatusCode())) {
-      throw new RuntimeException("Request failed : HTTP error code " + response.getStatusLine().getStatusCode() + " "+response.getStatusLine().getReasonPhrase());
+      throw new TransactionException("Request failed : HTTP error code " +
+                                     response.getStatusLine().getStatusCode() + " " +getResponseText(response));
     }
   }
 

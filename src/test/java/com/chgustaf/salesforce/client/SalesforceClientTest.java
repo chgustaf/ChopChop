@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.authentication.secrets.Secrets;
 import com.chgustaf.salesforce.authentication.secrets.SecretsUtil;
 import java.io.File;
@@ -19,7 +20,7 @@ public class SalesforceClientTest {
   @Test
   public void testAuthenticateJWT_getAccessToken()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
 
     BaseHTTPClient baseHTTPClient = mock(BaseHTTPClient.class);
     String response = readResourceJSON("username-password-authenticate-success.json");
@@ -33,7 +34,7 @@ public class SalesforceClientTest {
 
   @Test
   public void testAuthenticateUserPassword_getAccessToken()
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
 
     BaseHTTPClient baseHTTPClient = mock(BaseHTTPClient.class);
     String response = readResourceJSON("username-password-authenticate-success.json");

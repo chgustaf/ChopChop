@@ -3,6 +3,7 @@ package com.chgustaf.salesforce.authentication.jwt;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.chgustaf.salesforce.authentication.AccessParameters;
 import com.chgustaf.salesforce.authentication.Authentication;
@@ -36,7 +37,7 @@ public class JWTAuthentication extends Authentication {
   }
 
   public AccessParameters getAccessToken(String loginURL, String jwt)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     HttpPost httpPost = new HttpPost(loginURL);
     httpPost.setHeader("Content-type", "application/x-www-form-urlencoded");
     httpPost.setEntity(getJWTEntity(jwt));
@@ -47,7 +48,8 @@ public class JWTAuthentication extends Authentication {
   }
 
   @Override
-  public AccessParameters authenticate() throws IOException, AuthenticationException {
+  public AccessParameters authenticate()
+      throws IOException, AuthenticationException, TransactionException {
     String jwt = createJWT();
     return getAccessToken(LOGIN_URL, jwt);
   }

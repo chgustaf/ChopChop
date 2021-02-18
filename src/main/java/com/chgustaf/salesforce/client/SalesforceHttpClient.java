@@ -6,6 +6,7 @@ import static com.chgustaf.salesforce.authentication.exceptions.AuthenticationEx
 import com.chgustaf.salesforce.authentication.AccessParameters;
 import com.chgustaf.salesforce.authentication.Authentication;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.authentication.jwt.JWTAuthentication;
 import com.chgustaf.salesforce.authentication.secrets.Secrets;
 import com.chgustaf.salesforce.authentication.secrets.SecretsUtil;
@@ -28,14 +29,14 @@ public class SalesforceHttpClient {
   private final BaseHTTPClient httpClient;
 
   public SalesforceHttpClient()
-      throws AuthenticationException, IOException {
+      throws AuthenticationException, IOException, TransactionException {
     this(new BaseHTTPClient(), SecretsUtil.readCredentials("secrets.json"));
   }
 
   // For testing
   SalesforceHttpClient(BaseHTTPClient httpClient,
                               Secrets secrets)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     this.httpClient = httpClient;
     initClass(getAuthenticationFlow(secrets), secrets, httpClient);
   }
@@ -43,13 +44,14 @@ public class SalesforceHttpClient {
   void initClass(AuthenticationFlow authenticationFlow,
                          Secrets secrets,
                          BaseHTTPClient httpClient)
-      throws AuthenticationException, IOException {
+      throws AuthenticationException, IOException, TransactionException {
     authentication = determineFlow(authenticationFlow, secrets, httpClient);
     accessParameters = authentication.authenticate();
     System.out.println("Access Token " + accessParameters);
   }
 
-  AccessParameters authenticate(Authentication authentication) throws IOException, AuthenticationException {
+  AccessParameters authenticate(Authentication authentication)
+      throws IOException, AuthenticationException, TransactionException {
     return authentication.authenticate();
   }
 
@@ -71,7 +73,7 @@ public class SalesforceHttpClient {
   }
 
   public String executeHttpRequest(HttpRequest request)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     String returnString = "";
     synchronized (accessParameters) {
       System.out.println("Synchronized start "+Thread.currentThread().getName());

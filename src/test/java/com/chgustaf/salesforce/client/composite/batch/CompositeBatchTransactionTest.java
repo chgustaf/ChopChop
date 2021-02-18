@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Primary_Test_Object__c;
 import com.chgustaf.salesforce.client.composite.domain.Query;
@@ -37,7 +38,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchPost_success() throws IOException, AuthenticationException {
+  public void batchPost_success() throws IOException, AuthenticationException,
+                                         TransactionException {
     String id = "0013V000009id1YQAQ";
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":201,\"result\":\n"
                           + "{\"id\":\""+id+"\",\"success\":true,\"errors\":[]}}]}";
@@ -58,7 +60,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchPost_unknownException() throws IOException, AuthenticationException {
+  public void batchPost_unknownException()
+      throws IOException, AuthenticationException, TransactionException {
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"UNKNOWN_EXCEPTION\",\"message\":\"An unexpected error occurred. Please include this ErrorId if you contact support: 8425053-14906 (608530858)\"}],\"statusCode\":500}]}";
 
@@ -80,7 +83,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchPost_invalidFieldException() throws IOException, AuthenticationException {
+  public void batchPost_invalidFieldException()
+      throws IOException, AuthenticationException, TransactionException {
     String responseJson =
         "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"No such column &#39;aFieldThatDoesNotExist&#39; on sobject of type Account\"}],\"statusCode\":400}]}";
     SalesforceCompositeBatchClient salesforceCompositeBatchClient =
@@ -110,7 +114,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchDelete_success() throws IOException, AuthenticationException {
+  public void batchDelete_success()
+      throws IOException, AuthenticationException, TransactionException {
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,"
                           + "\"result\":null}]}";
     SalesforceCompositeBatchClient
@@ -133,7 +138,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchDelete_FailChildRecords() throws IOException, AuthenticationException {
+  public void batchDelete_FailChildRecords()
+      throws IOException, AuthenticationException, TransactionException {
     String id = "123456788";
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"DELETE_FAILED\",\"message\":\"Your attempt to delete Edge Communications could not be completed because some opportunities in that account were closed won. The opportunities that could not be deleted are shown below.: Edge Emergency Generator, Edge Installation, Edge SLA\\n\"}],\"statusCode\":400}]}\n";
@@ -157,7 +163,7 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchGet_success() throws IOException, AuthenticationException {
+  public void batchGet_success() throws IOException, AuthenticationException, TransactionException {
     String id = "0013V000009ikVtQAI";
     String name = "PTO-1609674290821";
     String responseJson =
@@ -184,7 +190,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchGet_notFound() throws IOException, AuthenticationException {
+  public void batchGet_notFound() throws IOException, AuthenticationException,
+                                         TransactionException {
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"NOT_FOUND\",\"message\":\"Provided external ID field does not exist or is not accessible: null\"}],\"statusCode\":404}]}";
     SalesforceCompositeBatchClient
@@ -204,7 +211,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void batchUpdate_success() throws IOException, AuthenticationException {
+  public void batchUpdate_success()
+      throws IOException, AuthenticationException, TransactionException {
     String id = "123456789";
     int testNumber = 1;
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,"
@@ -231,7 +239,7 @@ public class CompositeBatchTransactionTest {
 
 
   @Test
-  public void query_success() throws IOException, AuthenticationException {
+  public void query_success() throws IOException, AuthenticationException, TransactionException {
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":\n"
                           + "{\"totalSize\":13,\"done\":true,"
                           + "\"records\":[{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}";
@@ -251,7 +259,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void query_nextRecordsUrl() throws IOException, AuthenticationException {
+  public void query_nextRecordsUrl()
+      throws IOException, AuthenticationException, TransactionException {
     String responseJson =
         "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":{\"totalSize\":13,"
         + "\"done\":false,\"nextRecordsUrl\":\"/services/data/v50.0/query/01g09000000h1LvAAI-2000\",\"records\":[{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}";
@@ -271,7 +280,8 @@ public class CompositeBatchTransactionTest {
   }
 
   @Test
-  public void query_invalidField() throws IOException, AuthenticationException {
+  public void query_invalidField() throws IOException, AuthenticationException,
+                                          TransactionException {
     String invalidFieldError =
         "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\","
         + "\"message\":\"\\nSELECT Subjec FROM Primary_Test_Object__c\\n       ^\\nERROR at "
@@ -305,7 +315,8 @@ public class CompositeBatchTransactionTest {
   }
 
 
-  private SalesforceCompositeBatchClient mockCompositeBatchResponse(String json) throws IOException, AuthenticationException {
+  private SalesforceCompositeBatchClient mockCompositeBatchResponse(String json)
+      throws IOException, AuthenticationException, TransactionException {
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = mock(SalesforceCompositeBatchClient.class);
     when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class))).thenReturn(json);
@@ -313,7 +324,7 @@ public class CompositeBatchTransactionTest {
   }
 
   private CompositeBatchTransaction getCompositeBatchTransaction(String responseJson)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockCompositeBatchResponse(responseJson);
     return new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
   }

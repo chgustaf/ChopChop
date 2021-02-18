@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.authentication.secrets.Secrets;
 import com.chgustaf.salesforce.authentication.secrets.SecretsUtil;
 import java.io.File;
@@ -34,7 +35,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void incorrectAuthenticationFlow_fail()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
     Secrets secrets = SecretsUtil
@@ -48,7 +49,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void initClassNoAuthenitcationFlow_fail()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
     Secrets secrets = SecretsUtil
@@ -61,7 +62,7 @@ public class SalesforceHttpClientTest {
 
   @Test
   public void testAuthenticateUserPasswordGetAccessToken_success()
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
     Secrets secrets = SecretsUtil.readTestCredentials("secrets_usernamepassword.json");
@@ -75,7 +76,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void testAuthenticateJWTGetAccessToken_success()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
     Secrets secrets = SecretsUtil
@@ -90,7 +91,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void testExecuteHttpRequest_POST()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
     Secrets secrets = SecretsUtil
@@ -103,7 +104,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void testExecuteHttpRequest_GET()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
     when(baseHTTPClient.get(any(HttpGet.class))).thenReturn(response);
@@ -117,7 +118,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void testExecuteHttpRequest_PATCH()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
     when(baseHTTPClient.patch(any(HttpPatch.class))).thenReturn(response);
@@ -131,7 +132,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void testExecuteHttpRequest_DELETE()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response);
     when(baseHTTPClient.delete(any(HttpDelete.class))).thenReturn(response);
@@ -145,7 +146,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void test401onAuthentication_POST()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     when(baseHTTPClient.post(any(HttpPost.class))).thenThrow(new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST"));
     Secrets secrets = SecretsUtil.readTestCredentials("secrets_jwt.json");
     AuthenticationException authenticationException = assertThrows(AuthenticationException.class,
@@ -159,7 +160,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void test401onSecondPostCallFailedReauthentication_POST()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response).thenThrow(new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST"));
     Secrets secrets = SecretsUtil.readTestCredentials("secrets_jwt.json");
@@ -178,7 +179,7 @@ public class SalesforceHttpClientTest {
   @Test
   public void test401onSecondPostCallButReauthenticationSuccessful_POST()
       throws IOException,
-             AuthenticationException {
+             AuthenticationException, TransactionException {
     String response = readResourceJSON("username-password-authenticate-success.json");
     when(baseHTTPClient.post(any(HttpPost.class))).thenReturn(response)
         .thenThrow(new AuthenticationException(UNAUTHORIZED, "401 Unauthorized during POST"))

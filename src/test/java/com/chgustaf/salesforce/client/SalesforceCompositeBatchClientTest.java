@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.chgustaf.salesforce.authentication.AccessParameters;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.Test;
 public class SalesforceCompositeBatchClientTest {
 
   @Test
-  void initClass_success() throws IOException, AuthenticationException {
+  void initClass_success() throws IOException, AuthenticationException, TransactionException {
     SalesforceHttpClient salesforceHttpClient = mock(SalesforceHttpClient.class);
     String httpPostRequestValue = "{\"Method\":\"POST\", \"\"}";
     String httpPostReturnValue = "Test Return Value";

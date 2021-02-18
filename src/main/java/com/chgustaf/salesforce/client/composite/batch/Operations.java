@@ -14,14 +14,14 @@ public class Operations {
 
   public static <T extends Record> List<T> createRecords(List<T> records,
                                                          SalesforceCompositeBatchClient salesforceCompositeBatchClient)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction =
         new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
     for (T record : records) {
       transaction.create(record);
     }
     if (!transaction.execute()) {
-      System.out.println("Unable to create Account");
+      System.out.println("Unable to create records");
       return null;
     }
 
@@ -31,6 +31,48 @@ public class Operations {
     }
     return returnList;
   }
+
+  public static <T extends Record> List<T> getRecords(List<T> records,
+                                                         SalesforceCompositeBatchClient salesforceCompositeBatchClient)
+      throws IOException, AuthenticationException, TransactionException {
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+    for (T record : records) {
+      transaction.get(record);
+    }
+    if (!transaction.execute()) {
+      System.out.println("Unable to get records");
+      return null;
+    }
+
+    List<T> returnList = new ArrayList<>();
+    for (T record : records) {
+      returnList.add((T)transaction.getRecord(record.getReferenceId(), record.getEntityClass()));
+    }
+    return returnList;
+  }
+
+  public static <T extends Record> List<T> updateRecords(List<T> records,
+                                                      SalesforceCompositeBatchClient salesforceCompositeBatchClient)
+      throws IOException, AuthenticationException, TransactionException {
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+    for (T record : records) {
+      transaction.update(record);
+    }
+    if (!transaction.execute()) {
+      System.out.println("Unable to update records");
+      return null;
+    }
+
+    List<T> returnList = new ArrayList<>();
+    for (T record : records) {
+      returnList.add((T)transaction.getRecord(record.getReferenceId(), record.getEntityClass()));
+    }
+    return returnList;
+  }
+
+  // TODO: Add updateRecords, getRecords, deleteRecords
 
   public static <T extends Record> T get(T record,
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)

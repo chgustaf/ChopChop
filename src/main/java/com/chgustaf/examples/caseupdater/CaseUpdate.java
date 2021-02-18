@@ -1,7 +1,9 @@
 package com.chgustaf.examples.caseupdater;
 
 import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.createRecords;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.updateRecords;
 
 import com.chgustaf.examples.caseupdater.exampleclient.domain.Case;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
@@ -12,6 +14,7 @@ import com.chgustaf.salesforce.client.composite.domain.Query;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +22,7 @@ public class CaseUpdate {
 
 
   public static void main(String[] args)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
 
@@ -66,7 +69,7 @@ public class CaseUpdate {
     }
     queryResultList.stream().forEach(pto -> System.out.println("Here is one record of the Primary "
                                                            + "Test Object " + pto));*/
-    String queryStringCases = "SELECT subjec FROM Case";
+    String queryStringCases = "SELECT id, subject, accountId, origin FROM Case LIMIT 25";
     List<Case> caseList = null;
     try {
       caseList = query(
@@ -76,6 +79,23 @@ public class CaseUpdate {
       e.printStackTrace();
     }
     System.out.println("Here are the cases " + caseList.size());
+
+    caseList.stream().forEach(cas -> cas.setSubject(cas.getSubject()+"0"));
+    caseList.stream().forEach(cas -> System.out.println(cas.subject));
+
+    List<Case> cases = updateRecords(caseList, salesforceCompositeBatchClient);
+
+    Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+    testObject2.setTestNumber(2);
+    Primary_Test_Object__c testObject3 = new Primary_Test_Object__c();
+    testObject3.setTestNumber(3);
+
+    ArrayList<Primary_Test_Object__c> testObjects = new ArrayList<>();
+    testObjects.add(testObject2);
+    testObjects.add(testObject3);
+    List<Primary_Test_Object__c> returnList = createRecords(testObjects,
+        salesforceCompositeBatchClient);
+
 /*
     String queryStringTest = "SELECT id, Test_Formula_Field__c FROM Primary_Test_Object__c LIMIT "
                              + "10";

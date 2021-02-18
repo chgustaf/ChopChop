@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
@@ -39,7 +40,7 @@ class BaseHTTPClientTest extends Mockito {
   }
 
   @Test
-  void post_success() throws IOException, AuthenticationException {
+  void post_success() throws IOException, AuthenticationException, TransactionException {
     returnStatusCode(201);
     returnBody("Accepted");
     when(closeableHttpClient.execute(any())).thenReturn(closeableHttpResponse);
@@ -92,7 +93,7 @@ class BaseHTTPClientTest extends Mockito {
   }
 
   @Test
-  void patch_success() throws IOException, AuthenticationException {
+  void patch_success() throws IOException, AuthenticationException, TransactionException {
     returnStatusCode(200);
     returnBody("OK");
     when(closeableHttpClient.execute(any())).thenReturn(closeableHttpResponse);
@@ -108,7 +109,7 @@ class BaseHTTPClientTest extends Mockito {
   }
 
   @Test
-  void get_success() throws IOException, AuthenticationException {
+  void get_success() throws IOException, AuthenticationException, TransactionException {
     returnStatusCode(200);
     returnBody("OK");
     when(closeableHttpClient.execute(any())).thenReturn(closeableHttpResponse);
@@ -123,7 +124,7 @@ class BaseHTTPClientTest extends Mockito {
   }
 
   @Test
-  void delete_success() throws IOException, AuthenticationException {
+  void delete_success() throws IOException, AuthenticationException, TransactionException {
     returnStatusCode(204);
     returnBody("No Content");
     when(closeableHttpClient.execute(any())).thenReturn(closeableHttpResponse);

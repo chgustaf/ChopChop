@@ -1,6 +1,7 @@
 package com.chgustaf.salesforce.client.composite.batch;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Query;
 import com.chgustaf.salesforce.client.composite.domain.Record;
@@ -134,11 +135,12 @@ public class CompositeBatchTransaction {
     requests.add(batchRequest);
   }
 
-  boolean execute() throws IOException, AuthenticationException {
+  boolean execute() throws IOException, AuthenticationException, TransactionException {
     if (alreadyExecuted) {
       return false;
     }
     String payload = renderPayload();
+    System.out.println("Payload "+payload);
     String responseString = salesforceCompositeBatchClient.compositeBatchCall(payload);
     CompositeBatchResponse compositeBatchResponse = parseCompositeBatchResponse(responseString);
     resultHandler = new CompositeBatchResultHandler(requests, compositeBatchResponse);
@@ -150,6 +152,8 @@ public class CompositeBatchTransaction {
   }
 
   String renderPayload() throws JsonProcessingException {
+    int numberOfBatches = calculateNumberOfBatches(requests.size());
+    // TODO: fix the end splitting up of the payload into 25 chunks
     BatchRequest[] requestsArray =
         requests.toArray(new BatchRequest[requests.size()]);
 
@@ -160,6 +164,10 @@ public class CompositeBatchTransaction {
             .createCompositeBatchRequest();
     ObjectMapper mapper = new ObjectMapper();
     return mapper.writeValueAsString(request);
+  }
+
+  private int calculateNumberOfBatches(int numberOfElements) {
+    return (int) Math.ceil((double) numberOfElements/25);
   }
 
   CompositeBatchResponse parseCompositeBatchResponse(String stringResponse)

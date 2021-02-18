@@ -1,6 +1,7 @@
 package com.chgustaf.salesforce.authentication;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.authentication.secrets.Secrets;
 import com.chgustaf.salesforce.client.BaseHTTPClient;
 import java.io.IOException;
@@ -18,10 +19,12 @@ public abstract class Authentication {
     this.httpClient = httpClient;
   }
 
-  public abstract AccessParameters authenticate() throws IOException, AuthenticationException;
+  public abstract AccessParameters authenticate()
+      throws IOException, AuthenticationException, TransactionException;
 
 
-  public String post(HttpPost post) throws IOException, AuthenticationException {
+  public String post(HttpPost post)
+      throws IOException, AuthenticationException, TransactionException {
     return httpClient.post(post);
   }
 }

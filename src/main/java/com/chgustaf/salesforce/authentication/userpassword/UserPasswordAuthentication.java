@@ -2,6 +2,7 @@ package com.chgustaf.salesforce.authentication.userpassword;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.chgustaf.salesforce.authentication.AccessParameters;
 import com.chgustaf.salesforce.authentication.Authentication;
@@ -24,7 +25,7 @@ public class UserPasswordAuthentication extends Authentication {
   }
 
   public AccessParameters getAccessToken(String loginURL)
-      throws IOException, AuthenticationException {
+      throws IOException, AuthenticationException, TransactionException {
     HttpPost httpPost = new HttpPost(loginURL);
     httpPost.setHeader("Content-type", "application/x-www-form-urlencoded");
     httpPost.setEntity(getUserPasswordEntity());
@@ -35,7 +36,8 @@ public class UserPasswordAuthentication extends Authentication {
   }
 
   @Override
-  public AccessParameters authenticate() throws IOException, AuthenticationException {
+  public AccessParameters authenticate()
+      throws IOException, AuthenticationException, TransactionException {
     return getAccessToken(LOGIN_URL);
   }
 
