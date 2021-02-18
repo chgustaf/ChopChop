@@ -294,14 +294,13 @@ public class CompositeBatchTransactionTest {
     CompositeBatchTransaction transaction =
         new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
     transaction.query(query);
-    transaction.execute();
-    List<Primary_Test_Object__c> queryResult =
+    assertFalse(transaction.execute());
+    /*List<Primary_Test_Object__c> queryResult =
         transaction.getQueryResult(query.getReferenceId(),
             query.getEntityClass());
-    assertEquals(13, queryResult.size());
-
+    assertEquals(13, queryResult.size());*/
+    //TODO: The getQueryResult method needs to be able to return errors
   }
-
 
   @Test
   public void parse_Errors() throws IOException, AuthenticationException {

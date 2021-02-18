@@ -85,7 +85,7 @@ class BaseHTTPClientTest extends Mockito {
       postRequest.addHeader("Content-Type", "application/json");
       postRequest.addHeader("Authorization", "Bearer ");
       postRequest.setEntity(new StringEntity("Test", UTF_8));
-      RuntimeException thrownException = assertThrows(RuntimeException.class,
+      TransactionException thrownException = assertThrows(TransactionException.class,
           () -> httpClient.post(postRequest));
       System.out.println(thrownException.getMessage());
       assertTrue(thrownException.getMessage().contains("Request failed : HTTP error code 301"));
