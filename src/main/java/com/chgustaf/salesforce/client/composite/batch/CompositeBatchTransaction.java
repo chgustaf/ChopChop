@@ -139,23 +139,33 @@ public class CompositeBatchTransaction {
     if (alreadyExecuted) {
       return false;
     }
-    String payload = renderPayload();
-    System.out.println("Payload "+payload);
-    String responseString = salesforceCompositeBatchClient.compositeBatchCall(payload);
-    CompositeBatchResponse compositeBatchResponse = parseCompositeBatchResponse(responseString);
-    resultHandler = new CompositeBatchResultHandler(requests, compositeBatchResponse);
-    alreadyExecuted = true;
-    if (compositeBatchResponse.getHasErrors()) {
-      return false;
+    List<List<BatchRequest>> batchRequestsChunks = chunkBatchRequests();
+    resultHandler = new CompositeBatchResultHandler();
+    boolean hasErrors = false;
+    for (List<BatchRequest> requestChunk : batchRequestsChunks) {
+      String payload = renderPayload(requestChunk);
+      System.out.println("Payload " + payload);
+
+      String responseString = salesforceCompositeBatchClient.compositeBatchCall(payload);
+      CompositeBatchResponse compositeBatchResponse = parseCompositeBatchResponse(responseString);
+      if (compositeBatchResponse.getHasErrors()) {
+        hasErrors = true;
+      }
+      resultHandler.addResults(requestChunk, compositeBatchResponse);
     }
-    return true;
+    alreadyExecuted = true;
+    return !hasErrors;
   }
 
-  String renderPayload() throws JsonProcessingException {
+  List<List<BatchRequest>> chunkBatchRequests() {
+    return splitBatchRequests(requests, 25);
+  }
+
+  String renderPayload(List<BatchRequest> batchRequestChunk) throws JsonProcessingException {
     int numberOfBatches = calculateNumberOfBatches(requests.size());
     // TODO: fix the end splitting up of the payload into 25 chunks
     BatchRequest[] requestsArray =
-        requests.toArray(new BatchRequest[requests.size()]);
+        batchRequestChunk.toArray(new BatchRequest[batchRequestChunk.size()]);
 
     CompositeBatchRequest request =
         new CompositeBatchRequestBuilder()
@@ -166,7 +176,23 @@ public class CompositeBatchTransaction {
     return mapper.writeValueAsString(request);
   }
 
-  private int calculateNumberOfBatches(int numberOfElements) {
+  List<List<BatchRequest>> splitBatchRequests(List<BatchRequest> batchRequests, int chunkSize) {
+    return chopped(batchRequests, chunkSize);
+  }
+
+  <T> List<List<T>> chopped(List<T> list, final int L) {
+    List<List<T>> parts = new ArrayList<>();
+    final int N = list.size();
+    for (int i = 0; i < N; i += L) {
+      parts.add(new ArrayList<T>(
+          list.subList(i, Math.min(N, i + L)))
+      );
+    }
+    return parts;
+  }
+
+
+  int calculateNumberOfBatches(int numberOfElements) {
     return (int) Math.ceil((double) numberOfElements/25);
   }
 

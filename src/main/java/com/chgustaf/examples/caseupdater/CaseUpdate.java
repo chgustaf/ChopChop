@@ -1,7 +1,6 @@
 package com.chgustaf.examples.caseupdater;
 
 import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
-import static com.chgustaf.salesforce.client.composite.batch.Operations.createRecords;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.updateRecords;
 
@@ -14,7 +13,6 @@ import com.chgustaf.salesforce.client.composite.domain.Query;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,7 +66,7 @@ public class CaseUpdate {
       e.printStackTrace();
     }
     queryResultList.stream().forEach(pto -> System.out.println("Here is one record of the Primary "
-                                                           + "Test Object " + pto));*/
+                           /*                                + "Test Object " + pto));*//*
     String queryStringCases = "SELECT id, subject, accountId, origin FROM Case LIMIT 25";
     List<Case> caseList = null;
     try {
@@ -95,6 +93,16 @@ public class CaseUpdate {
     testObjects.add(testObject3);
     List<Primary_Test_Object__c> returnList = createRecords(testObjects,
         salesforceCompositeBatchClient);
+
+    returnList.forEach(obj -> obj.setTestText("test"));
+    updateRecords(returnList, salesforceCompositeBatchClient);
+*/
+
+    String queryString = "SELECT id, subject, accountId FROM Case";
+    Query<Case> caseQuery = new Query<>(queryString, Case.class);
+    List<Case> casesAgain = query(caseQuery, salesforceCompositeBatchClient);
+    casesAgain.forEach(obj -> obj.setSubject("Tester"));
+    updateRecords(casesAgain, salesforceCompositeBatchClient);
 
 /*
     String queryStringTest = "SELECT id, Test_Formula_Field__c FROM Primary_Test_Object__c LIMIT "
@@ -199,4 +207,6 @@ public class CaseUpdate {
       }
     }*/
   }
+
+
 }

@@ -28,10 +28,21 @@ public class CompositeBatchResultHandler {
   private List<CombinedRequestResponse> results;
   private List<BatchRequest> requests;
 
+  CompositeBatchResultHandler() {
+    results = new ArrayList<>();
+    requests = new ArrayList<>();
+  }
+
   CompositeBatchResultHandler(List<BatchRequest> batchRequests,
                               CompositeBatchResponse compositeBatchResponse) {
-    this.requests = batchRequests;
-    this.results = createResults(compositeBatchResponse);
+    this();
+    addResults(batchRequests, compositeBatchResponse);
+  }
+
+  void addResults(List<BatchRequest> batchRequests,
+                  CompositeBatchResponse compositeBatchResponse) {
+    this.requests.addAll(batchRequests);
+    this.results.addAll(createResults(compositeBatchResponse));
   }
 
   List<CombinedRequestResponse> createResults(CompositeBatchResponse compositeBatchResponse) {

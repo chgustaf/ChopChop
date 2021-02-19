@@ -72,8 +72,6 @@ public class Operations {
     return returnList;
   }
 
-  // TODO: Add updateRecords, getRecords, deleteRecords
-
   public static <T extends Record> T get(T record,
                                              SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException, TransactionException {
