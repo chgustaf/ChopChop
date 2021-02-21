@@ -39,4 +39,11 @@ public class CombinedRequestResponse {
   public void setStatusCode(final Integer statusCode) {
     this.statusCode = statusCode;
   }
+
+  public boolean success() {
+    if (statusCode != null) {
+      return ((199 < statusCode) && (statusCode < 299));
+    }
+    return false;
+  }
 }

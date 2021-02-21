@@ -20,7 +20,7 @@ public class AsynchronousOperations {
           List<T> recordList = new ArrayList<>();
           try {
             recordList = Operations.query(query, salesforceCompositeBatchClient);
-            System.out.println("Here are the records "+recordList);
+            System.out.println("Here are the records " + recordList);
           } catch (IOException | AuthenticationException | TransactionException e) {
             e.printStackTrace();
           }

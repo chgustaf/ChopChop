@@ -4,6 +4,7 @@ import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Query;
+import com.chgustaf.salesforce.client.composite.domain.QueryResult;
 import com.chgustaf.salesforce.client.composite.domain.Record;
 import com.chgustaf.salesforce.client.composite.dto.BatchRequest;
 import com.chgustaf.salesforce.client.composite.dto.BatchRequestBuilder;
@@ -30,9 +31,10 @@ public class CompositeBatchTransaction {
 
   SalesforceCompositeBatchClient salesforceCompositeBatchClient;
   CompositeBatchResultHandler resultHandler;
+  CompositeBatchQueryResultHandler queryResultHandler;
 
-  CompositeBatchTransaction(SalesforceCompositeBatchClient salesforceCompositeBatchClient,
-                            boolean haltOnError) {
+  public CompositeBatchTransaction(SalesforceCompositeBatchClient salesforceCompositeBatchClient,
+                                   boolean haltOnError) {
     this(salesforceCompositeBatchClient, haltOnError, false);
   }
 
@@ -141,6 +143,7 @@ public class CompositeBatchTransaction {
     }
     List<List<BatchRequest>> batchRequestsChunks = chunkBatchRequests();
     resultHandler = new CompositeBatchResultHandler();
+    queryResultHandler = new CompositeBatchQueryResultHandler();
     boolean hasErrors = false;
     for (List<BatchRequest> requestChunk : batchRequestsChunks) {
       String payload = renderPayload(requestChunk);
@@ -152,6 +155,7 @@ public class CompositeBatchTransaction {
         hasErrors = true;
       }
       resultHandler.addResults(requestChunk, compositeBatchResponse);
+      queryResultHandler.addResults(requestChunk, compositeBatchResponse);
     }
     alreadyExecuted = true;
     return !hasErrors;
@@ -162,8 +166,6 @@ public class CompositeBatchTransaction {
   }
 
   String renderPayload(List<BatchRequest> batchRequestChunk) throws JsonProcessingException {
-    int numberOfBatches = calculateNumberOfBatches(requests.size());
-    // TODO: fix the end splitting up of the payload into 25 chunks
     BatchRequest[] requestsArray =
         batchRequestChunk.toArray(new BatchRequest[batchRequestChunk.size()]);
 
@@ -198,7 +200,6 @@ public class CompositeBatchTransaction {
 
   CompositeBatchResponse parseCompositeBatchResponse(String stringResponse)
       throws JsonProcessingException {
-    System.out.println("String response "+ stringResponse);
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
@@ -213,19 +214,32 @@ public class CompositeBatchTransaction {
     return resultHandler.getRecord(referenceId, clazz);
   }
 
-  public <T extends Record> List<T> getQueryResult(String referenceId, Class<T> clazz)
+  public <T extends Record> List<T> getQueryResult2(String referenceId, Class<T> clazz)
       throws IOException {
     if (resultHandler == null) {
       return null;
     }
-    return resultHandler.getQueryResultList(referenceId, clazz);
+    return queryResultHandler.getQueryResultList(referenceId, clazz);
   }
 
-  public String nextRecordsUrl(final String referenceId) throws JsonProcessingException {
-    return resultHandler.nextRecordsUrl(referenceId);
+  public QueryResult getQueryResult(String referenceId)
+      throws IOException {
+    if (resultHandler == null) {
+      return null;
+    }
+    return queryResultHandler.getQueryResult(referenceId);
   }
 
-  public boolean done(final String referenceId) throws JsonProcessingException {
-    return resultHandler.done(referenceId);
+  public String nextRecordsUrl(final String referenceId) throws IOException {
+    return queryResultHandler.nextRecordsUrl(referenceId);
+  }
+
+  public boolean done(final String referenceId) throws IOException {
+    return queryResultHandler.done(referenceId);
+  }
+
+  public <T extends Record> List<T> getQueryResultList(String referenceId, Class<T> clazz)
+      throws IOException {
+    return queryResultHandler.getQueryResultList(referenceId, clazz);
   }
 }

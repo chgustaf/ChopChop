@@ -98,11 +98,18 @@ public class CaseUpdate {
     updateRecords(returnList, salesforceCompositeBatchClient);
 */
 
-    String queryString = "SELECT id, subject, accountId FROM Case";
+    String queryString = "SELECT id, subjec7, accountId FROM Case LIMIT 100";
     Query<Case> caseQuery = new Query<>(queryString, Case.class);
-    List<Case> casesAgain = query(caseQuery, salesforceCompositeBatchClient);
-    casesAgain.forEach(obj -> obj.setSubject("Tester"));
-    updateRecords(casesAgain, salesforceCompositeBatchClient);
+    List<Case> casesAgain = null;
+    try {
+      casesAgain = query(caseQuery, salesforceCompositeBatchClient);
+      casesAgain.forEach(obj -> obj.setSubject("Tester"));
+      updateRecords(casesAgain, salesforceCompositeBatchClient);
+    } catch (TransactionException e) {
+      System.out.println("This is an exception catch");
+      e.printStackTrace();
+    }
+
 
 /*
     String queryStringTest = "SELECT id, Test_Formula_Field__c FROM Primary_Test_Object__c LIMIT "
@@ -118,7 +125,6 @@ public class CaseUpdate {
     System.out.println("Here are the cases " + testList.size());
 
     // TODO: Write tests for queries
-    // TODO: fix so that one can create/update/delete in bulk
 /*
     Query query = new Query<>(Account.class);
     query.setQuery(URLEncoder.encode("SELECT id, name FROM Account",

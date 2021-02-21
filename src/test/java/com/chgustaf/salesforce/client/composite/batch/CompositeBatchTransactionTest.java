@@ -1,19 +1,18 @@
 package com.chgustaf.salesforce.client.composite.batch;
 
+import static com.chgustaf.salesforce.client.TestUtils.getCompositeBatchTransaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
-import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Primary_Test_Object__c;
 import com.chgustaf.salesforce.client.composite.domain.Query;
+import com.chgustaf.salesforce.client.composite.domain.QueryResult;
 import com.chgustaf.salesforce.client.composite.domain.TransactionError;
 import com.chgustaf.salesforce.client.composite.dto.BatchRequest;
 import com.chgustaf.salesforce.client.composite.dto.BatchRequestBuilder;
@@ -217,7 +216,9 @@ public class CompositeBatchTransactionTest {
 
 
   @Test
-  public void query_success() throws IOException, AuthenticationException, TransactionException {
+  public void query_success()
+      throws IOException, AuthenticationException, TransactionException, IllegalAccessException,
+             InstantiationException {
     String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":\n"
                           + "{\"totalSize\":13,\"done\":true,"
                           + "\"records\":[{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}";
@@ -227,15 +228,15 @@ public class CompositeBatchTransactionTest {
         getCompositeBatchTransaction(responseJson);
     transaction.query(query);
     transaction.execute();
-    List<Primary_Test_Object__c> queryResult =
-        transaction.getQueryResult(query.getReferenceId(),
-        query.getEntityClass());
-    assertEquals(13, queryResult.size());
+    QueryResult queryResult =
+        transaction.getQueryResult(query.getReferenceId());
+    assertEquals(13, queryResult.totalSize);
   }
 
   @Test
   public void query_nextRecordsUrl()
-      throws IOException, AuthenticationException, TransactionException {
+      throws IOException, AuthenticationException, TransactionException, IllegalAccessException,
+             InstantiationException {
     String responseJson =
         "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":{\"totalSize\":13,"
         + "\"done\":false,\"nextRecordsUrl\":\"/services/data/v50.0/query/01g09000000h1LvAAI-2000\",\"records\":[{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}";
@@ -245,16 +246,16 @@ public class CompositeBatchTransactionTest {
         getCompositeBatchTransaction(responseJson);
     transaction.query(query);
     transaction.execute();
-    List<Primary_Test_Object__c> queryResult =
-        transaction.getQueryResult(query.getReferenceId(),
-            query.getEntityClass());
-    assertEquals(13, queryResult.size());
+    QueryResult queryResult =
+        transaction.getQueryResult(query.getReferenceId());
+    assertEquals(13, queryResult.totalSize);
   }
 
 
   @Test
   public void query_invalidField() throws IOException, AuthenticationException,
-                                          TransactionException {
+                                          TransactionException, IllegalAccessException,
+                                          InstantiationException {
     String responseJson =
         "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\","
         + "\"message\":\"\\nSELECT Subjec FROM Primary_Test_Object__c\\n       ^\\nERROR at "
@@ -266,10 +267,10 @@ public class CompositeBatchTransactionTest {
         getCompositeBatchTransaction(responseJson);
     transaction.query(query);
     assertFalse(transaction.execute());
-    /*List<Primary_Test_Object__c> queryResult =
-        transaction.getQueryResult(query.getReferenceId(),
-            query.getEntityClass());
-    assertEquals(13, queryResult.size());*/
+    QueryResult queryResult =
+        transaction.getQueryResult(query.getReferenceId());
+    assertFalse(queryResult.success);
+    assertNull(queryResult.records);
     //TODO: The getQueryResult method needs to be able to return errors
   }
 
@@ -322,20 +323,45 @@ public class CompositeBatchTransactionTest {
     assertEquals(0, batchRequestsChopped.size());
   }
 
-  private SalesforceCompositeBatchClient mockSalesforceCompositeBatchClient(
-      final String responseJson) throws IOException, AuthenticationException, TransactionException {
-    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
-        mock(SalesforceCompositeBatchClient.class);
-    when(salesforceCompositeBatchClient.compositeBatchCall(any(String.class)))
-        .thenReturn(responseJson);
-    return salesforceCompositeBatchClient;
+  @Test
+  void sucessfulQueryShouldReturnQueryResultWithRecords()
+      throws TransactionException, IOException, AuthenticationException {
+    String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":200,\"result\":\n"
+                          + "{\"totalSize\":13,\"done\":true,"
+                          + "\"records\":[{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000008DqqoQAC\"},\"Id\":\"5003V000008DqqoQAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w5QAC\"},\"Id\":\"5003V000009V5w5QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IOQA0\"},\"Id\":\"5003V000009V6IOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6IPQA0\"},\"Id\":\"5003V000009V6IPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V689QAC\"},\"Id\":\"5003V000009V689QAC\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V68AQAS\"},\"Id\":\"5003V000009V68AQAS\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MQQA0\"},\"Id\":\"5003V000009V6MQQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6MRQA0\"},\"Id\":\"5003V000009V6MRQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6N9QAK\"},\"Id\":\"5003V000009V6N9QAK\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NAQA0\"},\"Id\":\"5003V000009V6NAQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NOQA0\"},\"Id\":\"5003V000009V6NOQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V6NPQA0\"},\"Id\":\"5003V000009V6NPQA0\"},{\"attributes\":{\"type\":\"Primary_Test_Object__c\",\"url\":\"/services/data/v50.0/sobjects/Primary_Test_Object__c/5003V000009V5w6QAC\"},\"Id\":\"5003V000009V5w6QAC\"}]}}]}";
+    String queryString = "SELECT id FROM Primary_Test_Object__c";
+    Query<Primary_Test_Object__c> query = new Query<>(queryString, Primary_Test_Object__c.class);
+    CompositeBatchTransaction transaction =
+        getCompositeBatchTransaction(responseJson);
+    transaction.query(query);
+    assertTrue(transaction.execute());
+    QueryResult res = transaction.getQueryResult(query.getReferenceId());
+    assertTrue(res.success);
+    assertNull(res.errors);
+    assertEquals(13, res.totalSize);
+    assertEquals(13, res.records.size());
   }
 
-
-  private CompositeBatchTransaction getCompositeBatchTransaction(String responseJson)
-      throws IOException, AuthenticationException, TransactionException {
-    SalesforceCompositeBatchClient salesforceCompositeBatchClient = mockSalesforceCompositeBatchClient(responseJson);
-    return new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+  @Test
+  void unsuccessfulQueryShouldReturnQueryResultWithErrors()
+      throws TransactionException, IOException, AuthenticationException {
+    String responseJson =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\","
+        + "\"message\":\"\\nSELECT Subjec FROM Primary_Test_Object__c\\n       ^\\nERROR at "
+        + "Row:1:Column:8\\nNo such column &#39;Subjec&#39; on entity &#39;Case&#39;. If you are attempting to use a custom field, be sure to append the &#39;__c&#39; after the custom field name. Please reference your WSDL or the describe call for the appropriate names.\"}],\"statusCode\":400}]}\n";
+    String queryString = "SELECT subjec FROM Primary_Test_Object__c";
+    Query<Primary_Test_Object__c> query = new Query<>(queryString, Primary_Test_Object__c.class);
+    CompositeBatchTransaction transaction =
+        getCompositeBatchTransaction(responseJson);
+    transaction.query(query);
+    assertFalse(transaction.execute());
+    QueryResult res = transaction.getQueryResult(query.getReferenceId());
+    assertFalse(res.success);
+    assertFalse(res.errors.isEmpty());
+    assertEquals(1, res.errors.size());
+    assertEquals("INVALID_FIELD", res.errors.get(0).getErrorCode());
+    assertTrue(res.errors.get(0).getMessage().contains("No such column"));
   }
+
 
 }

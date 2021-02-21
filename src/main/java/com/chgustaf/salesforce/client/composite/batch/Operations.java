@@ -4,11 +4,13 @@ import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Query;
+import com.chgustaf.salesforce.client.composite.domain.QueryResult;
 import com.chgustaf.salesforce.client.composite.domain.Record;
 import com.chgustaf.salesforce.client.composite.domain.TransactionError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Operations {
 
@@ -136,7 +138,7 @@ public class Operations {
       throws IOException, AuthenticationException, TransactionException {
     boolean thereAreMoreRecords = true;
     CompositeBatchTransaction transaction;
-    List<T> recordList = new ArrayList<>();
+    List<T> returnList = new ArrayList<>();
     Query<T> currentQuery = query;
     String nextUrl = null;
     do {
@@ -147,11 +149,28 @@ public class Operations {
       transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
       transaction.query(currentQuery);
 
-      if (!transaction.execute()) {
+      // If execution fails -> create transaction exception
+      /*if (!transaction.execute()) {
         Record returnRecord = transaction.getRecord(currentQuery.getReferenceId(), currentQuery.getEntityClass());
         throw constructTransactionException(returnRecord.getErrors());
+      }*/
+
+      if (!transaction.execute()) {
+        QueryResult queryResult = transaction.getQueryResult(currentQuery.getReferenceId());
+        if (queryResult.errors != null && !queryResult.errors.isEmpty()) {
+          String exceptionMessage =
+              queryResult.errors.stream().map(err -> err.getErrorCode() + " " + err.getMessage()).collect(
+              Collectors.joining(", "));
+          throw new TransactionException(exceptionMessage);
+        } else {
+          String exceptionMessage = "Unknown exception";
+          throw new TransactionException(exceptionMessage);
+        }
       }
-      recordList.addAll(transaction.getQueryResult(currentQuery.getReferenceId(), currentQuery.getEntityClass()));
+
+      //TODO: continue here. Should we move the query exctraction code into the QureyResult class?
+      returnList.addAll(transaction.getQueryResultList(currentQuery.getReferenceId(),
+          query.getEntityClass()));
 
       if (!transaction.done(currentQuery.getReferenceId())) {
         nextUrl = transaction.nextRecordsUrl(currentQuery.getReferenceId());
@@ -159,7 +178,7 @@ public class Operations {
         thereAreMoreRecords = false;
       }
     } while (thereAreMoreRecords);
-    return recordList;
+    return returnList;
   }
 
   private static TransactionException constructTransactionException(
