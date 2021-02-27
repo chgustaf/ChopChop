@@ -222,7 +222,7 @@ try {
 }
 ```
 
-To get a record (i.e. fetch all declared fields in the class):
+To get a record (i.e. it will fetch all declared and JsonProperty-annotated fields in the class):
 ```java
 Primary_Test_Object__c testObject = new Primary_Test_Object__c();
 testObject.setId("a0009000003yZTwAAM");

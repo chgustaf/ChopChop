@@ -80,7 +80,7 @@ public class BaseHTTPClient {
 
     if (!acceptableResponseCodes.get(httpMethod).contains(response.getStatusLine().getStatusCode())) {
       throw new TransactionException("Request failed : HTTP error code " +
-                                     response.getStatusLine().getStatusCode() + " " +getResponseText(response));
+                                     response.getStatusLine().getStatusCode() + " " +getResponseText(response), response.getStatusLine().getReasonPhrase());
     }
   }
 

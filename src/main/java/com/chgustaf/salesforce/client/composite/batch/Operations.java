@@ -34,8 +34,8 @@ public class Operations {
     return returnList;
   }
 
-  public static <T extends Record> List<T> getRecords(List<T> records,
-                                                         SalesforceCompositeBatchClient salesforceCompositeBatchClient)
+  public static <T extends Record> List<T> get(List<T> records,
+                                               SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction =
         new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
@@ -43,8 +43,12 @@ public class Operations {
       transaction.get(record);
     }
     if (!transaction.execute()) {
-      System.out.println("Unable to get records");
-      return null;
+      List<TransactionError> errors = new ArrayList<>();
+      for (T record : records) {
+        errors.addAll(transaction.getRecord(record.getReferenceId(),
+            record.getEntityClass()).getErrors());
+      }
+      throw constructTransactionException(errors);
     }
 
     List<T> returnList = new ArrayList<>();
@@ -149,22 +153,18 @@ public class Operations {
       transaction = new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
       transaction.query(currentQuery);
 
-      // If execution fails -> create transaction exception
-      /*if (!transaction.execute()) {
-        Record returnRecord = transaction.getRecord(currentQuery.getReferenceId(), currentQuery.getEntityClass());
-        throw constructTransactionException(returnRecord.getErrors());
-      }*/
-
       if (!transaction.execute()) {
         QueryResult queryResult = transaction.getQueryResult(currentQuery.getReferenceId());
         if (queryResult.errors != null && !queryResult.errors.isEmpty()) {
           String exceptionMessage =
               queryResult.errors.stream().map(err -> err.getErrorCode() + " " + err.getMessage()).collect(
               Collectors.joining(", "));
-          throw new TransactionException(exceptionMessage);
+          throw new TransactionException(exceptionMessage,
+              queryResult.errors.stream().findFirst().map(TransactionError::getErrorCode).orElse(
+                  "UNKNOWN_ERROR"));
         } else {
           String exceptionMessage = "Unknown exception";
-          throw new TransactionException(exceptionMessage);
+          throw new TransactionException(exceptionMessage, "UNKNOWN_ERROR");
         }
       }
 
@@ -187,6 +187,8 @@ public class Operations {
     for (TransactionError transactionError : transactionErrors) {
       errorMessage += transactionError.getErrorCode()+ " - " + transactionError.getMessage();
     }
-    return new TransactionException(errorMessage);
+    String code = (transactionErrors.size() > 1) ? "MULTIPLE_ERRORS" :
+                  transactionErrors.get(0).getErrorCode();
+    return new TransactionException(errorMessage, code);
   }
 }

@@ -1,10 +1,8 @@
 package com.chgustaf.examples.caseupdater;
 
-import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.get;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
-import static com.chgustaf.salesforce.client.composite.batch.Operations.updateRecords;
 
-import com.chgustaf.examples.caseupdater.exampleclient.domain.Case;
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
 import com.chgustaf.salesforce.authentication.exceptions.TransactionException;
 import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
@@ -13,6 +11,7 @@ import com.chgustaf.salesforce.client.composite.domain.Query;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,11 +43,52 @@ public class CaseUpdate {
     primaryTestObject.setTestTextEncrypted("Test encrypted");
     primaryTestObject.setTestTime("11:00:01");
     primaryTestObject.setTestUrl("https://google.com");
-    try {
-      primaryTestObject = create(primaryTestObject, salesforceCompositeBatchClient);
+
+    Primary_Test_Object__c secondaryTestObject = new Primary_Test_Object__c();
+    secondaryTestObject.setTestEmail("contact1@innovationmadness.com");
+    secondaryTestObject.setTestCheckbox(true);
+    secondaryTestObject.setTestCurrency(123.456f);
+    secondaryTestObject.setTestDate(Date.from(Instant.now()));
+    secondaryTestObject.setTestDateTime(Instant.now().atZone(ZoneId.of("UTC")));
+    secondaryTestObject.setTestGeolocationLatitude(59.334591d);
+    secondaryTestObject.setTestGeolocationLatitude(18.063242d);
+    secondaryTestObject.setTestMultiSelectPicklist("Test Value One; Test Value Two");
+    secondaryTestObject.setTestNumber(1234);
+    secondaryTestObject.setTestPercentage(98.89f);
+    secondaryTestObject.setTestPhone("+46727313212");
+    secondaryTestObject.setTestPicklist("Value Two");
+    secondaryTestObject.setTestText("Text");
+    secondaryTestObject.setTestTextArea("Text Area");
+    secondaryTestObject.setTestTextAreaLong("Text Area Long");
+    secondaryTestObject.setTestTextAreaRich("<html><h1>Text Area Rich</h1></html>");
+    secondaryTestObject.setTestTextEncrypted("Test encrypted");
+    secondaryTestObject.setTestTime("11:00:01");
+    secondaryTestObject.setTestUrl("https://google.com");
+    List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+    testObjects.add(primaryTestObject);
+    testObjects.add(secondaryTestObject);
+
+    Query<Primary_Test_Object__c> query1 =
+        new Query<>("SELECT id FROM Primary_Test_Object__c WHERE Test_Percentage__c != null LIMIT 2",
+            Primary_Test_Object__c.class);
+    List<Primary_Test_Object__c> queriedTestObjects = query(query1, salesforceCompositeBatchClient);
+
+    System.out.println(primaryTestObject.getAllFields());
+    List<Primary_Test_Object__c> getList = get(queriedTestObjects,
+        salesforceCompositeBatchClient);
+
+    for (Primary_Test_Object__c obj : getList) {
+      System.out.println(obj.toString());
+    }
+
+
+    /*try {
+      //primaryTestObject = create(primaryTestObject, salesforceCompositeBatchClient);
     } catch (TransactionException e) {
       e.printStackTrace();
-    }
+    }*/
+
+
 /*
     String queryString = "SELECT Test_Checkbox__c, Test_Currency__c, Test_Date__c, "
                         + "Test_Datetime__c, "
@@ -97,8 +137,8 @@ public class CaseUpdate {
     returnList.forEach(obj -> obj.setTestText("test"));
     updateRecords(returnList, salesforceCompositeBatchClient);
 */
-
-    String queryString = "SELECT id, subjec7, accountId FROM Case LIMIT 100";
+/*
+    String queryString = "SELECT id, subject, accountId FROM Case LIMIT 100";
     Query<Case> caseQuery = new Query<>(queryString, Case.class);
     List<Case> casesAgain = null;
     try {
@@ -109,7 +149,7 @@ public class CaseUpdate {
       System.out.println("This is an exception catch");
       e.printStackTrace();
     }
-
+*/
 
 /*
     String queryStringTest = "SELECT id, Test_Formula_Field__c FROM Primary_Test_Object__c LIMIT "
