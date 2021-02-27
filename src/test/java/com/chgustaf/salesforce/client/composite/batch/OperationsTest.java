@@ -49,7 +49,6 @@ public class OperationsTest {
 
   @Test
   void getRecord_fail() throws TransactionException, IOException, AuthenticationException {
-    // TODO: Continue write tests for the Operations class
     String id = "0013V000009ikVtQAI";
     String responseJson = "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode"
                           + "\":\"UNKNOWN_EXCEPTION\",\"message\":\"An unexpected error occurred. "
@@ -91,6 +90,8 @@ public class OperationsTest {
       assertTrue(testObject.getTestCheckbox());
     }
   }
+
+  // TODO: Continue write tests for the Operations class. Update, create and delete left.
 
   @Test
   void getRecords_fail() throws TransactionException, IOException, AuthenticationException {
