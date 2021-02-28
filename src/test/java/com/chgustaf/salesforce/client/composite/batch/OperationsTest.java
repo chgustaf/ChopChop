@@ -2,8 +2,10 @@ package com.chgustaf.salesforce.client.composite.batch;
 
 import static com.chgustaf.salesforce.client.TestUtils.getCompositeBatchTransaction;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.delete;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.get;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.update;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -234,5 +236,168 @@ public class OperationsTest {
     TransactionException exception = assertThrows(TransactionException.class, () -> create(testObjects,
         salesforceCompositeBatchClient));
     assertTrue(exception.getMessage().contains("INVALID_FIELD"));
+  }
+
+  @Test
+  void updateRecord_success() throws TransactionException, IOException, AuthenticationException {
+    String id = "0013V000009id1YQAQ";
+    String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,\"result\":null}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setId(id);
+    testObject.setTestNumber(123);
+    testObject = update(testObject, salesforceCompositeBatchClient);
+    assertEquals(id, testObject.getId());
+  }
+
+  @Test
+  void updateRecord_fail() throws TransactionException, IOException, AuthenticationException {
+    String id = "0013V000009id1YQAQ";
+    String responseJson =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"No such column &#39;Test_Number2__c&#39; on sobject of type Primary_Test_Object__c\"}],\"statusCode\":400}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setId(id);
+    testObject.setTestNumber(123);
+    TransactionException exception = assertThrows(TransactionException.class,
+        () -> update(testObject,
+        salesforceCompositeBatchClient));
+    assertEquals("INVALID_FIELD", exception.getCode());
+  }
+
+  @Test
+  void updateRecords_success() throws TransactionException, IOException, AuthenticationException {
+    String id1 = "0013V000009id1YQAQ";
+    String id2 = "0013V000009id1YQAQ";
+    String responseJson =
+        "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,\"result\":null},{\"statusCode\":204,\"result\":null}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+    Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+    testObject1.setId(id1);
+    testObject1.setTestNumber(123);
+    testObjects.add(testObject1);
+    Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+    testObject2.setId(id2);
+    testObject2.setTestNumber(456);
+    testObjects.add(testObject2);
+
+    testObjects = update(testObjects, salesforceCompositeBatchClient);
+    assertEquals(2, testObjects.size());
+  }
+
+  @Test
+  void updateRecords_fail() throws TransactionException, IOException, AuthenticationException {
+    String id1 = "0013V000009id1YQAQ";
+    String id2 = "0013V000009id1YQAQ";
+    String responseJson =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"No such column &#39;Test_Number2__c&#39; on sobject of type Primary_Test_Object__c\"}],\"statusCode\":400},{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"No such column &#39;Test_Number2__c&#39; on sobject of type Primary_Test_Object__c\"}],\"statusCode\":400}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+    Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+    testObject1.setId(id1);
+    testObject1.setTestNumber(123);
+    testObjects.add(testObject1);
+    Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+    testObject2.setId(id2);
+    testObject2.setTestNumber(456);
+    testObjects.add(testObject2);
+
+    TransactionException exception = assertThrows(TransactionException.class,
+        () -> update(testObjects,
+        salesforceCompositeBatchClient));
+    assertTrue(exception.getMessage().contains("INVALID_FIELD"));
+  }
+
+  @Test
+  void deleteRecord_success() throws TransactionException, IOException, AuthenticationException {
+    String id = "0013V000009id1YQAQ";
+    String responseJson =
+        "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,\"result\":null}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setId(id);
+    testObject = delete(testObject, salesforceCompositeBatchClient);
+    assertEquals(id, testObject.getId());
+  }
+
+  @Test
+  void deleteRecord_fail() throws TransactionException, IOException, AuthenticationException {
+    String id = "0013V000009id1YQAQ";
+    String responseJson =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"NOT_FOUND\",\"message\":\"Provided external ID field does not exist or is not accessible: 1234\"}],\"statusCode\":404}]}";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setId(id);
+    testObject.setTestNumber(123);
+    TransactionException exception = assertThrows(TransactionException.class,
+        () -> update(testObject,
+            salesforceCompositeBatchClient));
+    assertEquals("NOT_FOUND", exception.getCode());
+  }
+
+  @Test
+  void deleteRecords_fail() throws TransactionException, IOException, AuthenticationException {
+    String id1 = "0013V000009id1YQAQ";
+    String id2 = "0013V000009id1YQAQ";
+    String responseJson =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"NOT_FOUND\",\"message\":\"Provided external ID field does not exist or is not accessible: 123456\"}],\"statusCode\":404},{\"result\":[{\"errorCode\":\"NOT_FOUND\",\"message\":\"Provided external ID field does not exist or is not accessible: 123456\"}],\"statusCode\":404}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+    Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+    testObject1.setId(id1);
+    testObjects.add(testObject1);
+    Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+    testObject2.setId(id2);
+    testObjects.add(testObject2);
+
+    TransactionException exception = assertThrows(TransactionException.class,
+        () -> delete(testObjects,
+            salesforceCompositeBatchClient));
+    assertTrue(exception.getMessage().contains("NOT_FOUND"));
+  }
+
+  @Test
+  void deleteRecords_success() throws TransactionException, IOException, AuthenticationException {
+    String id1 = "0013V000009id1YQAQ";
+    String id2 = "0013V000009id1YQAQ";
+    String responseJson =
+        "{\"hasErrors\":false,\"results\":[{\"statusCode\":204,\"result\":null},{\"statusCode\":204,\"result\":null}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+    Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+    testObject1.setId(id1);
+    testObjects.add(testObject1);
+    Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+    testObject2.setId(id2);
+    testObjects.add(testObject2);
+
+    testObjects = delete(testObjects, salesforceCompositeBatchClient);
+    assertEquals(2, testObjects.size());
+    testObjects.forEach(obj -> assertTrue(obj.getSuccess()));
   }
 }

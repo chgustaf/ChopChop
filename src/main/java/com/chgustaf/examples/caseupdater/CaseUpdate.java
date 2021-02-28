@@ -1,7 +1,6 @@
 package com.chgustaf.examples.caseupdater;
 
-import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
-import static com.chgustaf.salesforce.client.composite.batch.Operations.get;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.delete;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
 
 import com.chgustaf.salesforce.authentication.exceptions.AuthenticationException;
@@ -10,10 +9,6 @@ import com.chgustaf.salesforce.client.SalesforceCompositeBatchClient;
 import com.chgustaf.salesforce.client.composite.domain.Primary_Test_Object__c;
 import com.chgustaf.salesforce.client.composite.domain.Query;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CaseUpdate {
@@ -23,7 +18,7 @@ public class CaseUpdate {
       throws IOException, AuthenticationException, TransactionException {
     SalesforceCompositeBatchClient
         salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
-
+/*
     Primary_Test_Object__c primaryTestObject = new Primary_Test_Object__c();
     primaryTestObject.setTestEmail("contact@innovationmadness.com");
     primaryTestObject.setTestCheckbox(true);
@@ -68,23 +63,23 @@ public class CaseUpdate {
     List<Primary_Test_Object__c> testObjects = new ArrayList<>();
     testObjects.add(primaryTestObject);
     testObjects.add(secondaryTestObject);
-
+*/
     //testObjects = create(testObjects, salesforceCompositeBatchClient);
-    primaryTestObject = create(primaryTestObject, salesforceCompositeBatchClient);
+    //primaryTestObject = create(primaryTestObject, salesforceCompositeBatchClient);
 
     Query<Primary_Test_Object__c> query1 =
-        new Query<>("SELECT id FROM Primary_Test_Object__c WHERE Test_Percentage__c != null LIMIT 2",
+        new Query<>("SELECT id FROM Primary_Test_Object__c WHERE Test_Percentage__c != null LIMIT"
+                    + " 1",
             Primary_Test_Object__c.class);
     List<Primary_Test_Object__c> queriedTestObjects = query(query1, salesforceCompositeBatchClient);
-
-    System.out.println(primaryTestObject.getAllFields());
-    List<Primary_Test_Object__c> getList = get(queriedTestObjects,
-        salesforceCompositeBatchClient);
-
-    for (Primary_Test_Object__c obj : getList) {
-      System.out.println(obj.toString());
-    }
-
+    Primary_Test_Object__c primary_test_object__c = queriedTestObjects.get(0);
+    primary_test_object__c.setId("1234");
+    primary_test_object__c = delete(primary_test_object__c, salesforceCompositeBatchClient);
+/*
+    Primary_Test_Object__c primary_test_object__c = new Primary_Test_Object__c();
+    primary_test_object__c.setId("a0009000003yniUAAQ");
+    primary_test_object__c.setTestNumber(23);
+    primary_test_object__c = update(primary_test_object__c, salesforceCompositeBatchClient);
 
     /*try {
       //primaryTestObject = create(primaryTestObject, salesforceCompositeBatchClient);

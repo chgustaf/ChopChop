@@ -52,17 +52,12 @@ public class CompositeBatchResultHandler {
                                                                           final CompositeBatchResponse theResponse,
                                                                           final int i) {
     Optional<CombinedRequestResponse> combinedRequestResponse;
-    if (theRequest.getMethod().equals("DELETE") || theRequest.getMethod().equals("PATCH")) {
-      combinedRequestResponse =
-          Optional.of(
-              new CombinedRequestResponse(
-                  theRequest, null, theResponse.getResults()[i].getStatusCode()));
-    } else {
+
       combinedRequestResponse = Optional.of(new CombinedRequestResponse(
           theRequest,
           theResponse.getResults()[i].getResult(),
           theResponse.getResults()[i].getStatusCode()));
-    }
+
     return combinedRequestResponse;
   }
 
@@ -78,38 +73,14 @@ public class CompositeBatchResultHandler {
       mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
       mapper.registerModule(new JavaTimeModule());
 
-      String json;
-      T record;
-      boolean success;
       switch (result.get().getRequest().getMethod()) {
         case "POST" :
-          // Merge the json that was sent with the id that was returned and create a new record
-          // of type T
-          success = (theResult.getStatusCode() == 201);
-          json = theResult.getRequest().getRichInput();
-          JsonNode innerResult = theResult.getResult();
-          record = mapper.readValue(json, clazz);
-          if (success) {
-            record.setId(innerResult.get("id").textValue());
-          } else {
-            ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionError>>() {});
-            List<TransactionError> errorList = reader.readValue(innerResult);
-            record.setErrors(errorList);
-          }
-          record.setSuccess(success);
-          record.setReferenceId(UUID.randomUUID().toString());
-          return record;
+          return retrievePostRecord(theResult, mapper, clazz);
         case "GET" :
           return retrieveGetRecord(theResult, mapper, clazz);
         case "PATCH" :
         case "DELETE" :
-          success = (result.get().getStatusCode() == 204);
-          json = result.get().getRequest().getRichInput();
-          record = mapper.readValue(json, clazz);
-          record.setReferenceId(UUID.randomUUID().toString());
-          record.setId(result.get().getRequest().getId());
-          record.setSuccess(success);
-          return record;
+          return retrievePatchDeleteRecord(theResult, mapper, clazz);
         default :
           return null;
       }
@@ -117,10 +88,29 @@ public class CompositeBatchResultHandler {
     return null;
   }
 
+  private <T extends  Record> T retrievePostRecord(CombinedRequestResponse result,
+                                                   ObjectMapper mapper, Class<T> clazz)
+      throws IOException {
+    boolean success = (result.getStatusCode() > 199 && result.getStatusCode() < 300);
+    String json = result.getRequest().getRichInput();
+    JsonNode innerResult = result.getResult();
+    T record = mapper.readValue(json, clazz);
+    if (success) {
+      record.setId(innerResult.get("id").textValue());
+    } else {
+      ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionError>>() {});
+      List<TransactionError> errorList = reader.readValue(innerResult);
+      record.setErrors(errorList);
+    }
+    record.setSuccess(success);
+    record.setReferenceId(UUID.randomUUID().toString());
+    return record;
+  }
+
   private <T extends Record> T retrieveGetRecord(CombinedRequestResponse result,
                                                  ObjectMapper mapper, Class<T> clazz)
       throws IOException {
-    boolean success = (result.getStatusCode() == 200);
+    boolean success = (result.getStatusCode() > 199 && result.getStatusCode() < 300);
     String json = result.getRequest().getRichInput();
     JsonNode innerResult = result.getResult();
     T record = mapper.readValue(json, clazz);
@@ -137,7 +127,25 @@ public class CompositeBatchResultHandler {
     return record;
   }
 
-  Optional<CombinedRequestResponse> findRequestResponse(String referenceId) {
+  private <T extends Record> T retrievePatchDeleteRecord(CombinedRequestResponse result,
+                                                         ObjectMapper mapper, Class<T> clazz)
+      throws IOException {
+    boolean success = (result.getStatusCode() > 199 && result.getStatusCode() < 300);
+    String json = result.getRequest().getRichInput();
+    T record = mapper.readValue(json, clazz);
+    JsonNode innerResult = result.getResult();
+    if (!success) {
+      ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionError>>() {});
+      List<TransactionError> errorList = reader.readValue(innerResult);
+      record.setErrors(errorList);
+    }
+    record.setReferenceId(UUID.randomUUID().toString());
+    record.setId(result.getRequest().getId());
+    record.setSuccess(success);
+    return record;
+  }
+
+  Optional<CombinedRequestResponse>  findRequestResponse(String referenceId) {
     return results.stream()
         .filter(res -> res.getRequest() != null)
         .filter(res -> res.getRequest().getReferenceId().equals(referenceId))

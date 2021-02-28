@@ -23,19 +23,9 @@ public class Operations {
       transaction.create(record);
     }
     if (!transaction.execute()) {
-      List<TransactionError> errors = new ArrayList<>();
-      for (T record : records) {
-        errors.addAll(transaction.getRecord(record.getReferenceId(),
-            record.getEntityClass()).getErrors());
-      }
-      throw constructTransactionException(errors);
+      throw buildTransactionException(records, transaction);
     }
-
-    List<T> returnList = new ArrayList<>();
-    for (T record : records) {
-      returnList.add((T)transaction.getRecord(record.getReferenceId(), record.getEntityClass()));
-    }
-    return returnList;
+    return retrieveResults(records, transaction);
   }
 
   public static <T extends Record> List<T> get(List<T> records,
@@ -47,23 +37,13 @@ public class Operations {
       transaction.get(record);
     }
     if (!transaction.execute()) {
-      List<TransactionError> errors = new ArrayList<>();
-      for (T record : records) {
-        errors.addAll(transaction.getRecord(record.getReferenceId(),
-            record.getEntityClass()).getErrors());
-      }
-      throw constructTransactionException(errors);
+      throw buildTransactionException(records, transaction);
     }
-
-    List<T> returnList = new ArrayList<>();
-    for (T record : records) {
-      returnList.add((T)transaction.getRecord(record.getReferenceId(), record.getEntityClass()));
-    }
-    return returnList;
+    return retrieveResults(records, transaction);
   }
 
-  public static <T extends Record> List<T> updateRecords(List<T> records,
-                                                      SalesforceCompositeBatchClient salesforceCompositeBatchClient)
+  public static <T extends Record> List<T> update(List<T> records,
+                                                  SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction =
         new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
@@ -71,15 +51,10 @@ public class Operations {
       transaction.update(record);
     }
     if (!transaction.execute()) {
-      System.out.println("Unable to update records");
-      return null;
+      throw buildTransactionException(records, transaction);
     }
 
-    List<T> returnList = new ArrayList<>();
-    for (T record : records) {
-      returnList.add((T)transaction.getRecord(record.getReferenceId(), record.getEntityClass()));
-    }
-    return returnList;
+    return retrieveResults(records, transaction);
   }
 
   public static <T extends Record> T get(T record,
@@ -141,6 +116,21 @@ public class Operations {
     return (T) transaction.getRecord(record.getReferenceId(), record.getEntityClass());
   }
 
+  public static <T extends Record> List<T> delete(List<T> records,
+                                                  SalesforceCompositeBatchClient salesforceCompositeBatchClient)
+      throws IOException, AuthenticationException, TransactionException {
+    CompositeBatchTransaction transaction =
+        new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
+    for (T record : records) {
+      transaction.delete(record);
+    }
+    if (!transaction.execute()) {
+      throw buildTransactionException(records, transaction);
+    }
+    return retrieveResults(records, transaction);
+  }
+
+
   public static <T extends Record> List<T> query(Query<T> query,
                                                  SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException, TransactionException {
@@ -185,6 +175,17 @@ public class Operations {
     return returnList;
   }
 
+  private static <T extends Record>  List<TransactionError> collectTransactionErrors(
+      List<T> records,
+      CompositeBatchTransaction transaction) throws IOException {
+    List<TransactionError> errors = new ArrayList<>();
+    for (T record : records) {
+      errors.addAll(transaction.getRecord(record.getReferenceId(),
+          record.getEntityClass()).getErrors());
+    }
+    return errors;
+  }
+
   private static TransactionException constructTransactionException(
       List<TransactionError> transactionErrors) {
     String errorMessage = "";
@@ -194,5 +195,20 @@ public class Operations {
     String code = (transactionErrors.size() > 1) ? "MULTIPLE_ERRORS" :
                   transactionErrors.get(0).getErrorCode();
     return new TransactionException(errorMessage, code);
+  }
+
+  private static <T extends Record> TransactionException buildTransactionException(List<T> records, CompositeBatchTransaction transaction)
+      throws IOException, TransactionException {
+    throw constructTransactionException(collectTransactionErrors(records, transaction));
+  }
+
+  private static <T extends Record> List<T> retrieveResults(List<T> records,
+                                                            CompositeBatchTransaction transaction)
+      throws IOException {
+    List<T> returnList = new ArrayList<>();
+    for (T record : records) {
+      returnList.add((T)transaction.getRecord(record.getReferenceId(), record.getEntityClass()));
+    }
+    return returnList;
   }
 }

@@ -185,6 +185,8 @@ public class Primary_Test_Object__c extends Record {
     }
 }
 ```
+ChopChop supports all known salesforce field types. Check the example class 
+Primary_Test_Object__c in the domain package for how to add each type of field.
 
 ### Start writing your code
 You should by this stage be ready to start doing the real work; writing your code.
