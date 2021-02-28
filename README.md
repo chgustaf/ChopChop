@@ -200,7 +200,9 @@ Primary_Test_Object__c in the domain package for how to add each type of field.
 
 ### Start writing your code
 You should by this stage be ready to start doing the real work; writing your code.
-It's rather simple. To create a record:
+It's very simple! 
+
+To create a record:
 ```java
 SalesforceCompositeBatchClient salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
 Primary_Test_Object__c testObject = new Primary_Test_Object__c();
@@ -211,6 +213,23 @@ try {
   e.printStackTrace();
 }
 ```
+To create several records:
+```java
+SalesforceCompositeBatchClient salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
+List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+testObject1.setTestCheckbox(true);
+testObjects.add(testObject1);
+Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+testObject2.setTestCheckbox(true);
+testObjects.add(testObject2);
+try {
+  primaryTestObject = create(testObjects, salesforceCompositeBatchClient);
+} catch (TransactionException e) {
+  e.printStackTrace();
+}
+```
+
 
 To update a record:
 ```java
