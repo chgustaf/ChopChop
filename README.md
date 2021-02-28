@@ -5,7 +5,7 @@ ChopChop - A Salesforce Client that will quickly get you started
 
 ![Maven Package](https://github.com/chgustaf/ChopChop/workflows/Maven%20Package/badge.svg)
 ![Java CI with Maven](https://github.com/chgustaf/ChopChop/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
-![Test Coverage](https://github.com/chgustaf/ChopChop/workflows/Maven%20Package/jacoco.svg)
+<img src=".github/badges/jacoco.svg" alt="Jacoco results"/> <img src=".github/badges/branches.svg" alt="Branch coverage"/>
 
 
 The ChopChop client is distributed through Github Packages. Setup your maven application so that 
