@@ -1,17 +1,27 @@
 
 
-ChopChop - A Salesforce Client that will quickly get you started
+ChopChop - A Salesforce Java Client that gets you started quickly
 ===============
 
 ![Maven Package](https://github.com/chgustaf/ChopChop/workflows/Maven%20Package/badge.svg)
 ![Java CI with Maven](https://github.com/chgustaf/ChopChop/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
 <img src=".github/badges/jacoco.svg" alt="Jacoco results"/> <img src=".github/badges/branches.svg" alt="Branch coverage"/>
 
+The idea behind ChopChop is to reduce the complexity of getting a java application up and 
+running that integrates to your Salesforce org. It is aimed a being used as a prototyping tool 
+more than for production usage. 
+The client/library helps you with two main parts:
+* Authentication
+* CRUD operations of records
+
+You can choose from two ways Oauth flows for authentication: Oauth 2.0. Username-Password and 
+the Oauth 2.0 JWT Bearer Flow.
+The way you create, read, update and delete records have been designed to look as the way you do 
+it in Apex code. See the section "Start writing your code" for snippets of code.
 
 The ChopChop client is distributed through Github Packages. Setup your maven application so that 
 you can import github packages through the dependencies in your pom.xml file. You'll find 
 instructions on how to do this here:
-
 
 How to use:
 
@@ -185,7 +195,7 @@ public class Primary_Test_Object__c extends Record {
     }
 }
 ```
-ChopChop supports all known salesforce field types. Check the example class 
+ChopChop supports all salesforce field types. Check the example class 
 Primary_Test_Object__c in the domain package for how to add each type of field.
 
 ### Start writing your code
@@ -214,6 +224,24 @@ try {
   e.printStackTrace();
 }
 ```
+To update several records:
+```java
+List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+testObject1.setId("a0009000003yZTwAAM");
+testObject1.setTestCheckbox(true);
+testObjects.add(testObject1);
+Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+testObject2.setId("a0009000003yZTwAAM");
+testObject2.setTestCheckbox(true);
+testObjects.add(testObject2);
+try {
+  testObjects = update(testObjects, salesforceCompositeBatchClient);
+} catch (TransactionException e) {
+  e.printStackTrace();
+}
+```
+
 
 To delete a record:
 ```java
@@ -221,6 +249,20 @@ Primary_Test_Object__c testObject = new Primary_Test_Object__c();
 testObject.setId("a0009000003yZTwAAM");
 try {
   primaryTestObject = delete(primaryTestObject, salesforceCompositeBatchClient);
+} catch (TransactionException e) {
+  e.printStackTrace();
+}
+```
+To delete several records:
+```java
+List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+testObject1.setId("a0009000003yZTwAAM");
+Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+testObject2.setId("a0009000003yZTwAAM");
+testObjects.add(testObject2);
+try {
+  testObjects = delete(testObjects, salesforceCompositeBatchClient);
 } catch (TransactionException e) {
   e.printStackTrace();
 }
