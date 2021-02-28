@@ -204,7 +204,8 @@ It's very simple!
 
 To create a record:
 ```java
-SalesforceCompositeBatchClient salesforceCompositeBatchClient = new SalesforceCompositeBatchClient();
+SalesforceCompositeBatchClient salesforceCompositeBatchClient = 
+    new SalesforceCompositeBatchClient();
 Primary_Test_Object__c testObject = new Primary_Test_Object__c();
 testObject.setTestCheckbox(true);
 try {
@@ -224,7 +225,7 @@ Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
 testObject2.setTestCheckbox(true);
 testObjects.add(testObject2);
 try {
-  primaryTestObject = create(testObjects, salesforceCompositeBatchClient);
+  testObjects = create(testObjects, salesforceCompositeBatchClient);
 } catch (TransactionException e) {
   e.printStackTrace();
 }
@@ -233,6 +234,8 @@ try {
 
 To update a record:
 ```java
+SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+    new SalesforceCompositeBatchClient();
 Primary_Test_Object__c testObject = new Primary_Test_Object__c();
 testObject.setId("a0009000003yZTwAAM");
 testObject.setTestCheckbox(true);
@@ -245,6 +248,8 @@ try {
 ```
 To update several records:
 ```java
+SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+    new SalesforceCompositeBatchClient();
 List<Primary_Test_Object__c> testObjects = new ArrayList<>();
 Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
 testObject1.setId("a0009000003yZTwAAM");
@@ -264,6 +269,8 @@ try {
 
 To delete a record:
 ```java
+SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+    new SalesforceCompositeBatchClient();
 Primary_Test_Object__c testObject = new Primary_Test_Object__c();
 testObject.setId("a0009000003yZTwAAM");
 try {
@@ -274,6 +281,8 @@ try {
 ```
 To delete several records:
 ```java
+SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+    new SalesforceCompositeBatchClient();
 List<Primary_Test_Object__c> testObjects = new ArrayList<>();
 Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
 testObject1.setId("a0009000003yZTwAAM");
@@ -289,6 +298,8 @@ try {
 
 To get a record (i.e. it will fetch all declared and JsonProperty-annotated fields in the class):
 ```java
+SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+    new SalesforceCompositeBatchClient();
 Primary_Test_Object__c testObject = new Primary_Test_Object__c();
 testObject.setId("a0009000003yZTwAAM");
 try {
@@ -300,6 +311,8 @@ try {
 
 To query for records:
 ```java
+SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+    new SalesforceCompositeBatchClient();
 String queryStringCases = "SELECT Subject FROM Case";
 List<Case> caseList = null;
 try {
