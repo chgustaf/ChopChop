@@ -1,6 +1,7 @@
 package com.chgustaf.salesforce.client.composite.batch;
 
 import static com.chgustaf.salesforce.client.TestUtils.getCompositeBatchTransaction;
+import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.get;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -154,6 +155,84 @@ public class OperationsTest {
 
   @Test
   void query_multiPageResultsSet() {
+    //TODO: Fix this multi part test method
+  }
 
+  @Test
+  void createRecord_success() throws TransactionException, IOException, AuthenticationException {
+    String id = "0013V000009id1YQAQ";
+    String responseJson = "{\"hasErrors\":false,\"results\":[{\"statusCode\":201,\"result\":\n"
+                          + "{\"id\":\""+id+"\",\"success\":true,\"errors\":[]}}]}";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setTestNumber(123);
+    testObject = create(testObject, salesforceCompositeBatchClient);
+    assertEquals(id, testObject.getId());
+  }
+
+  @Test
+  void createRecord_fail() throws TransactionException, IOException, AuthenticationException {
+    String id = "0013V000009id1YQAQ";
+    String responseJson =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"No such column &#39;Test_Text1__c&#39; on sobject of type Primary_Test_Object__c\"}],\"statusCode\":400}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject = new Primary_Test_Object__c();
+    testObject.setTestNumber(123);
+
+    TransactionException exception = assertThrows(TransactionException.class, () -> create(testObject,
+        salesforceCompositeBatchClient));
+    assertTrue(exception.getMessage().contains("INVALID_FIELD"));
+  }
+
+  @Test
+  void createRecords_success() throws TransactionException, IOException, AuthenticationException {
+    String id1 = "a0009000005IjFRAA0";
+    String id2 = "a0009000005IjFSAA0";
+    String responseJson =
+        "{\"hasErrors\":false,\"results\":[{\"statusCode\":201,\"result\":\n"
+            + "{\"id\":\"a0009000005IjFRAA0\",\"success\":true,\"errors\":[]}},{\"statusCode\":201,\"result\":\n"
+            + "{\"id\":\"a0009000005IjFSAA0\",\"success\":true,\"errors\":[]}}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+    testObject1.setTestNumber(123);
+    Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+    testObject2.setTestNumber(456);
+    List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+    testObjects.add(testObject1);
+    testObjects.add(testObject2);
+
+    testObjects = create(testObjects, salesforceCompositeBatchClient);
+    assertEquals(id1, testObjects.get(0).getId());
+    assertEquals(id2, testObjects.get(1).getId());
+  }
+
+  @Test
+  void createRecords_fail() throws TransactionException, IOException, AuthenticationException {
+    String responseJson =
+        "{\"hasErrors\":true,\"results\":[{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"\\nTest_Phone__c,Test_Picklist__c,Test_Text1__c,Test_Text_Area__c\\n                               ^\\nERROR at Row:1:Column:268\\nNo such column &#39;Test_Text1__c&#39; on entity &#39;Primary_Test_Object__c&#39;. If you are attempting to use a custom field, be sure to append the &#39;__c&#39; after the custom field name. Please reference your WSDL or the describe call for the appropriate names.\"}],\"statusCode\":400},{\"result\":[{\"errorCode\":\"INVALID_FIELD\",\"message\":\"\\nTest_Phone__c,Test_Picklist__c,Test_Text1__c,Test_Text_Area__c\\n                               ^\\nERROR at Row:1:Column:268\\nNo such column &#39;Test_Text1__c&#39; on entity &#39;Primary_Test_Object__c&#39;. If you are attempting to use a custom field, be sure to append the &#39;__c&#39; after the custom field name. Please reference your WSDL or the describe call for the appropriate names.\"}],\"statusCode\":400}]}\n";
+    SalesforceCompositeBatchClient salesforceCompositeBatchClient =
+        mock(SalesforceCompositeBatchClient.class);
+    when(salesforceCompositeBatchClient.compositeBatchCall(anyString())).thenReturn(responseJson);
+
+    Primary_Test_Object__c testObject1 = new Primary_Test_Object__c();
+    testObject1.setTestNumber(123);
+    Primary_Test_Object__c testObject2 = new Primary_Test_Object__c();
+    testObject2.setTestNumber(456);
+    List<Primary_Test_Object__c> testObjects = new ArrayList<>();
+    testObjects.add(testObject1);
+    testObjects.add(testObject2);
+
+    TransactionException exception = assertThrows(TransactionException.class, () -> create(testObjects,
+        salesforceCompositeBatchClient));
+    assertTrue(exception.getMessage().contains("INVALID_FIELD"));
   }
 }

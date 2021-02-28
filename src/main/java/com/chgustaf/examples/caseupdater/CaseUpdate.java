@@ -1,5 +1,6 @@
 package com.chgustaf.examples.caseupdater;
 
+import static com.chgustaf.salesforce.client.composite.batch.Operations.create;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.get;
 import static com.chgustaf.salesforce.client.composite.batch.Operations.query;
 
@@ -67,6 +68,9 @@ public class CaseUpdate {
     List<Primary_Test_Object__c> testObjects = new ArrayList<>();
     testObjects.add(primaryTestObject);
     testObjects.add(secondaryTestObject);
+
+    //testObjects = create(testObjects, salesforceCompositeBatchClient);
+    primaryTestObject = create(primaryTestObject, salesforceCompositeBatchClient);
 
     Query<Primary_Test_Object__c> query1 =
         new Query<>("SELECT id FROM Primary_Test_Object__c WHERE Test_Percentage__c != null LIMIT 2",

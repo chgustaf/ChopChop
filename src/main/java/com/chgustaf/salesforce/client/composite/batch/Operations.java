@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 
 public class Operations {
 
-  public static <T extends Record> List<T> createRecords(List<T> records,
-                                                         SalesforceCompositeBatchClient salesforceCompositeBatchClient)
+  public static <T extends Record> List<T> create(List<T> records,
+                                                  SalesforceCompositeBatchClient salesforceCompositeBatchClient)
       throws IOException, AuthenticationException, TransactionException {
     CompositeBatchTransaction transaction =
         new CompositeBatchTransaction(salesforceCompositeBatchClient, false);
@@ -23,8 +23,12 @@ public class Operations {
       transaction.create(record);
     }
     if (!transaction.execute()) {
-      System.out.println("Unable to create records");
-      return null;
+      List<TransactionError> errors = new ArrayList<>();
+      for (T record : records) {
+        errors.addAll(transaction.getRecord(record.getReferenceId(),
+            record.getEntityClass()).getErrors());
+      }
+      throw constructTransactionException(errors);
     }
 
     List<T> returnList = new ArrayList<>();
