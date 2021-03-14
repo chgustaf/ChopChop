@@ -14,6 +14,7 @@ The client/library helps you with two main parts:
 * Authentication
 * CRUD operations of records
 
+
 You can choose from two ways Oauth flows for authentication: Oauth 2.0. Username-Password and 
 the Oauth 2.0 JWT Bearer Flow.
 The way you create, read, update and delete records have been designed to look as the way you do 
